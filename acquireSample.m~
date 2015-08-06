@@ -148,7 +148,7 @@ end
 times = all_times(sample);
 indices = find(sample);
 [start_stop_times start_stop_indices] = ...
-	generateContiguousSamples(times, indices, all_times);
+	generateContiguousSamples(times, all_times);
 
 
 
@@ -206,8 +206,7 @@ indices = find(distance_from_center < circumParms.radius);
 
 end
 
-function [start_stop_times, start_stop_indices] = ...
-		generateContiguousSamples(sampleTimes, sampleIndices, allTimes)
+function [start_stop_times, start_stop_indices] = generateContiguousSamples(sampleTimes, allTimes)
 % This function detects contiguous times in the sample times and outputs,
 % and re-casts the times into a list of starts and stops. Each row is a
 % start stop pair. In between each start stop pair are contiguous times.
@@ -215,6 +214,8 @@ function [start_stop_times, start_stop_indices] = ...
 % It's a beta version. This is not the best way to detect contnuity. Just a
 % fast version and easy to cook up. I'm expecting that we'll change this.
 
+% Get list of all indices of sample times
+[~, sampleIndices] = ismember(sampleTimes,allTimes);
 % Generate a diff of these indices .. contiguous will separate by 1 step
 diff_samp_ind = diff(sampleIndices);
 
