@@ -191,7 +191,18 @@ throw(ME);
 
 end
 
-%% Helper functions
+
+
+
+
+
+
+
+
+
+
+
+%% Helper functions -----------------------------------------
 % --- Helper function: processTuple
 function winData = windowData(dat, anim, day, epo, tet, windowTimes)
     
