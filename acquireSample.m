@@ -243,8 +243,8 @@ contiguous_regions(end) = numel(sampleIndices);
 contiguous_regions = contiguous_regions';
 
 % Convert start and stop vector indicies into contiguous regions into times
-start_stop_times = allTimes(contiguous_regions);
-start_stop_indices = contiguous_regions;
+start_stop_indices = sampleIndices(contiguous_regions);
+start_stop_times = allTimes(start_stop_indices);
 
 end
 
