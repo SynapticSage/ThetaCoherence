@@ -146,7 +146,16 @@ end
 %i.e. correct times from sample logical
 times = times(sample);
 
-%% HELPER FUNCTIONS
+
+
+
+
+
+
+
+
+
+%% HELPER FUNCTIONS ------------------------------------
 
 function [ indices ] = circumscribePoint( trajectoryData, circumParms )
 %CIRCLESAMPLE returns indices for a circle of points around a position
