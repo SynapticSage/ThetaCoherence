@@ -118,7 +118,7 @@ for a = 1:numel(animal_list)
 	acquisition(a).data = cell(...
 		numel(dataToGet.animals.(anim).days), ...
 		numel(dataToGet.animals.(anim).epochs), ...
-		numel(dataToGet.animals.(anim).tetrodes));
+		numel(dataToGet.animals.(anim).tetrodes+1));
 	
     for d = dataToGet.animals.(anim).days
         
@@ -172,6 +172,7 @@ for a = 1:numel(animal_list)
 					start_stop_times);
                 
 			end % of tetrode loop
+			
 		end % of epoch loop
 	end % of day loop
 end % of animal loop
@@ -225,8 +226,7 @@ function winData = windowData(dat, anim, day, epo, tet, windowTimes)
     % could be a variety of names to a general name
     temp = [];
     eval(['temp = data_import.' dat '{' num2str(day) '}' ...
-		'{' num2str(epo) '}']);
-	temp = temp{1};
+		'{' num2str(epo) '}{' num2str(tet) '}']);
     
     % Now we need to estimate the time corresponding to the points in the
     % data
