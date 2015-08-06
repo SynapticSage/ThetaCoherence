@@ -1,4 +1,5 @@
-function [times, indices] = acquireSample(data, sampleParams)
+function [all_times, indices, start_stop_indices, start_stop_times] = ...
+	acquireSample(data, sampleParams)
 % acquireSample
 % 
 % This function will be used to simplify the process of selecting
@@ -49,8 +50,8 @@ function [times, indices] = acquireSample(data, sampleParams)
 % ---------------------
 % times ... all times that fall within sampleParams criteria
 
-times = data.linpos.statematrix.time;
-sample = ones(size(times));				% Sample, a logical vector describing 
+all_times = data.linpos.statematrix.time;
+sample = ones(size(all_times));				% Sample, a logical vector describing 
 										% time entries that belong in our sample .. 
 										% Each section of code below, a
 										% constraint test is performed, and
@@ -73,14 +74,14 @@ if(isfield(sampleParams,'trajbound_type'))
 	% describing which elements are in the pair of times. Use logical OR to
 	% gradually create a picture of all times to be investigated.
 	
-	logical_start_stop	= zeros(size(times));	% detects points in a single trajectory per loop iteration
-	all_times			= zeros(size(times));	% updates to catalogue all points per iteration
+	logical_start_stop	= zeros(size(all_times));	% detects points in a single trajectory per loop iteration
+	all_times			= zeros(size(all_times));	% updates to catalogue all points per iteration
 	
 	for i = 1:size(trajbound_startStops,1)
 		
 		% Find which times in the (start, stop) boundary
-		logical_start_stop = ( times > trajbound_startStops(i,1) ) & ...
-			( times < trajbound_startStops(i,2) );
+		logical_start_stop = ( all_times > trajbound_startStops(i,1) ) & ...
+			( all_times < trajbound_startStops(i,2) );
 		
 		% Add the points found for ith trajectory to total record of times
 		all_times = all_times | logical_start_stop;
@@ -133,7 +134,7 @@ if(isfield(sampleParams, 'circleParams'))
 		sampleParams.circleParams);
 	
 	% WE have indicies that belong, but we need a logical vector
-	circ_logical = zeros(size(times));
+	circ_logical = zeros(size(all_times));
 	circ_logical(circ_subset_indices) = ...
 		~circ_logical(circ_subset_indices);
 	
@@ -144,8 +145,14 @@ end
 
 %% Return total sample
 %i.e. correct times from sample logical
-times = times(sample);
+times = all_times(sample);
 indices = find(sample);
+start_stop_indices = generateContiguousSamples(times, all_times);
+start_stop_times = all_times(start_stop_indices);
+
+
+
+
 
 
 
@@ -196,6 +203,48 @@ distance_from_center = sqrt(( x_pos - xc ).^2 + (y_pos - yc).^2);
 
 indices = find(distance_from_center < circumParms.radius);
 
+
+end
+
+function [starts_stops] = generateContiguousSamples(sampleTimes, allTimes)
+% This function detects contiguous times in the sample times and outputs,
+% and re-casts the times into a list of starts and stops. Each row is a
+% start stop pair. In between each start stop pair are contiguous times.
+%
+% It's a beta version. This is not the best way to detect contnuity. Just a
+% fast version and easy to cook up. I'm expecting that we'll change this.
+
+% Get list of all indices of sample times
+[~, sampleIndices] = ismember(sampleTimes,allTimes);
+% Generate a diff of these indices .. contiguous will separate by 1 step
+diff_samp_ind = diff(sampleIndices);
+
+% Generate list of incontinuities in the diff
+points_of_incontinuity = find(diff_samp_ind > 3);
+
+
+% diff_times = diff(sampleTimes);
+% sorted_diff_of_times = sort(diff_times);
+% longest_time_threshold = diff_times( round(end * 0.995 ) ) * 4; % take the upper 0.5% percentile of values, and multiply by 4
+% 
+% points_of_incontinuity = find(diff_times > longest_time_threshold);
+
+% Create a matrix of	[start_1 stop_2]
+%						[start_2 stop_2]
+%						[ ...		   ]
+%						[start_n stop_n]
+%
+diff_starts_stops(1,:) = points_of_incontinuity; 
+diff_starts_stops(2,:) = points_of_incontinuity+1;
+contiguous_regions = zeros(2, size(diff_starts_stops,2) + 1);
+contiguous_regions(:,1:end-1) = diff_starts_stops;
+contiguous_regions(2:end-1) = contiguous_regions(1:end-2);
+contiguous_regions(1) = 1;
+contiguous_regions(end) = numel(allTimes);
+contiguous_regions = contiguous_regions';
+
+% Convert start and stop vector indicies in contiguous regions into times
+starts_stops = allTimes(contiguous_regions);
 
 end
 

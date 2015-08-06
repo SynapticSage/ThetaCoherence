@@ -155,7 +155,8 @@ for a = 1:numel(animal_list)
 			%% Find times to sample
 			
 			% Find times!!
-			timesInSample = acquireSample( data, ...
+			[timesInSample,indicesInSample, start_stop_times, ...
+				start_stop_indices] = acquireSample( data, ...
 				dataToGet.sampleParams);
 			allTimes = data.pos.data(:,1);
 			% Get list of continuous time windows - we pass in sample times
@@ -257,48 +258,6 @@ function winData = windowData(dat, anim, day, epo, tet, windowTimes)
     % Return the data points
     return;
     
-end
-
-function [starts_stops] = generateContiguousSamples(sampleTimes, allTimes)
-% This function detects contiguous times in the sample times and outputs,
-% and re-casts the times into a list of starts and stops. Each row is a
-% start stop pair. In between each start stop pair are contiguous times.
-%
-% It's a beta version. This is not the best way to detect contnuity. Just a
-% fast version and easy to cook up. I'm expecting that we'll change this.
-
-% Get list of all indices of sample times
-[~, sampleIndices] = ismember(sampleTimes,allTimes);
-% Generate a diff of these indices .. contiguous will separate by 1 step
-diff_samp_ind = diff(sampleIndices);
-
-% Generate list of incontinuities in the diff
-points_of_incontinuity = find(diff_samp_ind > 3);
-
-
-% diff_times = diff(sampleTimes);
-% sorted_diff_of_times = sort(diff_times);
-% longest_time_threshold = diff_times( round(end * 0.995 ) ) * 4; % take the upper 0.5% percentile of values, and multiply by 4
-% 
-% points_of_incontinuity = find(diff_times > longest_time_threshold);
-
-% Create a matrix of	[start_1 stop_2]
-%						[start_2 stop_2]
-%						[ ...		   ]
-%						[start_n stop_n]
-%
-diff_starts_stops(1,:) = points_of_incontinuity; 
-diff_starts_stops(2,:) = points_of_incontinuity+1;
-contiguous_regions = zeros(2, size(diff_starts_stops,2) + 1);
-contiguous_regions(:,1:end-1) = diff_starts_stops;
-contiguous_regions(2:end-1) = contiguous_regions(1:end-2);
-contiguous_regions(1) = 1;
-contiguous_regions(end) = numel(allTimes);
-contiguous_regions = contiguous_regions';
-
-% Convert start and stop vector indicies in contiguous regions into times
-starts_stops = allTimes(contiguous_regions);
-
 end
 
 %% Post-processing phase
