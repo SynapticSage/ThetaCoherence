@@ -74,7 +74,7 @@ if(isfield(sampleParams,'trajbound_type'))
 	% describing which elements are in the pair of times. Use logical OR to
 	% gradually create a picture of all times to be investigated.
 	
-	logical_onepath	= zeros(size(all_times));	% detects points in a single trajectory per loop iteration
+	logical_onepath			= zeros(size(all_times));	% detects points in a single trajectory per loop iteration
 	logical_times			= zeros(size(all_times));	% updates to catalogue all points per iteration
 	
 	for i = 1:size(trajbound_startStops,1)
@@ -89,7 +89,7 @@ if(isfield(sampleParams,'trajbound_type'))
 	end
 	
 	% Update the sample
-	sample = sample & all_times;
+	sample = sample & logical_times;
 	
 	% Remove variables just used from namespace
 	clear logical_start_stop subset_trajbound_indicies ...
@@ -219,7 +219,7 @@ function [start_stop_times, start_stop_indices] = ...
 diff_samp_ind = diff(sampleIndices);
 
 % Generate list of incontinuities in the diff
-points_of_incontinuity = find(diff_samp_ind > 3);
+points_of_incontinuity = find(diff_samp_ind > 7);
 
 
 % diff_times = diff(sampleTimes);
@@ -239,7 +239,7 @@ contiguous_regions = zeros(2, size(diff_starts_stops,2) + 1);
 contiguous_regions(:,1:end-1) = diff_starts_stops;
 contiguous_regions(2:end-1) = contiguous_regions(1:end-2);
 contiguous_regions(1) = 1;
-contiguous_regions(end) = numel(allTimes);
+contiguous_regions(end) = numel(sampleIndices);
 contiguous_regions = contiguous_regions';
 
 % Convert start and stop vector indicies into contiguous regions into times

@@ -74,7 +74,7 @@ if(isfield(sampleParams,'trajbound_type'))
 	% describing which elements are in the pair of times. Use logical OR to
 	% gradually create a picture of all times to be investigated.
 	
-	logical_onepath	= zeros(size(all_times));	% detects points in a single trajectory per loop iteration
+	logical_onepath			= zeros(size(all_times));	% detects points in a single trajectory per loop iteration
 	logical_times			= zeros(size(all_times));	% updates to catalogue all points per iteration
 	
 	for i = 1:size(trajbound_startStops,1)
@@ -148,7 +148,7 @@ end
 times = all_times(sample);
 indices = find(sample);
 [start_stop_times start_stop_indices] = ...
-	generateContiguousSamples(times, all_times);
+	generateContiguousSamples(times, indices, all_times);
 
 
 
@@ -206,7 +206,8 @@ indices = find(distance_from_center < circumParms.radius);
 
 end
 
-function [start_stop_times, start_stop_indices] = generateContiguousSamples(sampleTimes, allTimes)
+function [start_stop_times, start_stop_indices] = ...
+		generateContiguousSamples(sampleTimes, sampleIndices, allTimes)
 % This function detects contiguous times in the sample times and outputs,
 % and re-casts the times into a list of starts and stops. Each row is a
 % start stop pair. In between each start stop pair are contiguous times.
@@ -214,13 +215,11 @@ function [start_stop_times, start_stop_indices] = generateContiguousSamples(samp
 % It's a beta version. This is not the best way to detect contnuity. Just a
 % fast version and easy to cook up. I'm expecting that we'll change this.
 
-% Get list of all indices of sample times
-[~, sampleIndices] = ismember(sampleTimes,allTimes);
 % Generate a diff of these indices .. contiguous will separate by 1 step
 diff_samp_ind = diff(sampleIndices);
 
 % Generate list of incontinuities in the diff
-points_of_incontinuity = find(diff_samp_ind > 3);
+points_of_incontinuity = find(diff_samp_ind > 7);
 
 
 % diff_times = diff(sampleTimes);
@@ -240,7 +239,7 @@ contiguous_regions = zeros(2, size(diff_starts_stops,2) + 1);
 contiguous_regions(:,1:end-1) = diff_starts_stops;
 contiguous_regions(2:end-1) = contiguous_regions(1:end-2);
 contiguous_regions(1) = 1;
-contiguous_regions(end) = numel(allTimes);
+contiguous_regions(end) = numel(sampleIndices);
 contiguous_regions = contiguous_regions';
 
 % Convert start and stop vector indicies into contiguous regions into times
