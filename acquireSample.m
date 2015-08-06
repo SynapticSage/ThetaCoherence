@@ -1,4 +1,4 @@
-function [all_times, indices, start_stop_indices, start_stop_times] = ...
+function [all_times, indices, start_stop_times, start_stop_indices] = ...
 	acquireSample(data, sampleParams)
 % acquireSample
 % 
@@ -74,17 +74,17 @@ if(isfield(sampleParams,'trajbound_type'))
 	% describing which elements are in the pair of times. Use logical OR to
 	% gradually create a picture of all times to be investigated.
 	
-	logical_start_stop	= zeros(size(all_times));	% detects points in a single trajectory per loop iteration
-	all_times			= zeros(size(all_times));	% updates to catalogue all points per iteration
+	logical_onepath	= zeros(size(all_times));	% detects points in a single trajectory per loop iteration
+	logical_times			= zeros(size(all_times));	% updates to catalogue all points per iteration
 	
 	for i = 1:size(trajbound_startStops,1)
 		
 		% Find which times in the (start, stop) boundary
-		logical_start_stop = ( all_times > trajbound_startStops(i,1) ) & ...
+		logical_onepath = ( all_times > trajbound_startStops(i,1) ) & ...
 			( all_times < trajbound_startStops(i,2) );
 		
 		% Add the points found for ith trajectory to total record of times
-		all_times = all_times | logical_start_stop;
+		logical_times = logical_times | logical_onepath;
 		
 	end
 	
@@ -92,7 +92,7 @@ if(isfield(sampleParams,'trajbound_type'))
 	sample = sample & all_times;
 	
 	% Remove variables just used from namespace
-	clear logical_start_stop all_times subset_trajbound_indicies ...
+	clear logical_start_stop subset_trajbound_indicies ...
 		trajbound_startStops;
 	
 end
@@ -147,8 +147,8 @@ end
 %i.e. correct times from sample logical
 times = all_times(sample);
 indices = find(sample);
-start_stop_indices = generateContiguousSamples(times, all_times);
-start_stop_times = all_times(start_stop_indices);
+[start_stop_times start_stop_indices] = ...
+	generateContiguousSamples(times, all_times);
 
 
 
@@ -206,7 +206,7 @@ indices = find(distance_from_center < circumParms.radius);
 
 end
 
-function [starts_stops] = generateContiguousSamples(sampleTimes, allTimes)
+function [start_stop_times, start_stop_indices] = generateContiguousSamples(sampleTimes, allTimes)
 % This function detects contiguous times in the sample times and outputs,
 % and re-casts the times into a list of starts and stops. Each row is a
 % start stop pair. In between each start stop pair are contiguous times.
@@ -243,8 +243,9 @@ contiguous_regions(1) = 1;
 contiguous_regions(end) = numel(allTimes);
 contiguous_regions = contiguous_regions';
 
-% Convert start and stop vector indicies in contiguous regions into times
-starts_stops = allTimes(contiguous_regions);
+% Convert start and stop vector indicies into contiguous regions into times
+start_stop_times = allTimes(contiguous_regions);
+start_stop_indices = contiguous_regions;
 
 end
 
