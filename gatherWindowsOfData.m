@@ -161,8 +161,6 @@ for a = 1:numel(animal_list)
 			allTimes = data.pos.data(:,1);
 			% Get list of continuous time windows - we pass in sample times
 			% and well as a list of all times
-			windowTimes = ...
-				generateContiguousSamples(timesInSample, allTimes);
 			
 			%% Window out the correct data per tetrode
             for t = dataToGet.animals.(anim).tetrodes
@@ -171,7 +169,7 @@ for a = 1:numel(animal_list)
                 acquisition(a).data{d,e,t} ...
 					= windowData(dataToGet.datType, ...
 					anim,d,e,t,...
-					windowTimes);
+					start_stop_times);
                 
 			end % of tetrode loop
 		end % of epoch loop

@@ -219,7 +219,7 @@ function [start_stop_times, start_stop_indices] = ...
 diff_samp_ind = diff(sampleIndices);
 
 % Generate list of incontinuities in the diff
-points_of_incontinuity = find(diff_samp_ind > 7);
+points_of_incontinuity = find(diff_samp_ind > 25);
 
 
 % diff_times = diff(sampleTimes);
