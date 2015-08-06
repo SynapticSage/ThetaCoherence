@@ -36,7 +36,7 @@ load HPatrajinfo05;
 data.trajinfo = trajinfo{5}{2};
 
 % Run the acquireSample function
-[time, time_logical] = acquireSample(data,sampleParams)
+[time, indices] = acquireSample(data,sampleParams)
 
 % WORKS!
 
