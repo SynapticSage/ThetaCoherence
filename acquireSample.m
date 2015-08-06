@@ -1,4 +1,4 @@
-function [times] = acquireSample(data, sampleParams)
+function [times, indices] = acquireSample(data, sampleParams)
 % acquireSample
 % 
 % This function will be used to simplify the process of selecting
@@ -145,6 +145,7 @@ end
 %% Return total sample
 %i.e. correct times from sample logical
 times = times(sample);
+indices = find(sample);
 
 %% HELPER FUNCTIONS
 
