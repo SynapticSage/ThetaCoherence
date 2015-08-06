@@ -83,8 +83,6 @@ function [acquisition] = ...
 % 
 
 
-%% FUNCTION CONSTANTS ( .. these will later become parameters ..)
-WINDOW = [-0.020 0.030];        % Seconds before and after the transition
 
 
 %% Preprocessing Steps
@@ -191,7 +189,18 @@ throw(ME);
 
 end
 
-%% Helper functions
+
+
+
+
+
+
+
+
+
+
+
+%% Helper functions -----------------------------------------
 % --- Helper function: processTuple
 function winData = windowData(dat, anim, day, epo, tet, windowTimes)
     
