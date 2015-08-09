@@ -109,7 +109,7 @@ end
 
 % if user did not pass indices, set them
 if(~ismember('datType_indices',fields(dataToGet)))
-	dataToGet.datType_indices = {':',1};
+	dataToGet.datType_indices = {1,':'};
 end
 
 
@@ -194,9 +194,9 @@ for a = 1:numel(animal_list)
             for t = dataToGet.animals.(anim).tetrodes
                 
 				% Acquire matrix of windowed data
-                [acquisition(a).data{d,e,t}, acquisition.time_vec{d,e,t}] ...
+                [acquisition(a).data{d,e,t}, time_vec] ...
 					= windowData(...
-					dataToGet.datType, dataToGet.datType_sub, dataToGet.datType_indices, ...
+					dataToGet.datType, dataToGet.datType_sub, dataToGet.dat ...
 					anim,d,e,t,...
 					start_stop_times);
                 
@@ -262,7 +262,7 @@ function [winData, time_vec] = windowData(dat, dat_sub, dat_ind,...
     % could be a variety of names to a general name
     temp = [];
     eval(['temp = data_import.' dat '{' num2str(day) '}' ...
-		'{' num2str(epo) '}{' num2str(tet) '};']);
+		'{' num2str(epo) '}{' num2str(tet) '}']);
     
     % Now we need to estimate the time corresponding to the points in the
     % data
