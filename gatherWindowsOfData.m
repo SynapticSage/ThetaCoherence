@@ -194,7 +194,7 @@ for a = 1:numel(animal_list)
             for t = dataToGet.animals.(anim).tetrodes
                 
 				% Acquire matrix of windowed data
-                [acquisition(a).data{d,e,t}, acquisition.time_vec{d,e,t}] ...
+                [acquisition(a).data{d,e,t}, acquisition(a).time_vec{d,e,t}] ...
 					= windowData(...
 					dataToGet.datType, dataToGet.datType_sub, dataToGet.datType_indices, ...
 					anim,d,e,t,...
@@ -277,6 +277,13 @@ function [winData, time_vec] = windowData(dat, dat_sub, dat_ind,...
     % detected by segment transitions
     winData = zeros( size(windowTimes,1), numel(time_vec) );
     
+    % Detect the class of data in the imported data ... e.g. int16, int32,
+    % double, or float, and then store that. Below we will have to convert
+    % the logical we multiply, so that matlab doesn't bitch about type
+    % incompatability.
+    data_class=class(temp.data);
+    
+    
     % Grab all of the data in the windows of time
     for ind = 1:size(windowTimes,1)
         
@@ -286,7 +293,7 @@ function [winData, time_vec] = windowData(dat, dat_sub, dat_ind,...
         
         % Multiply by logical to zero out irrelevant data, and store vector
         % into a column of the matrix.
-        winData(ind,:) = int16(times_of_interest').* ...
+        winData(ind,:) = cast(times_of_interest', data_class).* ...
 			temp.(dat_sub)(I{1},I{2});											% TO IMPROVE: Need to AUTOMATICALLY  cast times_of_interest to whatever the data's type is!
 
 	end

@@ -2,14 +2,14 @@ clear all;
 
 % if files.brandeis.edu is in the file system, then add data to path
 
-files_dot_brandeis_edu = '/Volumes/jadhav-lab/';
+files_dot_brandeis_edu = '\\files.brandeis.edu\jadhav-lab\';
 if(exist(files_dot_brandeis_edu, 'dir'))
 	
 	% Adds all data folders to path and subfolders. For now this is
 	% how functions will find data.
 	path(path,genpath([files_dot_brandeis_edu 'DATA/sjadhav/HPExpt/HPa_direct'])) 
-	path(path,genpath([files_dot_brandeis_edu 'DATA/sjadhav/HPExpt/HPa_direct']))
-	path(path,genpath([files_dot_brandeis_edu 'DATA/sjadhav/HPExpt/HPa_direct']))
+	path(path,genpath([files_dot_brandeis_edu 'DATA/sjadhav/HPExpt/HPb_direct']))
+	path(path,genpath([files_dot_brandeis_edu 'DATA/sjadhav/HPExpt/HPc_direct']))
 end
 
 
@@ -56,10 +56,10 @@ data.trajinfo = trajinfo{5}{2};
 %% TEST SECTION: show gatherWindowsofData works
 
 dataFolder = './';	% DOES NOT HAVE TO BE IN DATA FOLDER RIGHT NOW ... just add whole data folder heirarchy to path above -- see code line 1 atop!
-animals = {'HPa'};
-day_set = [5];			% set of days to analyze for all animals ... 
-epoch_set = [2];		% set of epochs to analyze for all animals ... 
-tetrode_set = [1];		% set of tetrodes to analyze for all animals ... 
+animals = {'HPa', 'HPb'};
+day_set = [2:3];			% set of days to analyze for all animals ... 
+epoch_set = [2 4];		% set of epochs to analyze for all animals ... 
+tetrode_set = [1:2];		% set of tetrodes to analyze for all animals ... 
 						% .. these could in theory be set individually per
 						% animal so that different sets analyzed for
 						% different animals
@@ -79,7 +79,7 @@ end
 dataToGet.sampleParams = sampleParams;
 
 % specify which electrophysiology data to window!
-dataToGet.datType = 'theta';
+dataToGet.datType = 'eeg';
 
 % RUN FUNCTION!
 acquisition = gatherWindowsOfData(dataFolder, dataToGet);
