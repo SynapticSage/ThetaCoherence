@@ -41,6 +41,17 @@ function [all_times, indices, start_stop_times, start_stop_indices] = ...
 %       number of the segment and segment_side encodes the start (0) or end
 %       of the segment (1) as 0 or 1.
 %
+%	'sampleParams.edgeMode' .. resets the sampling method to grab from the
+%	edges of the detected sampling periods, a certain window around each
+%	edge. This is a struct, and if it exists, acquireSample will enter this
+%	mode.
+%
+%		'sampleParams.edgeMode.window' .. = [indices_before indices_after]
+%		This tells the method to sample indices_before time points before
+%		and indices_after time points after edges of sample, as defined by
+%		00001111 the interface between sampling (1) and non-sampling (0)
+%		region.
+%
 %	NOTES: I'm expecting this struct will be expanded over time to encopass
 %	greater and greater levels of selection criteria. I think this function
 %	could beecome useful to future analyses, if we make it robust and
@@ -49,6 +60,10 @@ function [all_times, indices, start_stop_times, start_stop_indices] = ...
 % OUTPUTS
 % ---------------------
 % times ... all times that fall within sampleParams criteria
+% indices ... all indices that fall within sampleParams criteria
+% start_stop_times ... the beginning and end of each sample period, where
+% each pair is stored in a row and start stop in columns repsectively.
+% start_stop_indices ... same, except with vector indices instead of times
 
 all_times = data.linpos.statematrix.time;
 sample = ones(size(all_times));				% Sample, a logical vector describing 
@@ -143,12 +158,16 @@ if(isfield(sampleParams, 'circleParams'))
 	
 end
 
+% 
+
 %% Return total sample
 %i.e. correct times from sample logical
 times = all_times(sample);
 indices = find(sample);
 [start_stop_times start_stop_indices] = ...
 	generateContiguousSamples(times, indices, all_times);
+
+%% If edgeMode on, then transform into edge sample
 
 
 
