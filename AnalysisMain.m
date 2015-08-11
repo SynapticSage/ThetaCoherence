@@ -2,14 +2,15 @@ clear all;
 
 % if files.brandeis.edu is in the file system, then add data to path
 
-files_dot_brandeis_edu = '\\files.brandeis.edu\jadhav-lab\';
+files_dot_brandeis_edu = '/Volumes/jadhav-lab/';
+path_str = 'DATA/sjadhav/HPexpt/'
 if(exist(files_dot_brandeis_edu, 'dir'))
 	
 	% Adds all data folders to path and subfolders. For now this is
 	% how functions will find data.
-	path(path,genpath([files_dot_brandeis_edu 'DATA/sjadhav/HPExpt/HPa_direct'])) 
-	path(path,genpath([files_dot_brandeis_edu 'DATA/sjadhav/HPExpt/HPb_direct']))
-	path(path,genpath([files_dot_brandeis_edu 'DATA/sjadhav/HPExpt/HPc_direct']))
+	path(path,genpath([files_dot_brandeis_edu path_str 'HPa_direct'])) 
+	path(path,genpath([files_dot_brandeis_edu path_str 'HPb_direct']))
+	path(path,genpath([files_dot_brandeis_edu path_str 'HPc_direct']))
 end
 
 
@@ -38,9 +39,9 @@ sampleParams.circleParams.segment = [1 1];   % [1 0] denotes end (1) of segment 
 % Which trajectory type to sample?
 sampleParams.trajbound_type = 0 ;            % 0 denotes outbound
 
-% % Parameters for selecting whether or not to constrain sample to the edge
-% % of the detected sample zone
-% sampleParams.edgeMode.window = [200 200];
+% Parameters for selecting whether or not to constrain sample to the edge
+% of the detected sample zone
+sampleParams.edgeMode.window = [200 200];
 
 %% DEBUG SECTION: show acquireSample method works
 

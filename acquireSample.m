@@ -71,16 +71,11 @@ function [times, indices, start_stop_times, start_stop_indices] = ...
 %     [ ... ... ...  ]
 %     [ start_N end_N]
 % 
-% If edge_mode is on, then it's has a slightly different output. Each row
-% has 4 elements, 
-%
-%   [beginingSampleEdge_start_k, beginningSampleEdge_stop_k, endSampleEdge_start_k, endSampleEdge_end_k]
-%
-% with 1 <= k <= N.
+% If edge_mode is on, then it's has a slightly different output, where 
+% start_stop_times is a struct, with fields init_edge and term_edge that
+% store start_stop value for those respectively.
 %
 % 'start_stop_indices' ... same, except with vector indices instead of times.
-% The sample conversion from 2xN to 4XN matrix occurs with edge mode as
-% start_stop_times.
 %
 
 all_times = data.linpos.statematrix.time;
@@ -313,25 +308,38 @@ function [times, indices, start_stop_times, start_stop_indices] = ...
     % the start/stop times of the end of the sample period.
     
     % Create the index matrix
-    start_stop_indices = ssi * [1 1 0 0; 0 0 1 1];
-    start_stop_indices(:, [1 3]) = start_stop_indices(:,[1 3]) - ...
+    ssi = ssi * [1 1 0 0; 0 0 1 1];
+    ssi(:, [1 3]) = start_stop_indices(:,[1 3]) - ...
         window(1) * ones(size(ssi,1),2);
-    start_stop_indices(:,[2 4]) = start_stop_indices(:,[2 4]) + ...
+    ssi(:,[2 4]) = start_stop_indices(:,[2 4]) + ...
         window(2) * ones(size(ssi,1),2);
-    
-    
-    % If any indices carry over the boundaries, set them to NaN
+	
+	% Make struct using the previously constructed matrix
+	start_stop_indices.initEdge = ssi(:, [1 2]);
+	start_stop_indices.termEdge = ssi(:,[3 4]);
+	
+	% Throw out any samples with indices that bleed beyond possible range
+	% of indexed times, e.g. -2 or end+5.
+	if(min(start_stop_indices.initEdge) < 1)
+		%
+	end
+	
+	if(max(start_stop_indices.termEdge) > numel(all_times) )
+		%
+	end
+	
     
     % Create the time matrix
-    start_stop_times = all_times(start_stop_indices);
+    start_stop_times.initEdge = all_times(start_stop_indices.initEdge);
+	start_stop_times.termEdge = all_times(start_stop_indices.initEdge)
     sst = start_stop_times;
     
     % Re-doing the sample
     new_sample = zeros(size(all_times));
     for ind = 1:size(start_stop_time,1)
         
-        s = (all_times > sst(ind,1) & all_times < sst(ind,2)) ...
-            | (all_times > sst(ind,3) & all_times < sst(ind,4));          % TODO vector-ize this for-loop
+        s = (all_times > sst.initEdge(ind,1) & all_times < sst.initEdge(ind,2)) ...
+            | (all_times > sst.termEdge(ind,3) & all_times < sst.termEdge(ind,4));         % TODO vector-ize this for-loop
         
         new_sample = new_sample | s;
         
