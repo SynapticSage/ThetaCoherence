@@ -178,7 +178,7 @@ end
 times = all_times(sample);
 indices = find(sample);
 [start_stop_times, start_stop_indices] = ...
-	generateContiguousSamples(times, indices, all_times);
+	generateContiguousSamples(sample, all_times);
 
 %% If edgeMode on, then transform into edge sample
 
@@ -247,44 +247,20 @@ indices = find(distance_from_center < circumParms.radius);
 end
 
 function [start_stop_times, start_stop_indices] = ...
-		generateContiguousSamples(sampleTimes, sampleIndices, allTimes)
+		generateContiguousSamples(Samples, allTimes)
 % This function detects contiguous times in the sample times and outputs,
 % and re-casts the times into a list of starts and stops. Each row is a
 % start stop pair. In between each start stop pair are contiguous times.
 %
-% It's a beta version. This is not the best way to detect contnuity. Just a
-% fast version and easy to cook up. I'm expecting that we'll change this.
 
-% Generate a diff of these indices .. contiguous will separate by 1 step
-diff_samp_ind = diff(sampleIndices);
-
-% Generate list of incontinuities in the diff
-points_of_incontinuity = find(diff_samp_ind > 25);
-
-
-% diff_times = diff(sampleTimes);
-% sorted_diff_of_times = sort(diff_times);
-% longest_time_threshold = diff_times( round(end * 0.995 ) ) * 4; % take the upper 0.5% percentile of values, and multiply by 4
-% 
-% points_of_incontinuity = find(diff_times > longest_time_threshold);
-
-% Create a matrix of	[start_1 stop_2]
-%						[start_2 stop_2]
-%						[ ...		   ]
-%						[start_n stop_n]
-%
-diff_starts_stops(1,:) = points_of_incontinuity; 
-diff_starts_stops(2,:) = points_of_incontinuity+1;
-contiguous_regions = zeros(2, size(diff_starts_stops,2) + 1);
-contiguous_regions(:,1:end-1) = diff_starts_stops;
-contiguous_regions(2:end-1) = contiguous_regions(1:end-2);
-contiguous_regions(1) = 1;
-contiguous_regions(end) = numel(sampleIndices);
-contiguous_regions = contiguous_regions';
-
-% Convert start and stop vector indicies into contiguous regions into times
-start_stop_indices = sampleIndices(contiguous_regions);
-start_stop_times = allTimes(start_stop_indices);
+% find start of relevant idx (+1 since diff)
+diff_sample_start_idx=find(diff(Samples)==1)+1; 
+% find end of relevant idx
+diff_sample_end_idx=find(diff(Samples)==-1);
+% gen times from master time vector
+start_stop_times=[allTimes(diff_sample_start_idx), allTimes(diff_sample_end_idx)];
+% return already found idxs
+start_stop_indices=[diff_sample_start_idx, diff_sample_end_idx];
 
 end
 
