@@ -1,4 +1,4 @@
-function [all_times, indices, start_stop_times, start_stop_indices] = ...
+function [times, indices, start_stop_times, start_stop_indices] = ...
 	acquireSample(data, sampleParams)
 % acquireSample
 % 
@@ -59,11 +59,29 @@ function [all_times, indices, start_stop_times, start_stop_indices] = ...
 %
 % OUTPUTS
 % ---------------------
-% times ... all times that fall within sampleParams criteria
-% indices ... all indices that fall within sampleParams criteria
-% start_stop_times ... the beginning and end of each sample period, where
-% each pair is stored in a row and start stop in columns repsectively.
-% start_stop_indices ... same, except with vector indices instead of times
+% 'times' ... all times that fall within sampleParams criteria
+%
+% 'indices' ... all indices that fall within sampleParams criteria
+%
+% 'start_stop_times' ... the beginning and end of each sample period, where
+% each pair is stored in a row and start stop in columns repsectively. So,
+% 
+%     [ start_1 end_1] 
+%     [ start_2 end_2]
+%     [ ... ... ...  ]
+%     [ start_N end_N]
+% 
+% If edge_mode is on, then it's has a slightly different output. Each row
+% has 4 elements, 
+%
+%   [beginingSampleEdge_start_k, beginningSampleEdge_stop_k, endSampleEdge_start_k, endSampleEdge_end_k]
+%
+% with 1 <= k <= N.
+%
+% 'start_stop_indices' ... same, except with vector indices instead of times.
+% The sample conversion from 2xN to 4XN matrix occurs with edge mode as
+% start_stop_times.
+%
 
 all_times = data.linpos.statematrix.time;
 sample = ones(size(all_times));				% Sample, a logical vector describing 
@@ -164,12 +182,20 @@ end
 %i.e. correct times from sample logical
 times = all_times(sample);
 indices = find(sample);
-[start_stop_times start_stop_indices] = ...
+[start_stop_times, start_stop_indices] = ...
 	generateContiguousSamples(times, indices, all_times);
 
 %% If edgeMode on, then transform into edge sample
 
+if ismember('edgeMode', fields(sampleParams))
 
+% This recasts all times and indices in the manner described in the
+% function header of generateTimeAroundEdges
+[times, indices, start_stop_times, start_stop_indices] = ...
+    generateTimeAroundEdges(all_times, start_stop_indices, ...
+    sampleParams.edgeMode.window);
+
+end
 
 
 
@@ -265,6 +291,58 @@ contiguous_regions = contiguous_regions';
 start_stop_indices = sampleIndices(contiguous_regions);
 start_stop_times = allTimes(start_stop_indices);
 
+end
+
+function [times, indices, start_stop_times, start_stop_indices] = ...
+        generateTimeAroundEdges(all_times, ssi, window)
+    % This function takes in the times generated and converts to times
+    % padded around the beginnings and ends of a time sample, and ignores
+    % the middle of the sample so that 00000|111111|000000 with 1's
+    % representing sampled time and |'s representing sample edges becomes
+    % 0011|110011|110000.
+    %
+    % INPUTS
+    % 
+    %
+    % OUTPUTS
+    %
+    %
+    
+    % 4 x N matrix, where the first two columns hold the start/stop times
+    % of the beginning of the sample period and the last two columns hold
+    % the start/stop times of the end of the sample period.
+    
+    % Create the index matrix
+    start_stop_indices = ssi * [1 1 0 0; 0 0 1 1];
+    start_stop_indices(:, [1 3]) = start_stop_indices(:,[1 3]) - ...
+        window(1) * ones(size(ssi,1),2);
+    start_stop_indices(:,[2 4]) = start_stop_indices(:,[2 4]) + ...
+        window(2) * ones(size(ssi,1),2);
+    
+    
+    % If any indices carry over the boundaries, set them to NaN
+    
+    % Create the time matrix
+    start_stop_times = all_times(start_stop_indices);
+    sst = start_stop_times;
+    
+    % Re-doing the sample
+    new_sample = zeros(size(all_times));
+    for ind = 1:size(start_stop_time,1)
+        
+        s = (all_times > sst(ind,1) & all_times < sst(ind,2)) ...
+            | (all_times > sst(ind,3) & all_times < sst(ind,4));          % TODO vector-ize this for-loop
+        
+        new_sample = new_sample | s;
+        
+    end
+    
+    % Re-doing the indices
+    indices = find(new_sample);
+    
+    % Re-doing the times
+    times = all_times(indices);
+            
 end
 
 end
