@@ -86,7 +86,6 @@ sample = ones(size(all_times));				% Sample, a logical vector describing
 										% the sample is reduced by 0'ing
 										% irrelevant time points and 1'ing
 										% relevant points.
-sample_times = all_times;
 
 
 
@@ -132,7 +131,7 @@ if(isfield(sampleParams, 'circleParams'))
 	
 	% Adjust the sample
 	sample = sample & circ_logical;
-    sample_times = all_times(sample);
+    times
 	
 end
 
@@ -159,8 +158,8 @@ if(isfield(sampleParams,'trajbound_type'))
 		% Find which times in the (start, stop) boundary
         % EDIT: changed to sample so that we have a sense of the existing
         % sample already
-		logical_onepath = ( sample_times > trajbound_startStops(i,1) ) & ...
-			( sample_times < trajbound_startStops(i,2) );
+		logical_onepath = ( all_times > trajbound_startStops(i,1) ) & ...
+			( all_times < trajbound_startStops(i,2) );
         
         % Subset out so that only one occurs per trajcetory
         diff_onepath = diff(logical_onepath);
