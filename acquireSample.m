@@ -126,7 +126,7 @@ if(isfield(sampleParams, 'circleParams'))
     xc = sampleParams.circleParams.center(1); yc = sampleParams.circleParams.center(2);
     x_pos = trajectoryData(:,1); y_pos = trajectoryData(:,2);
     distance_from_center = sqrt(( x_pos - xc ).^2 + (y_pos - yc).^2);
-    circ_subset_indices = find(distance_from_center < sampleParams.circleParams.radius);
+    circ_subset_indices = find(distance_from_center <= sampleParams.circleParams.radius);
 	
 	% WE have indices that belong, but we need a logical vector
 	circ_logical = zeros(size(all_times));
@@ -162,8 +162,8 @@ if(isfield(sampleParams,'trajbound_type'))
 		% Find which times in the (start, stop) boundary
         % EDIT: changed to sample so that we have a sense of the existing
         % sample already
-		logical_onepath = ( sample_times > trajbound_startStops(i,1) ) & ...
-			( sample_times < trajbound_startStops(i,2) );
+		logical_onepath = ( sample_times => trajbound_startStops(i,1) ) & ...
+			( sample_times <= trajbound_startStops(i,2) );
         
         % Subset out so that only one occurs per trajcetory
         diff_onepath = diff(logical_onepath);
@@ -176,6 +176,12 @@ if(isfield(sampleParams,'trajbound_type'))
         % change logical to reflect only the first found trajcetory
         logical_onepath = zeros(size(logical_onepath));
         logical_onepath(initial:final) = 1;
+        
+%         logical_onepath = logical(logical_onepath);
+%         hold off;
+%         plot(data.pos.data(:,2), data.pos.data(:,3),'--');
+%         hold on;
+%         plot(data.pos.data(logical_onepath,2),data.pos.data(logical_onepath,3),'-*');
 		
 		% Add the points found for ith trajectory to total record of times
 		logical_times = logical_times | logical_onepath;
