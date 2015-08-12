@@ -186,6 +186,9 @@ if(isfield(sampleParams,'trajbound_type'))
 		% Add the points found for ith trajectory to total record of times
 		logical_times = logical_times | logical_onepath;
 		
+        start_stop_indices(i,:)= [initial final];
+        start_stop_times(i,:)= [all_times(initial) all_times(final)];
+        
 	end
 	
 	% Update the sample
@@ -197,13 +200,6 @@ if(isfield(sampleParams,'trajbound_type'))
 	
 end
 
-%% Return total sample
-%i.e. correct times from sample logical
-times = all_times(sample);
-indices = find(sample);
-p = [];
-[start_stop_times, start_stop_indices] = ...
-	generateContiguousSamples(sample, all_times);
 
 %% If edgeMode on, then transform into edge sample
 
@@ -231,23 +227,6 @@ end
 
 %% HELPER FUNCTIONS ------------------------------------
 
-function [start_stop_times, start_stop_indices] = ...
-		generateContiguousSamples(Samples, allTimes)
-% This function detects contiguous times in the sample times and outputs,
-% and re-casts the times into a list of starts and stops. Each row is a
-% start stop pair. In between each start stop pair are contiguous times.
-%
-
-% find start of relevant idx (+1 since diff)
-diff_sample_start_idx=find(diff(Samples)==1)+1; 
-% find end of relevant idx
-diff_sample_end_idx=find(diff(Samples)==-1);
-% gen times from master time vector
-start_stop_times=[allTimes(diff_sample_start_idx), allTimes(diff_sample_end_idx)];
-% return already found idxs
-start_stop_indices=[diff_sample_start_idx, diff_sample_end_idx];
-
-end
 
 function [times, indices, start_stop_times, start_stop_indices] = ...
         generateTimeAroundEdge(all_times, ssi, window, edge_string)
