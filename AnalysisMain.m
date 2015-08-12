@@ -40,8 +40,10 @@ sampleParams.circleParams.segment = [1 1];   % [1 0] denotes end (1) of segment 
 sampleParams.trajbound_type = 0 ;            % 0 denotes outbound
 
 % Parameters for selecting whether or not to constrain sample to the edge
-% of the detected sample zone
-sampleParams.edgeMode.window = [30 30];
+% of the detected sample zone.  For 30hz sample rate, [15 15] grabs 500
+% msec in front and behind 1st boundary crossing. 15 frames foward and
+% backward.
+sampleParams.edgeMode.window = [15 15];
 
 %% DEBUG SECTION: show acquireSample method works
 

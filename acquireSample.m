@@ -192,6 +192,7 @@ end
 %i.e. correct times from sample logical
 times = all_times(sample);
 indices = find(sample);
+p = [];
 [start_stop_times, start_stop_indices] = ...
 	generateContiguousSamples(sample, all_times);
 
@@ -304,8 +305,8 @@ function [times, indices, start_stop_times, start_stop_indices] = ...
 	
 	% Break if edge cases found! -- this will be thrown out if our data
 	% fails to trigger them
-	assert(min(min(start_stop_indices{1})) > 0);
-	assert(max(max(start_stop_indices{2})) > numel(all_times) );
+% 	assert(min(min(start_stop_indices{1})) > 0);
+% 	assert(max(max(start_stop_indices{2})) > numel(all_times) );
 	
     % NOW WE HAVE TO RE-DO all other representations of sample times ..
     % they are equivalent forms, but this function must return them.
@@ -317,17 +318,16 @@ function [times, indices, start_stop_times, start_stop_indices] = ...
     % REDOING the sample
     new_sample = zeros(size(all_times));
 	sst = start_stop_times;
-    for ind = 1:size(start_stop_times.initEdge,1)
-        
-        s = (all_times > sst{1}(ind,1) & all_times < sst{2}(ind,2)) ...
-            | (all_times > sst{1}(ind,1) & all_times < sst{2}(ind,2));         % TODO vector-ize this for-loop
+    for ind = 1:size(start_stop_times{1},1)
+        s = (all_times > sst{1}(ind,1) & all_times < sst{1}(ind,2)) | ... 
+			(all_times > sst{2}(ind,1) & all_times < sst{2}(ind,2));
         
         new_sample = new_sample | s;
         
     end
     
     % REDOING the indices
-    indices = find(new_sample);
+    indices = find(new_sample == 1);
     
     % REDOING the times
     times = all_times(indices);
