@@ -132,7 +132,7 @@ if(isfield(sampleParams, 'circleParams'))
 	
 	% Adjust the sample
 	sample = sample & circ_logical;
-    sample_times = all_times(sample);
+    sample_times(~sample) = 0;
 	
 end
 
@@ -312,17 +312,17 @@ function [times, indices, start_stop_times, start_stop_indices] = ...
 	% Throw out any samples with indices that bleed beyond possible range
 	% of indexed times, e.g. -2 or end+5.
 	if(min(start_stop_indices.initEdge) < 1)
-		%
+		disp('ERROR!');
 	end
 	
 	if(max(start_stop_indices.termEdge) > numel(all_times) )
-		%
+		disp('ERROR!');
 	end
 	
     
     % Create the time matrix
     start_stop_times.initEdge = all_times(start_stop_indices.initEdge);
-	start_stop_times.termEdge = all_times(start_stop_indices.initEdge)
+	start_stop_times.termEdge = all_times(start_stop_indices.termEdge)
     sst = start_stop_times;
     
     % Re-doing the sample

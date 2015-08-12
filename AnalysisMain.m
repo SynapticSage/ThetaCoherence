@@ -3,7 +3,7 @@ clear all;
 % if files.brandeis.edu is in the file system, then add data to path
 
 files_dot_brandeis_edu = '\\file.brandeis.edu\jadhav-lab\';
-path_str = 'DATA\sjadhav\HPexpt/'
+path_str = 'DATA\sjadhav\HPexpt\'
 if(exist(files_dot_brandeis_edu, 'dir'))
 	
 	% Adds all data folders to path and subfolders. For now this is
