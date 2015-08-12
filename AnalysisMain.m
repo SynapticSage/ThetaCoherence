@@ -41,7 +41,7 @@ sampleParams.trajbound_type = 0 ;            % 0 denotes outbound
 
 % Parameters for selecting whether or not to constrain sample to the edge
 % of the detected sample zone
-sampleParams.edgeMode.window = [200 200];
+sampleParams.edgeMode.window = [30 30];
 
 %% DEBUG SECTION: show acquireSample method works
 

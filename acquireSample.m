@@ -220,7 +220,7 @@ end
 
 %% HELPER FUNCTIONS ------------------------------------
 
-function [ indices ] = circumscribePoint( trajectoryData, circumParms )
+function [ indices ] = circumscribePoint( trajectoryData, circumParams )
 %CIRCLESAMPLE returns indices for a circle of points around a position
 %   circleSample obtains indices of a circle of points around a position
 %   provided by the user.
@@ -248,7 +248,7 @@ function [ indices ] = circumscribePoint( trajectoryData, circumParms )
 
 
 %% Pre-processing phase .. simplify variable names
-xc = circumParms.center(1); yc = circumParms.center(2);
+xc = circumParams.center(1); yc = circumParams.center(2);
 
 x_pos = trajectoryData(:,1); y_pos = trajectoryData(:,2);
 
@@ -256,7 +256,7 @@ x_pos = trajectoryData(:,1); y_pos = trajectoryData(:,2);
 
 distance_from_center = sqrt(( x_pos - xc ).^2 + (y_pos - yc).^2);
 
-indices = find(distance_from_center < circumParms.radius);
+indices = find(distance_from_center < circumParams.radius);
 
 
 end
@@ -298,48 +298,38 @@ function [times, indices, start_stop_times, start_stop_indices] = ...
     % of the beginning of the sample period and the last two columns hold
     % the start/stop times of the end of the sample period.
     
-    % Create the index matrix
-    ssi = ssi * [1 1 0 0; 0 0 1 1];
-    ssi(:, [1 3]) = ssi(:,[1 3]) - ...
-        window(1) * ones(size(ssi,1),2);
-    ssi(:,[2 4]) = ssi(:,[2 4]) + ...
-        window(2) * ones(size(ssi,1),2);
+	% Create entrance window .. the start and stop time
+	start_stop_indices{1} = [ssi(:,1) - window(1), ssi(:,1) + window(2)];
+	start_stop_indices{2} = [ssi(:,2) - window(1), ssi(:,2) + window(2)];
 	
-	% Make struct using the previously constructed matrix
-	start_stop_indices.initEdge = ssi(:, [1 2]);
-	start_stop_indices.termEdge = ssi(:,[3 4]);
+	% Break if edge cases found! -- this will be thrown out if our data
+	% fails to trigger them
+	assert(min(min(start_stop_indices{1})) > 0);
+	assert(max(max(start_stop_indices{2})) > numel(all_times) );
 	
-	% Throw out any samples with indices that bleed beyond possible range
-	% of indexed times, e.g. -2 or end+5.
-	if(min(start_stop_indices.initEdge) < 1)
-		disp('ERROR!');
-	end
-	
-	if(max(start_stop_indices.termEdge) > numel(all_times) )
-		disp('ERROR!');
-	end
-	
+    % NOW WE HAVE TO RE-DO all other representations of sample times ..
+    % they are equivalent forms, but this function must return them.
     
-    % Create the time matrix
-    start_stop_times.initEdge = all_times(start_stop_indices.initEdge);
-	start_stop_times.termEdge = all_times(start_stop_indices.termEdge)
-    sst = start_stop_times;
+	% REDOING start_stop_times
+    start_stop_times{1} = all_times(start_stop_indices{1});
+	start_stop_times{2} = all_times(start_stop_indices{2});
     
-    % Re-doing the sample
+    % REDOING the sample
     new_sample = zeros(size(all_times));
-    for ind = 1:size(start_stop_time,1)
+	sst = start_stop_times;
+    for ind = 1:size(start_stop_times.initEdge,1)
         
-        s = (all_times > sst.initEdge(ind,1) & all_times < sst.initEdge(ind,2)) ...
-            | (all_times > sst.termEdge(ind,3) & all_times < sst.termEdge(ind,4));         % TODO vector-ize this for-loop
+        s = (all_times > sst{1}(ind,1) & all_times < sst{2}(ind,2)) ...
+            | (all_times > sst{1}(ind,1) & all_times < sst{2}(ind,2));         % TODO vector-ize this for-loop
         
         new_sample = new_sample | s;
         
     end
     
-    % Re-doing the indices
+    % REDOING the indices
     indices = find(new_sample);
     
-    % Re-doing the times
+    % REDOING the times
     times = all_times(indices);
             
 end
