@@ -253,6 +253,9 @@ function [times, indices, start_stop_times, start_stop_indices] = ...
     % REDOING the sample
     new_sample = zeros(size(all_times));
 	sst = start_stop_times;
+    
+    
+    
     for ind = 1:size(start_stop_times,1)
 		
         s = all_times > sst(ind,1) & all_times < sst(ind,2);
