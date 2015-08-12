@@ -181,7 +181,7 @@ if(isfield(sampleParams,'trajbound_type'))
 		logical_times = logical_times | logical_onepath;
 		
         start_stop_indices(i,:)= [initial final];
-        start_stop_times(i,:)= [alltimes(initial) alltimes(final)];
+        start_stop_times(i,:)= [all_times(initial) all_times(final)];
         
 	end
 	
