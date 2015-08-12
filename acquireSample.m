@@ -122,8 +122,11 @@ if(isfield(sampleParams, 'circleParams'))
     end
 	
 	% feed animal (x,y) position list and selection parameters
-	circ_subset_indices = circumscribePoint( data.pos.data(:,2:3), ...
-		sampleParams.circleParams);
+    trajectoryData= data.pos.data(:,2:3);
+    xc = sampleParams.circleParams.center(1); yc = sampleParams.circleParams.center(2);
+    x_pos = trajectoryData(:,1); y_pos = trajectoryData(:,2);
+    distance_from_center = sqrt(( x_pos - xc ).^2 + (y_pos - yc).^2);
+    circ_subset_indices = find(distance_from_center < sampleParams.circleParams.radius);
 	
 	% WE have indices that belong, but we need a logical vector
 	circ_logical = zeros(size(all_times));
@@ -221,47 +224,6 @@ end
 
 
 %% HELPER FUNCTIONS ------------------------------------
-
-function [ indices ] = circumscribePoint( trajectoryData, circumParams )
-%CIRCLESAMPLE returns indices for a circle of points around a position
-%   circleSample obtains indices of a circle of points around a position
-%   provided by the user.
-%
-% ------ INPUTS
-%
-% 'trajectoryData',
-%	matrix containing fields detailing the trajectory structure to find
-%	the proper indices on ... trajectoryData is a time * 2 matrix, where
-%	the first column is x and the second column is y coordinate.
-%
-% 'circumParams'
-%	structure containing fields detaling the parameters controlling the
-%	sampling process.
-%
-%	'circumParams.radius' controls the sampling radius
-%	'circumParams.center' = 1x2 [x y] coordinate of the point to draw the
-%	radius around and sample from.
-%
-% ------ OUTPUTS
-%
-% indices
-%	contains the indices that describe points in the trajectory data that
-%	are inside the circle specified by the circumParams
-
-
-%% Pre-processing phase .. simplify variable names
-xc = circumParams.center(1); yc = circumParams.center(2);
-
-x_pos = trajectoryData(:,1); y_pos = trajectoryData(:,2);
-
-%% Processing, pulling points
-
-distance_from_center = sqrt(( x_pos - xc ).^2 + (y_pos - yc).^2);
-
-indices = find(distance_from_center < circumParams.radius);
-
-
-end
 
 function [start_stop_times, start_stop_indices] = ...
 		generateContiguousSamples(Samples, allTimes)
