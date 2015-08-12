@@ -125,7 +125,7 @@ if(isfield(sampleParams, 'circleParams'))
 	circ_subset_indices = circumscribePoint( data.pos.data(:,2:3), ...
 		sampleParams.circleParams);
 	
-	% WE have indicies that belong, but we need a logical vector
+	% WE have indices that belong, but we need a logical vector
 	circ_logical = zeros(size(all_times));
 	circ_logical(circ_subset_indices) = ...
 		~circ_logical(circ_subset_indices);
@@ -183,7 +183,7 @@ if(isfield(sampleParams,'trajbound_type'))
 	sample = sample & logical_times;
 	
 	% Remove variables just used from namespace
-	clear logical_start_stop subset_trajbound_indicies ...
+	clear logical_start_stop subset_trajbound_indices ...
 		trajbound_startStops;
 	
 end
