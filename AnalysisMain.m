@@ -44,6 +44,7 @@ sampleParams.trajbound_type = 0 ;            % 0 denotes outbound
 % msec in front and behind 1st boundary crossing. 15 frames foward and
 % backward.
 sampleParams.edgeMode.window = [15 15];
+sampleParams.edgeMode.entranceOrExit = 'entrance';
 
 %% DEBUG SECTION: show acquireSample method works
 

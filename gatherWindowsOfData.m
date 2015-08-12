@@ -87,6 +87,10 @@ function [acquisition] = ...
 %			segment_side], where segment_integer denotes the number of the
 %			segment and segment_side encodes the start (0) or end of the
 %			segment (1) as 0 or 1.
+%
+%		'sampleParams.edgeMode.entranceOrExit  .. a string that can take
+%		the value of 'entrance' or 'exit'. Determines whether to take
+%		window of time when the animal enters or exits the boundary region.
 %   -----------------------------
 %
 % OUTPUTS ----------
@@ -234,7 +238,8 @@ end
 function [winData, time_vec] = windowData(dat, dat_sub, dat_ind,...
 		anim, day, epo, tet, ...
 		windowTimes)
-    
+	
+	%% Pre-processing
     % Preprocess the day string to add a 0 before the number if it's less
     % than 10
     if(day < 10)
@@ -251,7 +256,7 @@ function [winData, time_vec] = windowData(dat, dat_sub, dat_ind,...
 		tet_str = num2str(tet);
 	end
 	
-	% ind is a cell that will store our indices
+	% I is a cell that will store our indices
 	I = dat_ind;
 
     %% Acquire LFP or Spike data at these detected times

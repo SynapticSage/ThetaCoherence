@@ -203,8 +203,9 @@ if ismember('edgeMode', fields(sampleParams))
 % This recasts all times and indices in the manner described in the
 % function header of generateTimeAroundEdges
 [times, indices, start_stop_times, start_stop_indices] = ...
-    generateTimeAroundEdges(all_times, start_stop_indices, ...
-    sampleParams.edgeMode.window);
+    generateTimeAroundEdge(all_times, start_stop_indices, ...
+    sampleParams.edgeMode.window, ...
+	sampleParams.edgeMode.entranceOrExit);
 
 end
 
@@ -281,54 +282,44 @@ start_stop_indices=[diff_sample_start_idx, diff_sample_end_idx];
 end
 
 function [times, indices, start_stop_times, start_stop_indices] = ...
-        generateTimeAroundEdges(all_times, ssi, window)
+        generateTimeAroundEdge(all_times, ssi, window, edge_string)
     % This function takes in the times generated and converts to times
-    % padded around the beginnings and ends of a time sample, and ignores
+    % padded around either beginnings or ends of a time sample, and ignores
     % the middle of the sample so that 00000|111111|000000 with 1's
     % representing sampled time and |'s representing sample edges becomes
-    % 0011|110011|110000.
+    % 0011|110000|00000 or 0000|000011|11000.
     %
     % INPUTS
     % 
     %
     % OUTPUTS
-    %
-    %
+    % 
     
-    % 4 x N matrix, where the first two columns hold the start/stop times
-    % of the beginning of the sample period and the last two columns hold
-    % the start/stop times of the end of the sample period.
+    if strcmp(edge_string, 'entrance')
+		edge = 1;
+	elseif strcmp(edge_string,'exit')
+		edge = 2;
+	end
     
 	% Create entrance window .. the start and stop time
-	start_stop_indices{1} = [ssi(:,1) - window(1), ssi(:,1) + window(2)];
-	start_stop_indices{2} = [ssi(:,2) - window(1), ssi(:,2) + window(2)];
-	
-	% Break if edge cases found! -- this will be thrown out if our data
-	% fails to trigger them
-% 	assert(min(min(start_stop_indices{1})) > 0);
-% 	assert(max(max(start_stop_indices{2})) > numel(all_times) );
+	start_stop_indices = [ssi(:,edge) - window(1), ssi(:,edge) + window(2)];
 	
     % NOW WE HAVE TO RE-DO all other representations of sample times ..
     % they are equivalent forms, but this function must return them.
     
 	% REDOING start_stop_times
-    start_stop_times{1} = all_times(start_stop_indices{1});
-	start_stop_times{2} = all_times(start_stop_indices{2});
-    
+    start_stop_times = all_times(start_stop_indices);
     % REDOING the sample
     new_sample = zeros(size(all_times));
 	sst = start_stop_times;
-    for ind = 1:size(start_stop_times{1},1)
-        s = (all_times > sst{1}(ind,1) & all_times < sst{1}(ind,2)) | ... 
-			(all_times > sst{2}(ind,1) & all_times < sst{2}(ind,2));
-        
+    for ind = 1:size(start_stop_times,1)
+		
+        s = all_times > sst(ind,1) & all_times < sst(ind,2);
         new_sample = new_sample | s;
-        
-    end
-    
+		
+	end
     % REDOING the indices
     indices = find(new_sample == 1);
-    
     % REDOING the times
     times = all_times(indices);
             
