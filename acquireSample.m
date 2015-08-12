@@ -162,7 +162,7 @@ if(isfield(sampleParams,'trajbound_type'))
 		% Find which times in the (start, stop) boundary
         % EDIT: changed to sample so that we have a sense of the existing
         % sample already
-		logical_onepath = ( sample_times => trajbound_startStops(i,1) ) & ...
+		logical_onepath = ( sample_times >= trajbound_startStops(i,1) ) & ...
 			( sample_times <= trajbound_startStops(i,2) );
         
         % Subset out so that only one occurs per trajcetory
