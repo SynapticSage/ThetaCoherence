@@ -2,7 +2,7 @@ clear all;
 
 % if files.brandeis.edu is in the file system, then add data to path
 
-files_dot_brandeis_edu = '\\files.brandeis.edu\jadhav-lab'
+files_dot_brandeis_edu = '\home\mcz\DataShare\'
 path_str = '\DATA\sjadhav\HPexpt\'
 if(exist(files_dot_brandeis_edu, 'dir'))
 	
@@ -43,8 +43,8 @@ sampleParams.trajbound_type = 0 ;            % 0 denotes outbound
 % of the detected sample zone.  For 30hz sample rate, [15 15] grabs 500
 % msec in front and behind 1st boundary crossing. 15 frames foward and
 % backward.
-% sampleParams.edgeMode.window = [15 15];
-% sampleParams.edgeMode.entranceOrExit = 'entrance';
+ sampleParams.edgeMode.window = [15 15];
+ sampleParams.edgeMode.entranceOrExit = 'entrance';
 
 %% DEBUG SECTION: show acquireSample method works
 
@@ -57,17 +57,17 @@ load HPatrajinfo05;
 data.trajinfo = trajinfo{5}{2};
 
 % Run the acquireSample function
-[time, indices, t_paths, i_paths] = acquireSample(data,sampleParams)
+[time, indices, t_paths, i_paths] = acquireSample(data,sampleParams);
 
 % WORKS!
 
 %% TEST SECTION: show gatherWindowsofData works
 
 dataFolder = './';	% DOES NOT HAVE TO BE IN DATA FOLDER RIGHT NOW ... just add whole data folder heirarchy to path above -- see code line 1 atop!
-animals = {'HPa', 'HPb'};
-day_set = [2:3];			% set of days to analyze for all animals ... 
-epoch_set = [2 4];		% set of epochs to analyze for all animals ... 
-tetrode_set = [1:2];		% set of tetrodes to analyze for all animals ... 
+animals = {'HPa'};
+day_set = [5];			% set of days to analyze for all animals ... 
+epoch_set = [2];		% set of epochs to analyze for all animals ... 
+tetrode_set = [2];		% set of tetrodes to analyze for all animals ... 
 						% .. these could in theory be set individually per
 						% animal so that different sets analyzed for
 						% different animals

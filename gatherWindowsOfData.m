@@ -150,7 +150,7 @@ for a = 1:numel(animal_list)
 	acquisition(a).data = cell(...
 		numel(dataToGet.animals.(anim).days), ...
 		numel(dataToGet.animals.(anim).epochs), ...
-		numel(dataToGet.animals.(anim).tetrodes+1));
+		numel(dataToGet.animals.(anim).tetrodes));
 	
     for d = dataToGet.animals.(anim).days
         
@@ -247,7 +247,7 @@ function [winData, time_vec] = windowData(dat, dat_sub, dat_ind,...
     else
         day_str = num2str(day);
 	end
-	
+
 	% Preprocess the tetrode string to add a 0 before the number if it's less
     % than 10
 	if(tet < 10)
