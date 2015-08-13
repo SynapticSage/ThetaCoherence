@@ -11,7 +11,10 @@ params.fpass = [0 40]; % params.fpass = [0 400];
 params.tapers = [3 5];
 params.err = [2 0.05];
 
-%% 
+%% Analysis Parameters
+trial = params.trials
+
+%% For-loooping over acquisitions
 
 
 
