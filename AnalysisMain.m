@@ -2,7 +2,7 @@ clear all;
 
 % if files.brandeis.edu is in the file system, then add data to path
 
-files_dot_brandeis_edu = '\home\mcz\DataShare\'
+files_dot_brandeis_edu = '\\files.brandeis.edu\jadhav-lab'
 path_str = '\DATA\sjadhav\HPexpt\'
 if(exist(files_dot_brandeis_edu, 'dir'))
 	
