@@ -11,11 +11,19 @@ params.fpass = [0 40]; % params.fpass = [0 400];
 params.tapers = [3 5];
 params.err = [2 0.05];
 
-%% Analysis Parameters
-trial = params.trials
+%% Analysis Input Parameters
+d = params.days;      % for now we're passing in single day, and not list
+e = params.epochs;
+t = params.tetrodes;
+
+%% Setup/Preallocate Ouputs
 
 %% For-loooping over acquisitions
-
-
-
+for trial = 1:size(acquisition.data{d,e,t},1)
+    
+    [] = mtspecgramc(acquisition.data{d,e,t}(trial,:), movingwin,params);
+    
 end
+
+
+end 
