@@ -1,9 +1,12 @@
 clear all;
 
 % if files.brandeis.edu is in the file system, then add data to path
+d= filesep;
 
-files_dot_brandeis_edu = '\\files.brandeis.edu\jadhav-lab'
-path_str = '\DATA\sjadhav\HPexpt\'
+if isunix; files_dot_brandeis_edu = '/home/mcz/DataShare';
+else files_dot_brandeis_edu = '\\files.brandeis.edu\jadhav-lab'; end;
+path_str = [d 'DATA' d 'sjadhav' d 'HPexpt' d];
+
 if(exist(files_dot_brandeis_edu, 'dir'))
 	
 	% Adds all data folders to path and subfolders. For now this is
