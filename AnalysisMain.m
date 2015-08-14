@@ -96,17 +96,44 @@ dataToGet.datType = 'eeggnd';
 
 % specify process options if any
 processOptions.windowPadding = NaN;
-processOptions.singleTrace = true;
+
 
 % RUN FUNCTION!
 acquisition = gatherWindowsOfData(dataFolder, dataToGet, processOptions);
 
+%% TEST SECTION: Getting second acquisition
+
+dataFolder = './';	% DOES NOT HAVE TO BE IN DATA FOLDER RIGHT NOW ... just add whole data folder heirarchy to path above -- see code line 1 atop!
+animals = {'HPa'};
+day_set = [5];			% set of days to analyze for all animals ... 
+epoch_set = [2];		% set of epochs to analyze for all animals ... 
+tetrode_set = [16];		% set of tetrodes to analyze for all animals ... 
+
+						% .. these could in theory be set individually per
+						% animal so that different sets analyzed for
+						% different animals
+
+
+% set .animals field to contain who, which day, which epoch, and which
+% tetrodes
+for a = 1:numel(animals)
+	
+	dataToGet.animals.(animals{a}).days = day_set;
+	dataToGet.animals.(animals{a}).epochs = epoch_set;
+	dataToGet.animals.(animals{a}).tetrodes = tetrode_set;
+	
+end
+
+
+% RUN FUNCTION!
+acquisition2 = gatherWindowsOfData(dataFolder, dataToGet, processOptions);
+
 %% Debug generateSpecgrams
 
-params.days = 5; params.epochs = 2; params.tetrodes = 1;
-params.doPlot = 1;
+dataToProcess.days = 5; dataToProcess.epochs = 2; dataToProcess.tetrodes = 1; dataToProcess.tetrodes2 = 16; 
+dataToProcess.doPlot = 1;
 
-generateSpecgrams(acquisition,params);
+generateSpecgrams(acquisition,dataToProcess);
 
 % Run function
 

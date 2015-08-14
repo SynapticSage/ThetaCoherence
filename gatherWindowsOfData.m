@@ -316,7 +316,8 @@ function [winData, time_vec] = windowData(dat, dat_sub, dat_ind,...
     
     
     % Grab all of the data in the windows of time
-    if processOptions.singleTrace % SINGLE-TRACE MODE
+    if ismember('singleTrace',fields(processOptions)) && ...
+            processOptions.singleTrace % SINGLE-TRACE MODE
         
         temp =  temp.(dat_sub)(I{1},I{2});
         temp(~indicesInSample) = processOptions.windowPadding;
@@ -356,7 +357,7 @@ function [winData, time_vec] = windowData(dat, dat_sub, dat_ind,...
     
     % Return the data points
     return;
-    
+   
 end
 
 %% Post-processing phase
