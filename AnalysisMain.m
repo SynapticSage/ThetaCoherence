@@ -3,9 +3,10 @@ clear all;
 % if files.brandeis.edu is in the file system, then add data to path
 d= filesep;
 
-if isunix; files_dot_brandeis_edu = '/home/mcz/DataShare';
-else files_dot_brandeis_edu = '\\files.brandeis.edu\jadhav-lab'; end;
+if ismac||ispc; files_dot_brandeis_edu = '\\files.brandeis.edu\jadhav-lab';
+else files_dot_brandeis_edu = '/home/mcz/DataShare'; end;
 path_str = [d 'DATA' d 'sjadhav' d 'HPexpt' d];
+
 
 if(exist(files_dot_brandeis_edu, 'dir'))
 	
