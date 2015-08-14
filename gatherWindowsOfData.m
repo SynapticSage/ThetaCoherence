@@ -109,6 +109,12 @@ function [acquisition] = ...
 %		vector, but be able to detect what's not sample. Padding of any
 %		type takes up extra memory. Setting [] yields the most
 %		memory-efficient acquisitions.
+%
+%
+%       '.processOptions.singleTrace' .. If provided, grabs a single trace
+%       containing all windows of data.
+%
+%
 %   -----------------------------
 %
 % OUTPUTS ----------
@@ -224,7 +230,7 @@ for a = 1:numel(animal_list)
 					= windowData(...
 					dataToGet.datType, dataToGet.datType_sub, dataToGet.datType_indices, ...
 					anim,d,e,t,...
-					start_stop_times, ...
+					start_stop_times, indicesInSample, ...
 					processOptions);
                 
 			end % of tetrode loop
@@ -260,7 +266,7 @@ end
 % --- Helper function: processTuple
 function [winData, time_vec] = windowData(dat, dat_sub, dat_ind,...
 		anim, day, epo, tet, ...
-		windowTimes, ...
+		windowTimes, indicesInSample, ...
 		processOptions)
 	
 	%% Pre-processing
@@ -281,7 +287,7 @@ function [winData, time_vec] = windowData(dat, dat_sub, dat_ind,...
 	end
 	
 	% I is a cell that will store our indices
-	I = dat_ind;
+ 	I = dat_ind;
 
     %% Acquire LFP or Spike data at these detected times
     file_string = [ anim dat day_str '-' num2str(epo) '-' tet_str ];
@@ -302,10 +308,6 @@ function [winData, time_vec] = windowData(dat, dat_sub, dat_ind,...
     time_vec = linspace(time_start, time_end, ...
 		size(temp.(dat_sub)(I{1},I{2}),1));										% TO IMPROVE : Need to allow user to input field of data, and use that to determine column number
     
-    % Create 2D matrix that will hold a window of data per trigger time as
-    % detected by segment transitions
-    winData = zeros( size(windowTimes,1), numel(time_vec) );
-    
     % Detect the class of data in the imported data ... e.g. int16, int32,
     % double, or float, and then store that. Below we will have to convert
     % the logical we multiply, so that matlab doesn't bitch about type
@@ -314,30 +316,43 @@ function [winData, time_vec] = windowData(dat, dat_sub, dat_ind,...
     
     
     % Grab all of the data in the windows of time
-	if ~isempty(processOptions.windowPadding)
-		for ind = 1:size(windowTimes,1)
+    if processOptions.singleTrace % SINGLE-TRACE MODE
+        
+        temp =  temp.(dat_sub)(I{1},I{2});
+        temp(~indicesInSample) = processOptions.windowPadding;
+        winData = temp;
+        
+    else % MULTI-TRACE MODE
+        
+        % Create 2D matrix that will hold a window of data per trigger time as
+        % detected by segment transitions
+        winData = zeros( size(windowTimes,1), numel(time_vec) ); 
+        
+        if ~isempty(processOptions.windowPadding)
+            for ind = 1:size(windowTimes,1)
 
-			% Create logical vector for selecting the proper data to store
-			times_of_interest = (time_vec > windowTimes(ind,1)) & ...
-				(time_vec < windowTimes(ind,2));
+                % Create logical vector for selecting the proper data to store
+                single_trial_of_interest = (time_vec > windowTimes(ind,1)) & ...
+                    (time_vec < windowTimes(ind,2));
 
-			% Multiply by logical to zero out irrelevant data, and store vector
-			% into a column of the matrix.
-			winData(ind,:) = cast(times_of_interest', data_class).* ...
-				temp.(dat_sub)(I{1},I{2});
+                % Multiply by logical to zero out irrelevant data, and store vector
+                % into a column of the matrix.
+                winData(ind,:) = cast(single_trial_of_interest', data_class).* ...
+                    temp.(dat_sub)(I{1},I{2});
 
-			% Add padding if it's specified
-			if processOptions.windowPadding ~= 0			
-				winData(ind,~times_of_interest) = processOptions.windowPadding;
-			end
+                % Add padding if it's specified
+                if processOptions.windowPadding ~= 0			
+                    winData(ind,~single_trial_of_interest) = ...
+                        processOptions.windowPadding;
+                end
 
-		end
-	else
-		
-		%Calculate lowest possible elements per sample
-		
-		
-	end
+            end
+        else
+            %TODO write situation for [] padding
+        end
+    end
+    
+    
     
     % Return the data points
     return;

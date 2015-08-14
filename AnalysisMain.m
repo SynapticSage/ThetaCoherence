@@ -92,10 +92,23 @@ end
 dataToGet.sampleParams = sampleParams;
 
 % specify which electrophysiology data to window!
-dataToGet.datType = 'eeg';
+dataToGet.datType = 'eeggnd';
+
+% specify process options if any
+processOptions.windowPadding = NaN;
+processOptions.singleTrace = true;
 
 % RUN FUNCTION!
 acquisition = gatherWindowsOfData(dataFolder, dataToGet, processOptions);
+
+%% Debug generateSpecgrams
+
+params.days = 5; params.epochs = 2; params.tetrodes = 1;
+params.doPlot = 1;
+
+generateSpecgrams(acquisition,params);
+
+% Run function
 
 %% MAIN ANALYSIS SECTION -- Theta Coherence Analysis Guts
 
