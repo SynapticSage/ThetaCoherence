@@ -122,8 +122,11 @@ if(isfield(sampleParams, 'circleParams'))
     end
 	
 	% feed animal (x,y) position list and selection parameters
-	circ_subset_indices = circumscribePoint( data.pos.data(:,2:3), ...
-		sampleParams.circleParams);
+    trajectoryData= data.pos.data(:,2:3);
+    xc = sampleParams.circleParams.center(1); yc = sampleParams.circleParams.center(2);
+    x_pos = trajectoryData(:,1); y_pos = trajectoryData(:,2);
+    distance_from_center = sqrt(( x_pos - xc ).^2 + (y_pos - yc).^2);
+    circ_subset_indices = find(distance_from_center <= sampleParams.circleParams.radius);
 	
 	% WE have indices that belong, but we need a logical vector
 	circ_logical = zeros(size(all_times));
@@ -159,8 +162,8 @@ if(isfield(sampleParams,'trajbound_type'))
 		% Find which times in the (start, stop) boundary
         % EDIT: changed to sample so that we have a sense of the existing
         % sample already
-		logical_onepath = ( sample_times > trajbound_startStops(i,1) ) & ...
-			( sample_times < trajbound_startStops(i,2) );
+		logical_onepath = ( sample_times >= trajbound_startStops(i,1) ) & ...
+			( sample_times <= trajbound_startStops(i,2) );
         
         % Subset out so that only one occurs per trajcetory
         diff_onepath = diff(logical_onepath);
@@ -173,10 +176,19 @@ if(isfield(sampleParams,'trajbound_type'))
         % change logical to reflect only the first found trajcetory
         logical_onepath = zeros(size(logical_onepath));
         logical_onepath(initial:final) = 1;
+        
+%         logical_onepath = logical(logical_onepath);
+%         hold off;
+%         plot(data.pos.data(:,2), data.pos.data(:,3),'--');
+%         hold on;
+%         plot(data.pos.data(logical_onepath,2),data.pos.data(logical_onepath,3),'-*');
 		
 		% Add the points found for ith trajectory to total record of times
 		logical_times = logical_times | logical_onepath;
 		
+        start_stop_indices(i,:)= [initial final];
+        start_stop_times(i,:)= [all_times(initial) all_times(final)];
+        
 	end
 	
 	% Update the sample
@@ -188,13 +200,6 @@ if(isfield(sampleParams,'trajbound_type'))
 	
 end
 
-%% Return total sample
-%i.e. correct times from sample logical
-times = all_times(sample);
-indices = find(sample);
-p = [];
-[start_stop_times, start_stop_indices] = ...
-	generateContiguousSamples(sample, all_times);
 
 %% If edgeMode on, then transform into edge sample
 
@@ -222,64 +227,6 @@ end
 
 %% HELPER FUNCTIONS ------------------------------------
 
-function [ indices ] = circumscribePoint( trajectoryData, circumParams )
-%CIRCLESAMPLE returns indices for a circle of points around a position
-%   circleSample obtains indices of a circle of points around a position
-%   provided by the user.
-%
-% ------ INPUTS
-%
-% 'trajectoryData',
-%	matrix containing fields detailing the trajectory structure to find
-%	the proper indices on ... trajectoryData is a time * 2 matrix, where
-%	the first column is x and the second column is y coordinate.
-%
-% 'circumParams'
-%	structure containing fields detaling the parameters controlling the
-%	sampling process.
-%
-%	'circumParams.radius' controls the sampling radius
-%	'circumParams.center' = 1x2 [x y] coordinate of the point to draw the
-%	radius around and sample from.
-%
-% ------ OUTPUTS
-%
-% indices
-%	contains the indices that describe points in the trajectory data that
-%	are inside the circle specified by the circumParams
-
-
-%% Pre-processing phase .. simplify variable names
-xc = circumParams.center(1); yc = circumParams.center(2);
-
-x_pos = trajectoryData(:,1); y_pos = trajectoryData(:,2);
-
-%% Processing, pulling points
-
-distance_from_center = sqrt(( x_pos - xc ).^2 + (y_pos - yc).^2);
-
-indices = find(distance_from_center < circumParams.radius);
-
-
-end
-
-function [start_stop_times, start_stop_indices] = ...
-		generateContiguousSamples(Samples, allTimes)
-% This function detects contiguous times in the sample times and outputs,
-% and re-casts the times into a list of starts and stops. Each row is a
-% start stop pair. In between each start stop pair are contiguous times.
-%
-
-% find start of relevant idx (+1 since diff)
-diff_sample_start_idx=find(diff(Samples)==1)+1; 
-% find end of relevant idx
-diff_sample_end_idx=find(diff(Samples)==-1);
-% gen times from master time vector
-start_stop_times=[allTimes(diff_sample_start_idx), allTimes(diff_sample_end_idx)];
-% return already found idxs
-start_stop_indices=[diff_sample_start_idx, diff_sample_end_idx];
-
-end
 
 function [times, indices, start_stop_times, start_stop_indices] = ...
         generateTimeAroundEdge(all_times, ssi, window, edge_string)
@@ -312,6 +259,9 @@ function [times, indices, start_stop_times, start_stop_indices] = ...
     % REDOING the sample
     new_sample = zeros(size(all_times));
 	sst = start_stop_times;
+    
+    
+    
     for ind = 1:size(start_stop_times,1)
 		
         s = all_times > sst(ind,1) & all_times < sst(ind,2);

@@ -1,5 +1,5 @@
 function [acquisition] = ...
-	gatherWindowsOfData(dataFolder,dataToGet)
+	gatherWindowsOfData(dataFolder,dataToGet, processOptions)
 % function gatherWindowsOfData
 % for gathering all data for an (animal/prefix epoch day tet) tuple or set of
 % tuples. This function will be used to gather up all of the eeg data
@@ -57,6 +57,10 @@ function [acquisition] = ...
 %
 %	This parameter selects chich type of data to window.
 %
+%	.paddingRemoved (OPTIONAL) when data is grabbed, 0 padding at the
+%	non-sample data points is removed is this option is set, or if it's set
+%	to a value, say NaN, it will make 0's padding NaN padding.
+%
 %
 %   '.sampleParams' .. struct that describes the characteristics of the
 %   time points to sample. This structure will include any information
@@ -91,6 +95,20 @@ function [acquisition] = ...
 %		'sampleParams.edgeMode.entranceOrExit  .. a string that can take
 %		the value of 'entrance' or 'exit'. Determines whether to take
 %		window of time when the animal enters or exits the boundary region.
+%
+%
+%	'.processOptions' .. struct containing options for the process of
+%	sample triggered data windowing.
+%
+%		'.processOptions.windowPadding' .. If not provided, automatically
+%		set to 0, in which case time points outside sample are set to 0's,
+%		and length of complete trace of data is preserved. If padding is
+%		set to [], it deletes non-sample data, removing padding. This has
+%		the effect of only storing the actual values associated with a
+%		window of data. If set to NaN, you can retain the length of the
+%		vector, but be able to detect what's not sample. Padding of any
+%		type takes up extra memory. Setting [] yields the most
+%		memory-efficient acquisitions.
 %   -----------------------------
 %
 % OUTPUTS ----------
@@ -114,6 +132,10 @@ end
 % if user did not pass indices, set them
 if(~ismember('datType_indices',fields(dataToGet)))
 	dataToGet.datType_indices = {':',1};
+end
+
+if nargin < 3
+	processOptions.windowPadding = 0;
 end
 
 
@@ -150,7 +172,7 @@ for a = 1:numel(animal_list)
 	acquisition(a).data = cell(...
 		numel(dataToGet.animals.(anim).days), ...
 		numel(dataToGet.animals.(anim).epochs), ...
-		numel(dataToGet.animals.(anim).tetrodes+1));
+		numel(dataToGet.animals.(anim).tetrodes));
 	
     for d = dataToGet.animals.(anim).days
         
@@ -202,7 +224,8 @@ for a = 1:numel(animal_list)
 					= windowData(...
 					dataToGet.datType, dataToGet.datType_sub, dataToGet.datType_indices, ...
 					anim,d,e,t,...
-					start_stop_times);
+					start_stop_times, ...
+					processOptions);
                 
 			end % of tetrode loop
 			
@@ -237,7 +260,8 @@ end
 % --- Helper function: processTuple
 function [winData, time_vec] = windowData(dat, dat_sub, dat_ind,...
 		anim, day, epo, tet, ...
-		windowTimes)
+		windowTimes, ...
+		processOptions)
 	
 	%% Pre-processing
     % Preprocess the day string to add a 0 before the number if it's less
@@ -247,7 +271,7 @@ function [winData, time_vec] = windowData(dat, dat_sub, dat_ind,...
     else
         day_str = num2str(day);
 	end
-	
+
 	% Preprocess the tetrode string to add a 0 before the number if it's less
     % than 10
 	if(tet < 10)
@@ -290,17 +314,29 @@ function [winData, time_vec] = windowData(dat, dat_sub, dat_ind,...
     
     
     % Grab all of the data in the windows of time
-    for ind = 1:size(windowTimes,1)
-        
-        % Create logical vector for selecting the proper data to store
-        times_of_interest = (time_vec > windowTimes(ind,1)) & ...
-            (time_vec < windowTimes(ind,2));
-        
-        % Multiply by logical to zero out irrelevant data, and store vector
-        % into a column of the matrix.
-        winData(ind,:) = cast(times_of_interest', data_class).* ...
-			temp.(dat_sub)(I{1},I{2});
+	if ~isempty(processOptions.windowPadding)
+		for ind = 1:size(windowTimes,1)
 
+			% Create logical vector for selecting the proper data to store
+			times_of_interest = (time_vec > windowTimes(ind,1)) & ...
+				(time_vec < windowTimes(ind,2));
+
+			% Multiply by logical to zero out irrelevant data, and store vector
+			% into a column of the matrix.
+			winData(ind,:) = cast(times_of_interest', data_class).* ...
+				temp.(dat_sub)(I{1},I{2});
+
+			% Add padding if it's specified
+			if processOptions.windowPadding ~= 0			
+				winData(ind,~times_of_interest) = processOptions.windowPadding;
+			end
+
+		end
+	else
+		
+		%Calculate lowest possible elements per sample
+		
+		
 	end
     
     % Return the data points
