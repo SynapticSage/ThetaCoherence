@@ -98,9 +98,9 @@ function [acquisition] = ...
 % "acquisition" array such that:
 % 
 % acquisition(i).animal = animal name
-% acquisition(i).data{day,epoch,tetrode} = [] matrix such that each column
+% acquisition(i).data{day,epoch,tetrode} = [] matrix such that each rows
 % contains a copy of the data with only relevant values for a detected
-% trigger time. There are as many columns as there were triggered events.
+% trigger time. There are as many rows as there were triggered events.
 % 
 
 %% Handling of optional inputs
@@ -299,7 +299,7 @@ function [winData, time_vec] = windowData(dat, dat_sub, dat_ind,...
         % Multiply by logical to zero out irrelevant data, and store vector
         % into a column of the matrix.
         winData(ind,:) = cast(times_of_interest', data_class).* ...
-			temp.(dat_sub)(I{1},I{2});											% TO IMPROVE: Need to AUTOMATICALLY  cast times_of_interest to whatever the data's type is!
+			temp.(dat_sub)(I{1},I{2});
 
 	end
     
