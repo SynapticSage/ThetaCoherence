@@ -21,13 +21,13 @@ params.err = [2 0.05];
 params.pad = 7;
 
 %% Default parameters if not inputted
-if ~ismember('output', dataToProcess)
+if ~ismember('output', fields(dataToProcess))
 	dataToProcess.output = false;
 end
-if ~ismember('save', dataToProcess)
+if ~ismember('save', fields(dataToProcess))
 	dataToProcess.save = false;
 end
-if ~ismember('plot', dataToProcess)
+if ~ismember('plot', fields(dataToProcess))
 	dataToProcess.plot = true;
 end
 
