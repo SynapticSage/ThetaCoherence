@@ -4,7 +4,7 @@ clear all;
 d = filesep;
 
 if ispc; files_dot_brandeis_edu = '\\files.brandeis.edu\jadhav-lab';
-elseif ismac; files_dot_brandesi_edu = '/Volumes/jadhav-lab/';
+elseif ismac; files_dot_brandeis_edu = '/Volumes/jadhav-lab/';
 else files_dot_brandeis_edu = '/home/mcz/DataShare'; end;
 path_str = [d 'DATA' d 'sjadhav' d 'HPexpt' d];
 
@@ -93,7 +93,7 @@ end
 dataToGet.sampleParams = sampleParams;
 
 % specify which electrophysiology data to window!
-dataToGet.datType = 'eeggnd';
+dataToGet.datType = 'eeg';
 
 % specify process options if any
 processOptions.windowPadding = NaN;
@@ -104,36 +104,39 @@ acquisition = gatherWindowsOfData(dataFolder, dataToGet, processOptions);
 
 %% TEST SECTION: Getting second acquisition
 
-dataFolder = './';	% DOES NOT HAVE TO BE IN DATA FOLDER RIGHT NOW ... just add whole data folder heirarchy to path above -- see code line 1 atop!
-animals = {'HPa'};
-day_set = [5];			% set of days to analyze for all animals ... 
-epoch_set = [2];		% set of epochs to analyze for all animals ... 
-tetrode_set = [16];		% set of tetrodes to analyze for all animals ... 
-
-						% .. these could in theory be set individually per
-						% animal so that different sets analyzed for
-						% different animals
-
-
-% set .animals field to contain who, which day, which epoch, and which
-% tetrodes
-for a = 1:numel(animals)
-	
-	dataToGet.animals.(animals{a}).days = day_set;
-	dataToGet.animals.(animals{a}).epochs = epoch_set;
-	dataToGet.animals.(animals{a}).tetrodes = tetrode_set;
-	
-end
-
-
-% RUN FUNCTION!
-acquisition2 = gatherWindowsOfData(dataFolder, dataToGet, processOptions);
+% dataFolder = './';	% DOES NOT HAVE TO BE IN DATA FOLDER RIGHT NOW ... just add whole data folder heirarchy to path above -- see code line 1 atop!
+% animals = {'HPa'};
+% day_set = [5];			% set of days to analyze for all animals ... 
+% epoch_set = [2];		% set of epochs to analyze for all animals ... 
+% tetrode_set = [16];		% set of tetrodes to analyze for all animals ... 
+% 
+% 						% .. these could in theory be set individually per
+% 						% animal so that different sets analyzed for
+% 						% different animals
+% 
+% 
+% % set .animals field to contain who, which day, which epoch, and which
+% % tetrodes
+% for a = 1:numel(animals)
+% 	
+% 	dataToGet.animals.(animals{a}).days = day_set;
+% 	dataToGet.animals.(animals{a}).epochs = epoch_set;
+% 	dataToGet.animals.(animals{a}).tetrodes = tetrode_set;
+% 	
+% end
+% 
+% 
+% % RUN FUNCTION!
+% acquisition2 = gatherWindowsOfData(dataFolder, dataToGet, processOptions);
 
 %% Debug generateSpecgrams
 
 dataToProcess.days = 5; dataToProcess.epochs = 2; 
 dataToProcess.tetrodes = 1; dataToProcess.tetrodes2 = 16; 
+
 dataToProcess.plot = 1;
+dataToProcess.output = 0;
+dataToProcess.save = 1;
 
 generate_xGrams(acquisition,dataToProcess);		% add acquisition2 for coherograms
 

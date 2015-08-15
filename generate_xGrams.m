@@ -43,7 +43,7 @@ for a = 1:numel(acquisition)
                     if sum(isnan(specgram_data)) > 0
                         logicalvec = ~isnan(specgram_data);
                         [S, Stime, Sfreq, Serror] = ...
-                            mtspecgramc(specgram_data(logicalvec)', movingwin,params);
+                            mtspecgramc(specgram_data(logicalvec)', movingwin, params);
                     else
                         indices = find(acquisition.data{d,e,t}(trial,:) ~= 0);
                         [S, Stime, Sfreq, Serror] = ...
@@ -65,16 +65,16 @@ for a = 1:numel(acquisition)
                     end
 
                     %% If user asks for output to RAM or harddrive
-					if dataToProcess.output || dataToProcess.save
-						Output{d,e,t,trial}.S = Sfreq;
-						Output{d,e,t,trial}.Stime = Stime;
-						Output{d,e,t,trial}.Sfreq = Sfreq;
-						Output{d,e,t,trial}.Serror = Serror;
+					if (dataToProcess.output || dataToProcess.save)
+						Output.S = Sfreq;
+						Output.Stime = Stime;
+						Output.Sfreq = Sfreq;
+						Output.Serror = Serror;
 					end
 					
 					%% If user asks to output to RAM
 					if dataToProcess.output
-						gram(a).output = Output;
+						gram(a).output{d,e,t,trial} = Output;
 					end
 					
 					%% If user asks to save to harddrive, then do
@@ -217,6 +217,7 @@ end
 catch ME				% if screws up in for-loop, reset figure style.
 	%% Error post-processing
     set(groot,'DefaultFigureWindowStyle','normal')
+	disp(ME.message);
 	
 end
 
