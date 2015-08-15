@@ -64,17 +64,30 @@ for a = 1:numel(acquisition)
                         grid on;
                     end
 
-                    %% If user asks for output, then do
+                    %% If user asks for output to RAM or harddrive
+					if dataToProcess.output || dataToProcess.save
+						Output{d,e,t,trial}.S = Sfreq;
+						Output{d,e,t,trial}.Stime = Stime;
+						Output{d,e,t,trial}.Sfreq = Sfreq;
+						Output{d,e,t,trial}.Serror = Serror;
+					end
+					
+					%% If user asks to output to RAM
 					if dataToProcess.output
-						grams(a).output{d,e,t,trial}.S = Sfreq;
-						grams(a).output{d,e,t,trial}.Stime = Stime;
-						grams(a).output{d,e,t,trial}.Sfreq = Sfreq;
-						grams(a).output{d,e,t,trial}.Serror = Serror;
+						gram(a).output = Output;
 					end
 					
 					%% If user asks to save to harddrive, then do
 					if dataToProcess.save
-						% TODO
+						
+						SaveFileCharacteristics.animal = ...
+							acquisition(a).animal;
+						SaveFileCharacteristics.data_name = ...
+							'spec';
+						SaveFileCharacteristics.numerical_address = ...
+							[d e t trial];
+						
+						saveOutput(SaveFileCharacteristics, Output);
 					end
 
                 end
@@ -135,31 +148,60 @@ for a = 1:numel(acquisition)
 					end
 
 					%% If user asks for output, then add to proper cell locs
-					if dataToProcess.output
+					if dataToProcess.output || dataToProcess.save
 						% Cross-tetrode informations
-						grams(a).output{d,e,t,t2,trial}.C = C;
-						grams(a).output{d,e,t,t2,trial}.cerror = Cerr;
-						grams(a).output{d,e,t,t2,trial}.confC = confC;
-						grams(a).output{d,e,t,t2,trial}.phi = phi;
-						grams(a).output{d,e,t,t2,trial}.phistd;
-						grams(a).output{d,e,t,t2,trial}.S12 = S12;
-						grams(a).output{d,e,t,t2,trial}.Stime = Stime;
-						grams(a).output{d,e,t,t2,trial}.Sfreq = Sfreq;
+						Output12.C = C;
+						Output12.cerror = Cerr;
+						Output12.confC = confC;
+						Output12.phi = phi;
+						Output12.phistd;
+						Output12.S12 = S12;
+						Output12.Stime = Stime;
+						Output12.Sfreq = Sfreq;
 
 						% Single tetrode t information
-						grams(a).output{d,e,t,t,trial}.S = S1;
-						grams(a).output{d,e,t,t,trial}.Stime = Stime;
-						grams(a).output{d,e,t,t,trial}.Sfreq = Stime;
+						Output1.S = S1;
+						Output1.Stime = Stime;
+						Output1.Sfreq = Stime;
 
 						% Single tetrode t2 information
-						grams(a).output{d,e,t2,t2,trial}.S = S2;
-						grams(a).output{d,e,t2,t2,trial}.Stime = Stime;
-						grams(a).output{d,e,t2,t2,trial}.Sfreq = Stime;
+						Output2.S = S2;
+						Output2.Stime = Stime;
+						Output2.Sfreq = Stime;
+					end
+					
+					%% If user asks to output from function/RAM
+					if dataToProcess.output
+						grams(a).output{d,e,t,t2,trial} = Output12;
+						grams(a).output{d,e,t,t,trial} = Output1;
+						grams(a).output{d,e,t2,t2,trial} = Output2;
 					end
 					
 					%% If user asks to save data to harddrive, then do
 					if dataToProcess.save
-						% TODO
+						
+						% Save coherence for t & t2
+						SaveFileCharacteristics.animal = ...
+							acquisition(a).animal;
+						SaveFileCharacteristics.data_name = ...
+							'coher';
+						SaveFileCharacteristics.numerical_address = ...
+							[d e t t2 trial];
+						saveOutput(SaveFileCharacteristics, Output12);
+						
+						% Save spectrogram t
+						SaveFileCharacteristics.data_name = ...
+							'spec';
+						SaveFileCharacteristics.numerical_address = ...
+							[d e t trial];
+						saveOutput(SaveFileCharacteristics,Output1);
+						
+						% Save spectrogram t2
+						SaveFileCharacteristics.numerical_address = ...
+							[d e t2 trial];
+						
+						saveOutput(SaveFileCharacteristics,Output2);
+						
 					end
 					
 
@@ -192,7 +234,25 @@ return;
 	% cell arrays can be positively huge in memory, even when their
 	% elements are empty.
 	
+	% Setup shortened names for header strings
+	animal = SaveFileCharacteristics.animal;
+	data_name = SaveFileCharacteristics.data_name;
 	
+	% Create string for numerical address
+	numerical_address_string = [];
+	for num = SaveFileCharacteristics.numerical_address
+		numerical_address_string = [numerical_address_string ...
+			num2str(num) '-'];
+	end
+	% Remove last '-'
+	numerical_address_string = numerical_address_string(1:end-1);
+	
+	% Create filename
+	filename = [animal data_name numerical_address_string];
+	
+	% Save all fields in OutputsToSave struct as individual variables,
+	% -struct option seperates out the fields
+	save(filename,'-struct', 'OutputsToSave');
 	
 	end
 
