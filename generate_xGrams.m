@@ -1,4 +1,4 @@
-function [xGrams] = generate_xGrams(acquisition, dataToProcess, ...
+function [grams] = generate_xGrams(acquisition, dataToProcess, ...
     acquisition2)
 % Function that will accept 'acquisition' structure from gather windows of
 % data and from it compute either a spectrogram per set of data in
@@ -20,20 +20,24 @@ params.tapers = [3 5];
 params.err = [2 0.05];
 params.pad = 7;
 
-%% Spectrograms! For-loooping over acquisitions
+%%
 try
+	
+	
+%% Spectrograms! For-loooping over acquisitions
 if nargin < 3
 
 
 for a = 1:numel(acquisition)
     
-    xGrams(a).animal = acquisition(a).animal;
+    grams(a).animal = acquisition(a).animal;
     
     for d = dataToProcess.days
         for e = dataToProcess.epochs
             for t = dataToProcess.tetrodes
                 for trial = 1:size(acquisition.data{d,e,t},1)
-
+					
+					%% Acquire spectrograms for trial
                     specgram_data = acquisition.data{d,e,t}(trial,:);
 
                     if sum(isnan(specgram_data)) > 0
@@ -46,8 +50,8 @@ for a = 1:numel(acquisition)
                             mtspecgramc(specgram_data(indices(1):indices(end)), movingwin,params);
                     end
 
-                    % If plot option is on, plot each one
-                    if dataToProcess.doPlot
+                    %% If plot option is on, plot each one
+                    if dataToProcess.plot
                         input('Press return to continue');
                         i = imagesc(Stime,Sfreq,S');
                         i.Parent.YDir = 'normal';       % images invert by 
@@ -60,24 +64,33 @@ for a = 1:numel(acquisition)
                         grid on;
                     end
 
-                    % Place into output structure
-                    xGrams(a).output{d,e,t}.S = Sfreq;
-                    xGrams(a).output{d,e,t}.Stime = Stime;
-                    xGrams(a).output{d,e,t}.Sfreq = Sfreq;
-                    xGrams(a).output{d,e,t}.Serror = Serror;
+                    %% If user asks for output, then do
+					if dataToProcess.output
+						grams(a).output{d,e,t,trial}.S = Sfreq;
+						grams(a).output{d,e,t,trial}.Stime = Stime;
+						grams(a).output{d,e,t,trial}.Sfreq = Sfreq;
+						grams(a).output{d,e,t,trial}.Serror = Serror;
+					end
+					
+					%% If user asks to save to harddrive, then do
+					if dataToProcess.save
+						% TODO
+					end
 
                 end
             end
         end
     end
 end
+end
 
-%% Coherograms!
-elseif nargin == 3
+%% Coherograms! (and spectrograms)
+%
+if nargin == 3
 
 for a = 1:numel(acquisition)
     
-    xGrams(a).animal = acquisition(a).animal;
+    grams(a).animal = acquisition(a).animal;
     
     for d = dataToProcess.days
         for e = dataToProcess.epochs
@@ -85,6 +98,7 @@ for a = 1:numel(acquisition)
             for t2 = dataToProcess.tetrodes2
                 for trial = 1:size(acquisition.data{d,e,t},1)
 
+					%% Acquire coherence and spectrograms for trial
                     specgram_data = acquisition.data{d,e,t}(trial,:);
                     specgram_data2 = acquisition2.data{d,e,t2}(trial,:);
 
@@ -106,8 +120,8 @@ for a = 1:numel(acquisition)
                             specgram_data2(indices2(1):indices2(end))',movingwin,params);
                     end
 
-                    % If plot option is on, plot each one
-                    if dataToProcess.doPlot
+                    %% If plot option is on, plot each one
+                    if dataToProcess.plot
                         input('Press return to continue');
                         i = imagesc(Stime,Sfreq,C');
                         i.Parent.YDir = 'normal';       % images invert by 
@@ -118,14 +132,36 @@ for a = 1:numel(acquisition)
                         xlabel('Time (s)');
                         ylabel('Frequency (hZ)');
                         grid on;
-                    end
+					end
 
-                    % Place into output structure
-%                     grams(a).output{d,e,t}.C = C;
-%                     grams(a).output{d,e,t}.phi = phi;
-%                     grams(a).output{d,e,t}.Ctime = t;
-%                     grams(a).output{d,e,t}.Cfreq = f;
-%                     grams(a).output{d,e,t}.cerror = Cerr;
+					%% If user asks for output, then add to proper cell locs
+					if dataToProcess.output
+						% Cross-tetrode informations
+						grams(a).output{d,e,t,t2,trial}.C = C;
+						grams(a).output{d,e,t,t2,trial}.cerror = Cerr;
+						grams(a).output{d,e,t,t2,trial}.confC = confC;
+						grams(a).output{d,e,t,t2,trial}.phi = phi;
+						grams(a).output{d,e,t,t2,trial}.phistd;
+						grams(a).output{d,e,t,t2,trial}.S12 = S12;
+						grams(a).output{d,e,t,t2,trial}.Stime = Stime;
+						grams(a).output{d,e,t,t2,trial}.Sfreq = Sfreq;
+
+						% Single tetrode t information
+						grams(a).output{d,e,t,t,trial}.S = S1;
+						grams(a).output{d,e,t,t,trial}.Stime = Stime;
+						grams(a).output{d,e,t,t,trial}.Sfreq = Stime;
+
+						% Single tetrode t2 information
+						grams(a).output{d,e,t2,t2,trial}.S = S2;
+						grams(a).output{d,e,t2,t2,trial}.Stime = Stime;
+						grams(a).output{d,e,t2,t2,trial}.Sfreq = Stime;
+					end
+					
+					%% If user asks to save data to harddrive, then do
+					if dataToProcess.save
+						% TODO
+					end
+					
 
                 end
             end
@@ -135,11 +171,29 @@ for a = 1:numel(acquisition)
 end 
 end
 
-% if screws up in for-loop, reset figure style.
-catch ME
+
+catch ME				% if screws up in for-loop, reset figure style.
+	%% Error post-processing
     set(groot,'DefaultFigureWindowStyle','normal')
+	
 end
 
+%% Post-processing
+
 set(groot,'DefaultFigureWindowStyle','normal')
+return;
+
+%% HELPER FUNCTIONS
+
+	function saveOutput(SaveFileCharacteristics, OutputsToSave)
+	% Exists so that data can be saved per processing cyle instead of
+	% pushed into RAM. If an option is turned on, the function will save to
+	% hard-drive results instead of throwing into RAM. 4- and 5-dimensional
+	% cell arrays can be positively huge in memory, even when their
+	% elements are empty.
+	
+	
+	
+	end
 
 end 

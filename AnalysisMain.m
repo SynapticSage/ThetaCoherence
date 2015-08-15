@@ -1,4 +1,4 @@
-clear all;
+	clear all;
 
 % if files.brandeis.edu is in the file system, then add data to path
 d= filesep;
@@ -132,7 +132,7 @@ acquisition2 = gatherWindowsOfData(dataFolder, dataToGet, processOptions);
 
 dataToProcess.days = 5; dataToProcess.epochs = 2; 
 dataToProcess.tetrodes = 1; dataToProcess.tetrodes2 = 16; 
-dataToProcess.doPlot = 1;
+dataToProcess.plot = 1;
 
 generate_xGrams(acquisition,dataToProcess);		% add acquisition2 for coherograms
 
