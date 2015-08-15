@@ -134,8 +134,6 @@ acquisition = gatherWindowsOfData(dataFolder, dataToGet, processOptions);
 dataToProcess.days = 5; dataToProcess.epochs = 2; 
 dataToProcess.tetrodes = 1; dataToProcess.tetrodes2 = 16; 
 
-dataToProcess.plot = 1;
-dataToProcess.output = 0;
 dataToProcess.save = 1;
 
 generate_xGrams(acquisition,dataToProcess);		% add acquisition2 for coherograms

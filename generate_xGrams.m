@@ -20,6 +20,17 @@ params.tapers = [3 5];
 params.err = [2 0.05];
 params.pad = 7;
 
+%% Default parameters if not inputted
+if ~ismember('output', dataToProcess)
+	dataToProcess.output = false;
+end
+if ~ismember('save', dataToProcess)
+	dataToProcess.save = false;
+end
+if ~ismember('plot', dataToProcess)
+	dataToProcess.plot = true;
+end
+
 %%
 try
 	
