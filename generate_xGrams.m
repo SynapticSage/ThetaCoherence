@@ -1,4 +1,4 @@
-function [grams] = generateSpecgrams(acquisition, dataToProcess, ...
+function [xGrams] = generate_xGrams(acquisition, dataToProcess, ...
     acquisition2)
 % Function that will accept 'acquisition' structure from gather windows of
 % data and from it compute either a spectrogram per set of data in
@@ -27,7 +27,7 @@ if nargin < 3
 
 for a = 1:numel(acquisition)
     
-    grams(a).animal = acquisition(a).animal;
+    xGrams(a).animal = acquisition(a).animal;
     
     for d = dataToProcess.days
         for e = dataToProcess.epochs
@@ -61,10 +61,10 @@ for a = 1:numel(acquisition)
                     end
 
                     % Place into output structure
-                    grams(a).output{d,e,t}.S = Sfreq;
-                    grams(a).output{d,e,t}.Stime = Stime;
-                    grams(a).output{d,e,t}.Sfreq = Sfreq;
-                    grams(a).output{d,e,t}.Serror = Serror;
+                    xGrams(a).output{d,e,t}.S = Sfreq;
+                    xGrams(a).output{d,e,t}.Stime = Stime;
+                    xGrams(a).output{d,e,t}.Sfreq = Sfreq;
+                    xGrams(a).output{d,e,t}.Serror = Serror;
 
                 end
             end
@@ -77,7 +77,7 @@ elseif nargin == 3
 
 for a = 1:numel(acquisition)
     
-    grams(a).animal = acquisition(a).animal;
+    xGrams(a).animal = acquisition(a).animal;
     
     for d = dataToProcess.days
         for e = dataToProcess.epochs
