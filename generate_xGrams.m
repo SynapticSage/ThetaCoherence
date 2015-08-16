@@ -63,6 +63,17 @@ for a = 1:numel(acquisition)
 		  
 		  % Unable to test atm, draft code
 		  %Stime = Stime - length(Stime)/(params.Fs * 2); % This will make time start -win(1) instead of 0
+		  
+		  % Unable to test atm, draft code
+%		  % to figure out- importing relevant mean data, or meangrnd data. Differentiate between S and Sgrnd?
+%		  if zscore == 1
+%			meanspecgnd = eeggndspec{d}{e}{t}.meanspec;
+%        		stdspecgnd = eeggndspec{d}{e}{t}.stdspec;
+%        		
+%			% Z-score
+%			S_zscr = bsxfun(@minus,S,meanspecgnd(1:size(S,2))); 
+%        		S_zscr = bsxfun(@rdivide,S,stdspecgnd(1:size(S,2)));
+%		  end
 
                     %% If plot option is on, plot each one
                     if dataToProcess.plot
