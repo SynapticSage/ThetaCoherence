@@ -60,6 +60,9 @@ for a = 1:numel(acquisition)
                         [S, Stime, Sfreq, Serror] = ...
                             mtspecgramc(specgram_data(indices(1):indices(end)), movingwin,params);
                     end
+		  
+		  % Unable to test atm, draft code
+		  %Stime = Stime - length(Stime)/(params.Fs * 2); % This will make time start -win(1) instead of 0
 
                     %% If plot option is on, plot each one
                     if dataToProcess.plot
