@@ -131,13 +131,26 @@ function [acquisition] = ...
 
 % if user did not pass in the field to grab inside imported data, e.g.
 % 'data' in theta., then let's default to 'data'.
-if(~ismember('datType_sub',fields(dataToGet)))
+if ~ismember('datType_sub',fields(dataToGet))
 	dataToGet.datType_sub = 'data';
 end
-
 % if user did not pass indices, set them
-if(~ismember('datType_indices',fields(dataToGet)))
+if ~ismember('datType_indices',fields(dataToGet))
 	dataToGet.datType_indices = {':',1};
+end
+% if user did not pass data type, set it
+if ~ismember('datType', fields(dataToGet)) ...
+		|| isempty(dataToGet.datType)
+	
+	dataToGet.datType = 'eeg';
+end
+% if did not pass output option, set
+if ~ismember('output', fields(processOptions) )
+	processOptions.output = true;
+end
+% if did not pass save option, set
+if ~ismember('save', fields(processOptions) )
+	processOptions.save = false;
 end
 
 if nargin < 3
@@ -222,16 +235,38 @@ for a = 1:numel(animal_list)
 			% Get list of continuous time windows - we pass in sample times
 			% and well as a list of all times
 			
-			%% Window out the correct data per tetrode
             for t = dataToGet.animals.(anim).tetrodes
                 
+				%% Window out the correct data per tetrode
 				% Acquire matrix of windowed data
-                [acquisition(a).data{d,e,t}, acquisition(a).time_vec{d,e,t}] ...
+                [data, time_vec] ...
 					= windowData(...
 					dataToGet.datType, dataToGet.datType_sub, dataToGet.datType_indices, ...
 					anim,d,e,t,...
 					start_stop_times, indicesInSample, ...
 					processOptions);
+				
+				%% Add to output if requested
+				if processOptions.output
+					
+					acquisition(a).data{d,e,t} = data;
+					acquisition(a).time_vec{d,e,t} = data;
+					
+				end
+				
+				%% Add to save if requested
+				if processOptions.save
+					
+					OutputsToSave.data = data;
+					OutputsToSave.time_vec = time_vec;
+					
+					SaveFileCharacteristics.animal='HPa';
+					SaveFileCharacteristics.data_name = 'acquisition';
+					SaveFileCharacteristics.numerical_address = [d e t];
+					
+					saveOutput(OutputsToSave, SaveFileCharacteristics);
+					
+				end
                 
 			end % of tetrode loop
 			
@@ -251,6 +286,12 @@ throw(ME);
 
 end
 
+%% Post-processing phase
+% return to calling folder and remove dataFolder tree from the path
+rmpath(genpath(dataFolder));
+cd(initial_folder);
+
+return;		% Exit function
 
 
 
@@ -261,8 +302,8 @@ end
 
 
 
+%% HELPER FUNCTIONS -----------------------------------------
 
-%% Helper functions -----------------------------------------
 % --- Helper function: processTuple
 function [winData, time_vec] = windowData(dat, dat_sub, dat_ind,...
 		anim, day, epo, tet, ...
@@ -351,19 +392,39 @@ function [winData, time_vec] = windowData(dat, dat_sub, dat_ind,...
         else
             %TODO write situation for [] padding
         end
-    end
-    
-    
-    
-    % Return the data points
-    return;
-   
+	end
+		
 end
 
-%% Post-processing phase
-% return to calling folder and remove dataFolder tree from the path
-rmpath(genpath(dataFolder));
-cd(initial_folder);
+% --- Helper function: saveOutput
+function saveOutput(SaveFileCharacteristics, OutputsToSave)
+	% Exists so that data can be saved per processing cyle instead of
+	% pushed into RAM. If an option is turned on, the function will save to
+	% hard-drive results instead of throwing into RAM. 4- and 5-dimensional
+	% cell arrays can be positively huge in memory, even when their
+	% elements are empty.
+	
+	% Setup shortened names for header strings
+	animal = SaveFileCharacteristics.animal;
+	data_name = SaveFileCharacteristics.data_name;
+	
+	% Create string for numerical address
+	numerical_address_string = [];
+	for num = SaveFileCharacteristics.numerical_address
+		numerical_address_string = [numerical_address_string ...
+			num2str(num) '-'];
+	end
+	% Remove last '-'
+	numerical_address_string = numerical_address_string(1:end-1);
+	
+	% Create filename
+	filename = [animal data_name numerical_address_string];
+	
+	% Save all fields in OutputsToSave struct as individual variables,
+	% -struct option seperates out the fields
+	save(filename,'-struct', 'OutputsToSave');
+	
+	end
 
 end
 

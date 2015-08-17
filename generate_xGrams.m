@@ -51,7 +51,7 @@ for a = 1:numel(acquisition)
 					%% Acquire spectrograms for trial
                     specgram_data = acquisition.data{d,e,t}(trial,:);
 
-                    if sum(isnan(specgram_data)) > 0
+                    if any(isnan(specgram_data))
                         logicalvec = ~isnan(specgram_data);
                         [S, Stime, Sfreq, Serror] = ...
                             mtspecgramc(specgram_data(logicalvec)', movingwin, params);
