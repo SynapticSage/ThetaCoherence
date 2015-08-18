@@ -41,11 +41,10 @@ if sets == 'trials';
                 end
                 
                 % package mean Specs and SpecErrors
-                avg_specgram(a).output{uDay(d), uEpc(e), uTet(t)}....
-                meanS     = squeeze(mean(tempS     ,1));
                 avg_specgram(a).output{uDay(d), uEpc(e), uTet(t)}...
-                meanSerror= squeeze(mean(tempSerror,1));
-                
+                .meanS     =squeeze(mean(tempS     ,1));
+                avg_specgram(a).output{uDay(d), uEpc(e), uTet(t)}...
+                .meanSerror=squeeze(mean(tempSerror,1));
             end
         end
     end
