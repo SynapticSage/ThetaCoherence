@@ -8,27 +8,27 @@ function [grams] = generate_xGrams(acquisition, dataToProcess, ...
 % Calculates specgram unless user passes in a second acquisition structure.
 
 % Store figure window style
-default_fig = get(groot, 'DefaultFigureWindowStyle');
-set(groot,'DefaultFigureWindowStyle','docked')
+% default_fig = get(groot, 'DefaultFigureWindowStyle');
+% set(groot,'DefaultFigureWindowStyle','docked')
 
 %% Define Chronux params
 % -------------------------------------------
-movingwin = [100 10]/1000; %movingwin = [100 10]/1000;                
+movingwin = [400 40]/1000; %movingwin = [100 10]/1000;                
 params.Fs = 1500;
 params.fpass = [0 100]; % params.fpass = [0 400];
 params.tapers = [3 5];
 params.err = [2 0.05];
-params.pad = 7;
+%params.pad = 7;
 
 %% Default parameters if not inputted
 if ~ismember('output', fields(dataToProcess))
-	dataToProcess.output = false;
+	dataToProcess.output = true;
 end
 if ~ismember('save', fields(dataToProcess))
 	dataToProcess.save = false;
 end
 if ~ismember('plot', fields(dataToProcess))
-	dataToProcess.plot = true;
+	dataToProcess.plot = false;
 end
 
 %%
@@ -46,19 +46,19 @@ for a = 1:numel(acquisition)
     for d = dataToProcess.days
         for e = dataToProcess.epochs
             for t = dataToProcess.tetrodes
-                for trial = 1:size(acquisition.data{d,e,t},1)
+                for trial = 1:size(acquisition(a).data{d,e,t},1)
 					
 					%% Acquire spectrograms for trial
-                    specgram_data = acquisition.data{d,e,t}(trial,:);
+                    specgram_data = acquisition(a).data{d,e,t}(trial,:);
 
                     if any(isnan(specgram_data))
                         logicalvec = ~isnan(specgram_data);
                         [S, Stime, Sfreq, Serror] = ...
                             mtspecgramc(specgram_data(logicalvec)', movingwin, params);
                     else
-                        indices = find(acquisition.data{d,e,t}(trial,:) ~= 0);
+                        indices = find(acquisition(a).data{d,e,t}(trial,:) ~= 0);
                         [S, Stime, Sfreq, Serror] = ...
-                            mtspecgramc(specgram_data(indices(1):indices(end)), movingwin,params);
+                            mtspecgramc(specgram_data(indices(1):indices(end))', movingwin,params);
                     end
 		  
 		  % Unable to test atm, draft code
@@ -91,7 +91,7 @@ for a = 1:numel(acquisition)
 
                     %% If user asks for output to RAM or harddrive
 					if (dataToProcess.output || dataToProcess.save)
-						Output.S = Sfreq;
+						Output.S = S;
 						Output.Stime = Stime;
 						Output.Sfreq = Sfreq;
 						Output.Serror = Serror;
@@ -99,7 +99,7 @@ for a = 1:numel(acquisition)
 					
 					%% If user asks to output to RAM
 					if dataToProcess.output
-						gram(a).output{d,e,t,trial} = Output;
+						grams(a).output{d,e,t,trial} = Output;
 					end
 					
 					%% If user asks to save to harddrive, then do
@@ -134,11 +134,11 @@ for a = 1:numel(acquisition)
         for e = dataToProcess.epochs
             for t = dataToProcess.tetrodes
             for t2 = dataToProcess.tetrodes2
-                for trial = 1:size(acquisition.data{d,e,t},1)
+                for trial = 1:size(acquisition(a).data{d,e,t},1)
 
 					%% Acquire coherence and spectrograms for trial
-                    specgram_data = acquisition.data{d,e,t}(trial,:);
-                    specgram_data2 = acquisition2.data{d,e,t2}(trial,:);
+                    specgram_data = acquisition(a).data{d,e,t}(trial,:);
+                    specgram_data2 = acquisition2(a).data{d,e,t2}(trial,:);
 
                     if sum(isnan(specgram_data)) > 0
                         
@@ -179,7 +179,7 @@ for a = 1:numel(acquisition)
 						Output12.cerror = Cerr;
 						Output12.confC = confC;
 						Output12.phi = phi;
-						Output12.phistd;
+						Output12.phistd = phistd;
 						Output12.S12 = S12;
 						Output12.Stime = Stime;
 						Output12.Sfreq = Sfreq;
@@ -241,14 +241,14 @@ end
 
 catch ME				% if screws up in for-loop, reset figure style.
 	%% Error post-processing
-    set(groot,'DefaultFigureWindowStyle','normal')
+    set(groot,'DefaultFigureWindowStyle',default_fig)
 	disp(ME.message);
 	
 end
 
 %% Post-processing
 
-set(groot,'DefaultFigureWindowStyle','normal')
+set(groot,'DefaultFigureWindowStyle',default_fig)
 return;
 
 %% HELPER FUNCTIONS

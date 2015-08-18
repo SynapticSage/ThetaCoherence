@@ -57,7 +57,7 @@ function [acquisition] = ...
 %
 %	This parameter selects chich type of data to window.
 %
-%	.paddingRemoved (OPTIONAL) when data is grabbed, 0 padding at the
+%	.windowPadding (OPTIONAL) when data is grabbed, 0 padding at the
 %	non-sample data points is removed is this option is set, or if it's set
 %	to a value, say NaN, it will make 0's padding NaN padding.
 %

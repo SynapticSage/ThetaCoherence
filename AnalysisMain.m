@@ -133,12 +133,12 @@ toc
 
 %% Debug generateSpecgrams
 
-dataToProcess.days = 5; dataToProcess.epochs = 2; 
-dataToProcess.tetrodes = 1; dataToProcess.tetrodes2 = 16; 
+dataToProcess.days = [5 6]; dataToProcess.epochs = [2 4]; 
+dataToProcess.tetrodes = [1 2]; dataToProcess.tetrodes2 = 16; 
 
-dataToProcess.save = 1;
+dataToProcess.save = 0;
 
-generate_xGrams(acquisition,dataToProcess);		% add acquisition2 for coherograms
+Output= generate_xGrams(acquisition,dataToProcess);		% add acquisition2 for coherograms
 
 % Run function
 
