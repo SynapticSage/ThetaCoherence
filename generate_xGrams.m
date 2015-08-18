@@ -91,7 +91,7 @@ for a = 1:numel(acquisition)
 
                     %% If user asks for output to RAM or harddrive
 					if (dataToProcess.output || dataToProcess.save)
-						Output.S = Sfreq;
+						Output.S = S;
 						Output.Stime = Stime;
 						Output.Sfreq = Sfreq;
 						Output.Serror = Serror;

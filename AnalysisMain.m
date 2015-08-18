@@ -136,7 +136,7 @@ dataToProcess.tetrodes = [1 2]; dataToProcess.tetrodes2 = 16;
 
 dataToProcess.save = 0;
 
-generate_xGrams(acquisition,dataToProcess);		% add acquisition2 for coherograms
+Output= generate_xGrams(acquisition,dataToProcess);		% add acquisition2 for coherograms
 
 % Run function
 
