@@ -100,7 +100,9 @@ processOptions.windowPadding = NaN;
 
 
 % RUN FUNCTION!
+tic
 acquisition = gatherWindowsOfData(dataFolder, dataToGet, processOptions);
+toc
 
 %% TEST SECTION: Getting second acquisition
 

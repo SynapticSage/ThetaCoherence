@@ -58,7 +58,7 @@ for a = 1:numel(acquisition)
                     else
                         indices = find(acquisition(a).data{d,e,t}(trial,:) ~= 0);
                         [S, Stime, Sfreq, Serror] = ...
-                            mtspecgramc(specgram_data(indices(1):indices(end)), movingwin,params);
+                            mtspecgramc(specgram_data(indices(1):indices(end))', movingwin,params);
                     end
 		  
 		  % Unable to test atm, draft code
@@ -179,7 +179,7 @@ for a = 1:numel(acquisition)
 						Output12.cerror = Cerr;
 						Output12.confC = confC;
 						Output12.phi = phi;
-						Output12.phistd;
+						Output12.phistd = phistd;
 						Output12.S12 = S12;
 						Output12.Stime = Stime;
 						Output12.Sfreq = Sfreq;
@@ -241,14 +241,14 @@ end
 
 catch ME				% if screws up in for-loop, reset figure style.
 	%% Error post-processing
-    set(groot,'DefaultFigureWindowStyle','normal')
+    set(groot,'DefaultFigureWindowStyle',default_fig)
 	disp(ME.message);
 	
 end
 
 %% Post-processing
 
-set(groot,'DefaultFigureWindowStyle','normal')
+set(groot,'DefaultFigureWindowStyle',default_fig)
 return;
 
 %% HELPER FUNCTIONS

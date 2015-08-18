@@ -57,7 +57,7 @@ function [acquisition] = ...
 %
 %	This parameter selects chich type of data to window.
 %
-%	.paddingRemoved (OPTIONAL) when data is grabbed, 0 padding at the
+%	.windowPadding (OPTIONAL) when data is grabbed, 0 padding at the
 %	non-sample data points is removed is this option is set, or if it's set
 %	to a value, say NaN, it will make 0's padding NaN padding.
 %
@@ -209,6 +209,7 @@ for a = 1:numel(animal_list)
             
 			% Generate the file string from each of the cell elements passed from
 			% the nested loop over cells
+            clear file_cell;
 			file_cell{1} = [anim 'linpos' day ];
 			file_cell{2} = [anim 'trajinfo' day ];
 			file_cell{3} = [anim 'pos' day ];
@@ -224,6 +225,7 @@ for a = 1:numel(animal_list)
 			data.trajinfo = trajinfo{d}{e};
 			% Get epoch of raw position data!
 			data.pos = pos{d}{e};
+            clear pos linpos trajinfo;
 
 			%% Find times to sample
 			
