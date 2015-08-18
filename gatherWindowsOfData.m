@@ -209,6 +209,7 @@ for a = 1:numel(animal_list)
             
 			% Generate the file string from each of the cell elements passed from
 			% the nested loop over cells
+            clear file_cell;
 			file_cell{1} = [anim 'linpos' day ];
 			file_cell{2} = [anim 'trajinfo' day ];
 			file_cell{3} = [anim 'pos' day ];
@@ -224,6 +225,7 @@ for a = 1:numel(animal_list)
 			data.trajinfo = trajinfo{d}{e};
 			% Get epoch of raw position data!
 			data.pos = pos{d}{e};
+            clear pos linpos trajinfo;
 
 			%% Find times to sample
 			
