@@ -100,7 +100,7 @@ end
 % Get EEGs and spectrogram it
 % ------------------------------
 % cd([directoryname,'/EEG/']);
-savedir = [directoryname,'/EEGSpec/'];
+savedir = [directoryname,'/EEGCoh/'];
 
 for d=1:length(days)
     
