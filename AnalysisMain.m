@@ -69,10 +69,10 @@ data.trajinfo = trajinfo{5}{2};
 %% TEST SECTION: show gatherWindowsofData works
 
 dataFolder = './';	% DOES NOT HAVE TO BE IN DATA FOLDER RIGHT NOW ... just add whole data folder heirarchy to path above -- see code line 1 atop!
-animals = {'HPa'};
-day_set = [5];			% set of days to analyze for all animals ... 
-epoch_set = [2];		% set of epochs to analyze for all animals ... 
-tetrode_set = [1];		% set of tetrodes to analyze for all animals ... 
+animals = {'HPa','HPb'};
+day_set = [5 6];			% set of days to analyze for all animals ... 
+epoch_set = [2 4];		% set of epochs to analyze for all animals ... 
+tetrode_set = [1 2];		% set of tetrodes to analyze for all animals ... 
 
 						% .. these could in theory be set individually per
 						% animal so that different sets analyzed for
@@ -131,10 +131,10 @@ acquisition = gatherWindowsOfData(dataFolder, dataToGet, processOptions);
 
 %% Debug generateSpecgrams
 
-dataToProcess.days = 5; dataToProcess.epochs = 2; 
-dataToProcess.tetrodes = 1; dataToProcess.tetrodes2 = 16; 
+dataToProcess.days = [5 6]; dataToProcess.epochs = [2 4]; 
+dataToProcess.tetrodes = [1 2]; dataToProcess.tetrodes2 = 16; 
 
-dataToProcess.save = 1;
+dataToProcess.save = 0;
 
 generate_xGrams(acquisition,dataToProcess);		% add acquisition2 for coherograms
 
