@@ -2,9 +2,13 @@ function [grams] = generate_xGrams(acquisition, dataToProcess, ...
     acquisition2)
 % Function that will accept 'acquisition' structure from gather windows of
 % data and from it compute either a spectrogram per set of data in
-% acquision or some combination of spectrograms.
-%
-%
+% acquision or some combination of spectrograms. If you provide a second
+% acquisition 
+% 
+% dataToProcess .. struct descrbing the data to create spectrograms over
+%   dataToProcess.days = days to generate specgrams over
+%   dataToProcess.epochs = epochs to generate specgrams over
+%   dataToProcess.tetrodes = tetrodes to generate specgrams over
 %
 %
 %

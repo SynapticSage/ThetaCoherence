@@ -68,6 +68,50 @@ sampleParams.trajbound_type = 0 ;            % 0 denotes outbound
 
 %% TEST SECTION: show gatherWindowsofData works
 
+for day = 2:8
+dataFolder = './';      % DOES NOT HAVE TO BE IN DATA FOLDER RIGHT NOW ... just add whole data folder heirarchy to path above -- see code line 1 atop!
+animals = {'HPa'};
+day_set = [day];			% set of days to analyze for all animals ... 
+epoch_set = [2 4];		% set of epochs to analyze for all animals ... 
+tetrode_set = [1:7];		% set of tetrodes to analyze for all animals ... 
+
+						% .. these could in theory be set individually per
+						% animal so that different sets analyzed for
+						% different animals
+
+
+% set .animals field to contain who, which day, which epoch, and which
+% tetrodes
+clear dataToGet;
+for a = 1:numel(animals)
+	
+	dataToGet.animals.(animals{a}).days = day_set;
+	dataToGet.animals.(animals{a}).epochs = epoch_set;
+	dataToGet.animals.(animals{a}).tetrodes = tetrode_set;
+	
+end
+
+% set dataToGet.sampleParams, from the above section
+dataToGet.sampleParams = sampleParams;
+
+% specify which electrophysiology data to window!
+dataToGet.datType = 'eeggnd';
+
+% specify process options if any
+processOptions.windowPadding = NaN;
+
+
+% RUN FUNCTION!
+tic
+acquisition =...
+    gatherWindowsOfData(dataFolder, dataToGet, processOptions);
+toc
+
+save(['days_' num2str(day)] ,'acquisition','-v7.3')
+end
+
+%% TEST SECTION: show gatherWindowsofData works
+clear acquisition;
 dataFolder = './';	% DOES NOT HAVE TO BE IN DATA FOLDER RIGHT NOW ... just add whole data folder heirarchy to path above -- see code line 1 atop!
 animals = {'HPa'};
 day_set = [2:5];			% set of days to analyze for all animals ... 
@@ -94,49 +138,7 @@ end
 dataToGet.sampleParams = sampleParams;
 
 % specify which electrophysiology data to window!
-dataToGet.datType = 'eeg';
-
-% specify process options if any
-processOptions.windowPadding = NaN;
-
-
-% RUN FUNCTION!
-tic
-acquisition =...
-    gatherWindowsOfData(saveFolder, dataToGet, processOptions);
-toc
-
-save('days_2through5','acquisition','-v7.3')
-
-%% TEST SECTION: show gatherWindowsofData works
-clear acquisition;
-dataFolder = './';	% DOES NOT HAVE TO BE IN DATA FOLDER RIGHT NOW ... just add whole data folder heirarchy to path above -- see code line 1 atop!
-animals = {'HPa'};
-day_set = [1];			% set of days to analyze for all animals ... 
-epoch_set = [4 6];		% set of epochs to analyze for all animals ... 
-tetrode_set = [1:7];		% set of tetrodes to analyze for all animals ... 
-
-						% .. these could in theory be set individually per
-						% animal so that different sets analyzed for
-						% different animals
-
-
-% set .animals field to contain who, which day, which epoch, and which
-% tetrodes
-clear dataToGet;
-for a = 1:numel(animals)
-	
-	dataToGet.animals.(animals{a}).days = day_set;
-	dataToGet.animals.(animals{a}).epochs = epoch_set;
-	dataToGet.animals.(animals{a}).tetrodes = tetrode_set;
-	
-end
-
-% set dataToGet.sampleParams, from the above section
-dataToGet.sampleParams = sampleParams;
-
-% specify which electrophysiology data to window!
-dataToGet.datType = 'eeg';
+dataToGet.datType = 'eeggnd';
 
 % specify process options if any
 processOptions.windowPadding = NaN;
@@ -146,6 +148,8 @@ processOptions.windowPadding = NaN;
 tic
 acquisition =...
     gatherWindowsOfData(dataFolder, dataToGet, processOptions);
+
+save('days_6through8','acquisition','-v7.3')
 toc
 
 %% TEST SECTION: Getting second acquisition
