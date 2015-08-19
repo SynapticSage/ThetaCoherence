@@ -52,17 +52,17 @@ sampleParams.trajbound_type = 0 ;            % 0 denotes outbound
  sampleParams.edgeMode.entranceOrExit = 'entrance';
 
 %% DEBUG SECTION: show acquireSample method works
-
-% Load all three data types for day, epoch .. squeeze into data struct
-load HPalinpos05;
-data.linpos = linpos{5}{2};
-load HPapos05;
-data.pos = pos{5}{2};
-load HPatrajinfo05;
-data.trajinfo = trajinfo{5}{2};
-
-% Run the acquireSample function
-[time, indices, t_paths, i_paths] = acquireSample(data,sampleParams);
+% 
+% % Load all three data types for day, epoch .. squeeze into data struct
+% load HPalinpos05;
+% data.linpos = linpos{5}{2};
+% load HPapos05;
+% data.pos = pos{5}{2};
+% load HPatrajinfo05;
+% data.trajinfo = trajinfo{5}{2};
+% 
+% % Run the acquireSample function
+% [time, indices, t_paths, i_paths] = acquireSample(data,sampleParams);
 
 % WORKS!
 
@@ -131,7 +131,7 @@ toc
 % % RUN FUNCTION!
 % acquisition2 = gatherWindowsOfData(dataFolder, dataToGet, processOptions);
 
-%% Debug generateSpecgrams
+%% Debug generate_xGrams
 
 dataToProcess.days = [5 6]; dataToProcess.epochs = [2 4]; 
 dataToProcess.tetrodes = [1 2]; dataToProcess.tetrodes2 = 16; 
@@ -141,6 +141,19 @@ dataToProcess.save = 0;
 Output= generate_xGrams(acquisition,dataToProcess);		% add acquisition2 for coherograms
 
 % Run function
+
+%% Description of Tetrodes
+% From tetinfo files
+%
+% -----------------------
+% ANIMAL, HPa
+% -----------------------
+% Tetrodes			Area
+% -----------------------
+% 1-7		...		CA1
+% 8-14		...		iCA1
+% 15-20		...		PFC
+
 
 %% MAIN ANALYSIS SECTION -- Theta Coherence Analysis Guts
 
