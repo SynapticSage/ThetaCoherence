@@ -6,6 +6,7 @@ function [avg_specgram] = averageAcross(specgrams, sets, params)
 sets={'trial'};
 animNum= length(specgrams);
 for a= 1:animNum;
+    avg_specgram(a).animal= specgrams(a).animal;
 
 % retrieve general info on array size and # of dims 
 datSize(a,:)=  size(specgrams(a).output);
@@ -51,6 +52,7 @@ if ismember('trial',sets);
     end
 end
 end
+
 end
 
 
