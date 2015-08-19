@@ -131,16 +131,19 @@ toc
 % % RUN FUNCTION!
 % acquisition2 = gatherWindowsOfData(dataFolder, dataToGet, processOptions);
 
-%% Debug generate_xGrams
+%% TEST SECTION generate_xGrams
 
 dataToProcess.days = [5 6]; dataToProcess.epochs = [2 4]; 
 dataToProcess.tetrodes = [1 2]; dataToProcess.tetrodes2 = 16; 
 
-dataToProcess.save = 0;
+dataToProcess.save = 0; dataToProcess.output = 1; dataToProcess.plot = 0;
 
-Output= generate_xGrams(acquisition,dataToProcess);		% add acquisition2 for coherograms
+specgrams = generate_xGrams(acquisition,dataToProcess);    % add acquisition2 for coherograms
 
-% Run function
+%% TEST SECTION averageAcross
+
+sets = 'trials';
+avg_specgram = averageAcross(specgrams,sets);
 
 %% Description of Tetrodes
 % From tetinfo files

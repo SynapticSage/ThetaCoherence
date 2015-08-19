@@ -2,10 +2,10 @@ function [avg_specgram] = averageAcross(specgrams, sets, params)
 % Function controls the averaging across spectrograms.
 
 % if flag== trials, Output = Output(animals).{day,epoch,tetrode}
-sets='trials';
-animNum= length(specgrams);
+sets = 'trials';
+animNum = length(specgrams);
 
-for a= 1:animNum;
+for a = 1:animNum
 
 % retrieve general info on array size and # of dims 
 datSize(a,:)= size(specgrams(a).output);

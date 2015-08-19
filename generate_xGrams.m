@@ -8,8 +8,10 @@ function [grams] = generate_xGrams(acquisition, dataToProcess, ...
 % Calculates specgram unless user passes in a second acquisition structure.
 
 % Store figure window style
-% default_fig = get(groot, 'DefaultFigureWindowStyle');
-% set(groot,'DefaultFigureWindowStyle','docked')
+if ismac || ispc
+    default_fig = get(groot, 'DefaultFigureWindowStyle');
+    set(groot,'DefaultFigureWindowStyle','docked');
+end
 
 %% Define Chronux params
 % -------------------------------------------
