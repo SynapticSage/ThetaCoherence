@@ -241,7 +241,7 @@ for a = 1:numel(animal_list)
                 
 				%% Window out the correct data per tetrode
 				% Acquire matrix of windowed data
-                [data, time_vec] ...
+                [windowedData, time_vec] ...
 					= windowData(...
 					dataToGet.datType, dataToGet.datType_sub, dataToGet.datType_indices, ...
 					anim,d,e,t,...
@@ -251,15 +251,15 @@ for a = 1:numel(animal_list)
 				%% Add to output if requested
 				if processOptions.output
 					
-					acquisition(a).data{d,e,t} = data;
-					acquisition(a).time_vec{d,e,t} = data;
+					acquisition(a).data{d,e,t} = windowedData;
+					acquisition(a).time_vec{d,e,t} = windowedData;
 					
 				end
 				
 				%% Add to save if requested
 				if processOptions.save
 					
-					OutputsToSave.data = data;
+					OutputsToSave.data = windowedData;
 					OutputsToSave.time_vec = time_vec;
 					
 					SaveFileCharacteristics.animal='HPa';
@@ -280,12 +280,17 @@ end % of animal loop
 catch ME
 % Decommision the folders we added into the path at the start of the
 % function.
-disp('ERROR IN gatherWindowOfData...');
-disp('Throwing exception data...');
-rmpath(genpath(dataFolder));
-cd(initial_folder);
-throw(ME);
+    disp('ERROR IN gatherWindowOfData...');
+    disp('Throwing exception data...');
+    rmpath(genpath(dataFolder));
+    cd(initial_folder);
 
+    for section = 1:numel(ME.stack.line)
+        disp(sprintf('Line %d: %s', ...
+            ME.stack.line(section), ME.stack.name(section,:)));
+    end
+
+    throw(ME);
 end
 
 %% Post-processing phase
