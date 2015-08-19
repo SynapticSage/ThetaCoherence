@@ -36,8 +36,16 @@ if ismember('trial',sets);
                     % store all gathered S'es and Serrors in temp matrices
                     tempS(r,:,:)       = specgrams(a).output{d,e,t,r}.S;
                     tempSerror(r,:,:,:)= specgrams(a).output{d,e,t,r}.Serror;
+                    
+                    % package mean Specs and SpecErrors, squeeze out singleton
+                    avg_specgram(a).output{d,e,t}.meanS=     squeeze(mean(tempS     ,1));
+                    avg_specgram(a).output{d,e,t}.meanSerror=squeeze(mean(tempSerror,1));
+                    
+                    % package rest
+                    avg_specgram(a).output{d,e,t}.Stime= specgrams(a).output{d,e,t,1}.Stime;
+                    avg_specgram(a).output{d,e,t}.Sfreq= specgrams(a).output{d,e,t,1}.Sfreq;
+                    
                 end
-                
 
             end
         end
@@ -45,33 +53,28 @@ if ismember('trial',sets);
 end
 end
 
-% package mean Specs and SpecErrors, squeeze out singleton
-avg_specgram(a).output{d,e,t}.meanS=     squeeze(mean(tempS     ,1));
-avg_specgram(a).output{d,e,t}.meanSerror=squeeze(mean(tempSerror,1));
-
-idxs=[];
 
 
-if ismember('epochs',sets);
-    for d= uVals{1};
-        for t= uVals{3};
-            for e=uVals{2};
-                % get the indices for all relevant inputs for this operation (avg across trials)
-                idxs= [idxs; idx( (idx(:,1)==d & idx(:,2)==e & idx(:,3)==t),:)];
-                
-                for r= 1:length(idxs);
-                    % store all gathered S'es and Serrors in temp matrices
-                    tempS(r,:,:)       = specgrams(a).output{d,t,r}.S;
-                    tempSerror(r,:,:,:)= specgrams(a).output{d,t,r}.Serror;
-                    
-                    
-                    
-                end
-                
-            end
-        end
-    end
-end
+% idxs=[];
+% 
+% 
+% if ismember('epochs',sets);
+%     for d= uVals{1};
+%         for t= uVals{3};
+%             for e=uVals{2};
+%                 % get the indices for all relevant inputs for this operation (avg across trials)
+%                 idxs= [idxs; idx( (idx(:,1)==d & idx(:,2)==e & idx(:,3)==t),:)];
+%                 
+%                 for r= 1:length(idxs);
+%                     % store all gathered S'es and Serrors in temp matrices
+%                     tempS(r,:,:)       = specgrams(a).output{d,t,r}.S;
+%                     tempSerror(r,:,:,:)= specgrams(a).output{d,t,r}.Serror;  
+%                 end
+%                 
+%             end
+%         end
+%     end
+% end
 end
 
 %                 for r= 1:length(idxs);
