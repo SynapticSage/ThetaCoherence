@@ -2,8 +2,9 @@ function [avg_specgram] = averageAcross(specgrams, sets, params)
 % Function controls the averaging across spectrograms.
 
 % if flag== trials, Output = Output(animals).{day,epoch,tetrode}
-sets='trials';
+sets={'epoch','trial'};
 animNum= length(specgrams);
+depth={'day','epoch','tetrode','trial'};
 
 for a= 1:animNum;
 
@@ -15,41 +16,67 @@ datDims(a,:)= ndims(specgrams(a).output);
 relevElem=find( ~cellfun(@isempty,specgrams(a).output));
 
 % convert linear indices to subscript (dimensional) indices
-[day, epc, tet, tri]=ind2sub(datSize(a,:),relevElem);
+[temp_idx{1:datDims}] = ind2sub(datSize(a,:),relevElem);
 
 % assemble into one mat
-idx= [day epc tet tri];
+idx=[temp_idx{:}]; clear temp_idx
 
-% get unique values from each dimension where data is stored
-uDay= unique(day); uEpc= unique(epc);
-uTet= unique(tet); %uTri= unique(tri);
+% % get unique values from each dimension where data is stored
+for u=1:datDims; uVals{u,:}=unique(idx(:,u),'rows')'; end;
 
-if sets == 'trials';
-    for d= 1:length(uDay);
-        for e= 1:length(uEpc);
-            for t= 1:length(uTet);
+if ismember('trial',sets);
+    for d= uVals{1};
+        for e= uVals{2};
+            for t= uVals{3};
                 
                 % get the indices for all relevant inputs for this operation (avg across trials)
-                idxs= idx((idx(:,1)== uDay(d) &...
-                           idx(:,2)== uEpc(e) &...
-                           idx(:,3)== uTet(t) ),:);
+                idxs= idx( (idx(:,1)==d & idx(:,2)==e & idx(:,3)==t),:);
                 
                 for r= 1:length(idxs);
                     % store all gathered S'es and Serrors in temp matrices
-                    tempS(r,:,:)=...
-                    specgrams(a).output{uDay(d), uEpc(e), uTet(t), r}.S;
-                    tempSerror(r,:,:,:)=...
-                    specgrams(a).output{uDay(d), uEpc(e), uTet(t), r}.Serror;
+                    tempS(r,:,:)       = specgrams(a).output{d,e,t,r}.S;
+                    tempSerror(r,:,:,:)= specgrams(a).output{d,e,t,r}.Serror;
                 end
                 
-                % package mean Specs and SpecErrors, squeeze out singleton
-                avg_specgram(a).output{uDay(d), uEpc(e), uTet(t)}...
-                .meanS     =squeeze(mean(tempS     ,1));
-                avg_specgram(a).output{uDay(d), uEpc(e), uTet(t)}...
-                .meanSerror=squeeze(mean(tempSerror,1));
+
             end
         end
     end
 end
 end
+
+% package mean Specs and SpecErrors, squeeze out singleton
+avg_specgram(a).output{d,e,t}.meanS=     squeeze(mean(tempS     ,1));
+avg_specgram(a).output{d,e,t}.meanSerror=squeeze(mean(tempSerror,1));
+
+idxs=[];
+
+
+if ismember('epochs',sets);
+    for d= uVals{1};
+        for t= uVals{3};
+            for e=uVals{2};
+                % get the indices for all relevant inputs for this operation (avg across trials)
+                idxs= [idxs; idx( (idx(:,1)==d & idx(:,2)==e & idx(:,3)==t),:)];
+                
+                for r= 1:length(idxs);
+                    % store all gathered S'es and Serrors in temp matrices
+                    tempS(r,:,:)       = specgrams(a).output{d,t,r}.S;
+                    tempSerror(r,:,:,:)= specgrams(a).output{d,t,r}.Serror;
+                    
+                    
+                    
+                end
+                
+            end
+        end
+    end
+end
+end
+
+%                 for r= 1:length(idxs);
+%                     % store all gathered S'es and Serrors in temp matrices
+%                     tempS(r,:,:)       = specgrams(a).output{d,e,t,r}.S;
+%                     tempSerror(r,:,:,:)= specgrams(a).output{d,e,t,r}.Serror;
+%                 end
 

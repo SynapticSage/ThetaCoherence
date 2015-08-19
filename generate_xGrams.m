@@ -248,7 +248,7 @@ end
 
 %% Post-processing
 
-set(groot,'DefaultFigureWindowStyle',default_fig)
+%set(groot,'DefaultFigureWindowStyle',default_fig)
 return;
 
 %% HELPER FUNCTIONS
