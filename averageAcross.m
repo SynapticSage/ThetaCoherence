@@ -2,14 +2,13 @@ function [avg_specgram] = averageAcross(specgrams, sets, params)
 % Function controls the averaging across spectrograms.
 
 % if flag== trials, Output = Output(animals).{day,epoch,tetrode}
-sets={'epoch','trial'};
+sets={'trial'};
 animNum= length(specgrams);
-depth={'day','epoch','tetrode','trial'};
 
 for a= 1:animNum;
 
 % retrieve general info on array size and # of dims 
-datSize(a,:)= size(specgrams(a).output);
+datSize(a,:)=  size(specgrams(a).output);
 datDims(a,:)= ndims(specgrams(a).output);
 
 % Get nonzero input array indices (linear indexing)
@@ -52,34 +51,6 @@ if ismember('trial',sets);
     end
 end
 end
-
-
-
-% idxs=[];
-% 
-% 
-% if ismember('epochs',sets);
-%     for d= uVals{1};
-%         for t= uVals{3};
-%             for e=uVals{2};
-%                 % get the indices for all relevant inputs for this operation (avg across trials)
-%                 idxs= [idxs; idx( (idx(:,1)==d & idx(:,2)==e & idx(:,3)==t),:)];
-%                 
-%                 for r= 1:length(idxs);
-%                     % store all gathered S'es and Serrors in temp matrices
-%                     tempS(r,:,:)       = specgrams(a).output{d,t,r}.S;
-%                     tempSerror(r,:,:,:)= specgrams(a).output{d,t,r}.Serror;  
-%                 end
-%                 
-%             end
-%         end
-%     end
-% end
 end
 
-%                 for r= 1:length(idxs);
-%                     % store all gathered S'es and Serrors in temp matrices
-%                     tempS(r,:,:)       = specgrams(a).output{d,e,t,r}.S;
-%                     tempSerror(r,:,:,:)= specgrams(a).output{d,e,t,r}.Serror;
-%                 end
 
