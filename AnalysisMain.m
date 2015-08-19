@@ -69,10 +69,10 @@ sampleParams.trajbound_type = 0 ;            % 0 denotes outbound
 %% TEST SECTION: show gatherWindowsofData works
 
 dataFolder = './';	% DOES NOT HAVE TO BE IN DATA FOLDER RIGHT NOW ... just add whole data folder heirarchy to path above -- see code line 1 atop!
-animals = {'HPa','HPb'};
-day_set = [5 6];			% set of days to analyze for all animals ... 
+animals = {'HPa'};
+day_set = [2:5];			% set of days to analyze for all animals ... 
 epoch_set = [2 4];		% set of epochs to analyze for all animals ... 
-tetrode_set = [1 2];		% set of tetrodes to analyze for all animals ... 
+tetrode_set = [1:7];		% set of tetrodes to analyze for all animals ... 
 
 						% .. these could in theory be set individually per
 						% animal so that different sets analyzed for
@@ -81,6 +81,7 @@ tetrode_set = [1 2];		% set of tetrodes to analyze for all animals ...
 
 % set .animals field to contain who, which day, which epoch, and which
 % tetrodes
+clear dataToGet;
 for a = 1:numel(animals)
 	
 	dataToGet.animals.(animals{a}).days = day_set;
@@ -101,7 +102,50 @@ processOptions.windowPadding = NaN;
 
 % RUN FUNCTION!
 tic
-acquisition = gatherWindowsOfData(dataFolder, dataToGet, processOptions);
+acquisition =...
+    gatherWindowsOfData(saveFolder, dataToGet, processOptions);
+toc
+
+save('days_2through5','acquisition','-v7.3')
+
+%% TEST SECTION: show gatherWindowsofData works
+clear acquisition;
+dataFolder = './';	% DOES NOT HAVE TO BE IN DATA FOLDER RIGHT NOW ... just add whole data folder heirarchy to path above -- see code line 1 atop!
+animals = {'HPa'};
+day_set = [1];			% set of days to analyze for all animals ... 
+epoch_set = [4 6];		% set of epochs to analyze for all animals ... 
+tetrode_set = [1:7];		% set of tetrodes to analyze for all animals ... 
+
+						% .. these could in theory be set individually per
+						% animal so that different sets analyzed for
+						% different animals
+
+
+% set .animals field to contain who, which day, which epoch, and which
+% tetrodes
+clear dataToGet;
+for a = 1:numel(animals)
+	
+	dataToGet.animals.(animals{a}).days = day_set;
+	dataToGet.animals.(animals{a}).epochs = epoch_set;
+	dataToGet.animals.(animals{a}).tetrodes = tetrode_set;
+	
+end
+
+% set dataToGet.sampleParams, from the above section
+dataToGet.sampleParams = sampleParams;
+
+% specify which electrophysiology data to window!
+dataToGet.datType = 'eeg';
+
+% specify process options if any
+processOptions.windowPadding = NaN;
+
+
+% RUN FUNCTION!
+tic
+acquisition =...
+    gatherWindowsOfData(dataFolder, dataToGet, processOptions);
 toc
 
 %% TEST SECTION: Getting second acquisition
@@ -133,8 +177,8 @@ toc
 
 %% TEST SECTION generate_xGrams
 
-dataToProcess.days = [5 6]; dataToProcess.epochs = [2 4]; 
-dataToProcess.tetrodes = [1 2]; dataToProcess.tetrodes2 = 16; 
+dataToProcess.days = day_set; dataToProcess.epochs = epoch_set; 
+dataToProcess.tetrodes = tetrode_set; dataToProcess.tetrodes2 = 16; 
 
 dataToProcess.save = 0; dataToProcess.output = 1; dataToProcess.plot = 0;
 
@@ -142,8 +186,14 @@ specgrams = generate_xGrams(acquisition,dataToProcess);    % add acquisition2 fo
 
 %% TEST SECTION averageAcross
 
-sets = 'trials';
-avg_specgram = averageAcross(specgrams,sets);
+% sets = 'trials';
+% avg_specgram = averageAcross(specgrams,sets);
+
+sets.days = day_set;
+sets.epochs = epoch_set;
+sets.tets = tetrode_set;
+
+avg_spec = dirtyAvg(specgrams,sets);
 
 %% Description of Tetrodes
 % From tetinfo files

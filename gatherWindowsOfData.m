@@ -239,6 +239,8 @@ for a = 1:numel(animal_list)
 			
             for t = dataToGet.animals.(anim).tetrodes
                 
+                [a d e t]
+                
 				%% Window out the correct data per tetrode
 				% Acquire matrix of windowed data
                 [windowedData, time_vec] ...
@@ -261,8 +263,12 @@ for a = 1:numel(animal_list)
 					
 					OutputsToSave.data = windowedData;
 					OutputsToSave.time_vec = time_vec;
+                    OutputsToSave.description = ['data = trials x times'...
+                        '; time_vec = times per indices in trial ' ...
+                        'dimension of data'];
+                    
 					
-					SaveFileCharacteristics.animal='HPa';
+					SaveFileCharacteristics.animal=acquisition(a).animal;
 					SaveFileCharacteristics.data_name = 'acquisition';
 					SaveFileCharacteristics.numerical_address = [d e t];
 					

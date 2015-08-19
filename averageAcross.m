@@ -3,9 +3,9 @@ function [avg_specgram] = averageAcross(specgrams, sets, params)
 
 % if flag== trials, Output = Output(animals).{day,epoch,tetrode}
 
-sets={'epoch','trial'};
+sets = {'epoch','trial'};
 animNum= length(specgrams);
-depth={'day','epoch','tetrode','trial'};
+depth = {'day','epoch','tetrode','trial'};
 for a = 1:animNum
 
 % retrieve general info on array size and # of dims 
@@ -52,6 +52,7 @@ if ismember('trial',sets);
     end
 end
 end
+
 
 
 

@@ -5,6 +5,9 @@ function [grams] = generate_xGrams(acquisition, dataToProcess, ...
 % acquision or some combination of spectrograms.
 %
 %
+%
+%
+%
 % Calculates specgram unless user passes in a second acquisition structure.
 
 % Store figure window style
@@ -49,6 +52,8 @@ for a = 1:numel(acquisition)
         for e = dataToProcess.epochs
             for t = dataToProcess.tetrodes
                 for trial = 1:size(acquisition(a).data{d,e,t},1)
+                    
+                    [a d e t trial]
 					
 					%% Acquire spectrograms for trial
                     specgram_data = acquisition(a).data{d,e,t}(trial,:);
@@ -244,7 +249,16 @@ end
 catch ME				% if screws up in for-loop, reset figure style.
 	%% Error post-processing
     set(groot,'DefaultFigureWindowStyle',default_fig)
-	disp(ME.message);
+	
+    % Display information about error, the message and location of it
+    disp(ME.message);
+     for section = 1:numel(ME.stack.line)
+        disp(sprintf('Line %d: %s', ...
+            ME.stack.line(section), ME.stack.name(section,:)));
+     end
+     
+     % Save the data's state at the time of the error, for testing!
+     save('Error_generate_xGrams','-v7.3');
 	
 end
 
