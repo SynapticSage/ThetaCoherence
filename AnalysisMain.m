@@ -70,9 +70,9 @@ sampleParams.trajbound_type = 0 ;            % 0 denotes outbound
 
 dataFolder = './';	% DOES NOT HAVE TO BE IN DATA FOLDER RIGHT NOW ... just add whole data folder heirarchy to path above -- see code line 1 atop!
 animals = {'HPa','HPb'};
-day_set = [5 6];			% set of days to analyze for all animals ... 
+day_set = [2 3 4 5 6 7 8];			% set of days to analyze for all animals ... 
 epoch_set = [2 4];		% set of epochs to analyze for all animals ... 
-tetrode_set = [1 2];		% set of tetrodes to analyze for all animals ... 
+tetrode_set = [1 2 3 4 5 6 7];		% set of tetrodes to analyze for all animals ... 
 
 						% .. these could in theory be set individually per
 						% animal so that different sets analyzed for
@@ -134,7 +134,7 @@ toc
 %% TEST SECTION generate_xGrams
 
 dataToProcess.days = [5 6]; dataToProcess.epochs = [2 4]; 
-dataToProcess.tetrodes = [1 2]; dataToProcess.tetrodes2 = 16; 
+dataToProcess.tetrodes = [1 2 3 4 5 6 7 8 9 10]; dataToProcess.tetrodes2 = 16; 
 
 dataToProcess.save = 0; dataToProcess.output = 1; dataToProcess.plot = 0;
 
@@ -142,8 +142,43 @@ specgrams = generate_xGrams(acquisition,dataToProcess);    % add acquisition2 fo
 
 %% TEST SECTION averageAcross
 
-sets = 'trials';
+sets = 'trial';
+
 avg_specgram = averageAcross(specgrams,sets);
+
+%% Plotting and saving
+
+for a= [1 2];
+    for d= [5 6];
+        for e= [2 4];
+            for t= [1 2];
+                
+                temp= avg_specgram(a).output{d, e, t};
+                adjust=(max(temp.Stime)-min(temp.Stime))/2;
+                
+                temp.Stime=temp.Stime-min(temp.Stime)-adjust;
+                
+                q= figure; hold on;
+                set(gcf,'Position',[55 660 560 420]);
+                imagesc(temp.Stime,temp.Sfreq,temp.meanS'); colorbar;
+                title([avg_specgram(a).animal '- Day:' num2str(d)...
+                    ' Epoch:' num2str(e)...
+                    ' Tet:' num2str(t)...
+                    ],'FontSize',18,'Fontweight','normal');
+                ylabel('Freq','FontSize',20,'Fontweight','normal');
+                xlabel('Time(s)','FontSize',20,'Fontweight','normal');
+                set(gca,'XLim',[min(temp.Stime) max(temp.Stime)]);
+                set(gca,'YLim',[min(temp.Sfreq) max(temp.Sfreq)]);
+                
+                savepath= '/home/mcz/Desktop/GitProj/Images/';
+                
+                saveas(gcf, [savepath avg_specgram(a).animal '_' num2str(d) '_' num2str(e) '_' num2str(t) '.png']);
+                
+                close
+            end
+        end
+    end
+end
 
 %% Description of Tetrodes
 % From tetinfo files

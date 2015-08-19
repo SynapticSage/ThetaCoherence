@@ -1,4 +1,4 @@
-function [avg_specgram] = averageAcross(specgrams, sets, params)
+function [avg_specgram] = averageAcross(specgrams, sets)
 % Function controls the averaging across spectrograms.
 
 % if flag== trials, Output = Output(animals).{day,epoch,tetrode}
