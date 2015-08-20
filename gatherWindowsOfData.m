@@ -55,12 +55,6 @@ function [acquisition] = ...
 %	'.datType_indices' (OPTIONAL) refers to the form of the index in a cell
 %	array, e.g. {1,':'}, which would specify entries in data to grab.
 %
-%	This parameter selects chich type of data to window.
-%
-%	.windowPadding (OPTIONAL) when data is grabbed, 0 padding at the
-%	non-sample data points is removed is this option is set, or if it's set
-%	to a value, say NaN, it will make 0's padding NaN padding.
-%
 %
 %   '.sampleParams' .. struct that describes the characteristics of the
 %   time points to sample. This structure will include any information

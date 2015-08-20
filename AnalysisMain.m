@@ -1,4 +1,5 @@
-clear all;
+%% Putting Data Files on Path and Clearing Variables
+
 
 % if files.brandeis.edu is in the file system, then add data to path
 d = filesep;
@@ -18,6 +19,8 @@ if(exist(files_dot_brandeis_edu, 'dir'))
 	path(path,genpath([files_dot_brandeis_edu path_str 'HPc_direct']))
 end
 
+clear all;
+
 
 %% Parameter Section
 % This is where we specifiy which parameters we're interested ... which
@@ -29,118 +32,69 @@ end
 % How large of radius should we sample
 sampleParams.circleParams.radius = 20;       % 20 pixel radius
 % Where to sample
-sampleParams.circleParams.segment = [1 1];   % [1 0] denotes end (1) of segment number 1;
-											 % Note: reason second number
-											 % encodes start and end of
-											 % segment in 0 and 1 is
-											 % eventually we may extend
-											 % function to request a point
-											 % that is some fraction, e.g.
-											 % 0.75 from start (0) to end
-											 % (1) of segment
+% [1 0] denotes end (1) of segment number 1;
+sampleParams.circleParams.segment = [1 1];  
+% Note: Second number encodes start and end of segment in 0 and 1.
+% Eventually we may extend function to request a point that is some
+% fraction, e.g. 0.75 from start (0) to end (1) of segment
 
 % Parameters for selecting trajectory type
 % ---------------------------------------------------------
 % Which trajectory type to sample?
 sampleParams.trajbound_type = 0 ;            % 0 denotes outbound
 
-% Parameters for selecting whether or not to constrain sample to the edge
-% of the detected sample zone.  For 30hz sample rate, [15 15] grabs 500
-% msec in front and behind 1st boundary crossing. 15 frames foward and
-% backward.
+% Pameters for controlling edge mode
+% ----------------------------------------------------------------------
+% Edge mode refers to a mode where we sample from the edges of a choice
+% region. Adding it into the struct activates it. Placing a window subfield
+% controlls the size of the window in front and behind sample region
+% entrance or exit. Its unit is frames.  For 30hz sample rate, [15 15]
+% grabs 15 frames in front and behind boundary crossing. entranceOrExit
+% subfield controls whether to sample entrance or exit.
  sampleParams.edgeMode.window = [15 15];
  sampleParams.edgeMode.entranceOrExit = 'entrance';
+ 
+ % Parmeters for controlling which data to acquire spec or coheregrams from
+ % ------------------------------------------------------------------------
+ %
 
-%% DEBUG SECTION: show acquireSample method works
-% 
-% % Load all three data types for day, epoch .. squeeze into data struct
-% load HPalinpos05;
-% data.linpos = linpos{5}{2};
-% load HPapos05;
-% data.pos = pos{5}{2};
-% load HPatrajinfo05;
-% data.trajinfo = trajinfo{5}{2};
-% 
-% % Run the acquireSample function
-% [time, indices, t_paths, i_paths] = acquireSample(data,sampleParams);
-
-% WORKS!
-
-%% TEST SECTION: show gatherWindowsofData works
-
-dataFolder = './';	% DOES NOT HAVE TO BE IN DATA FOLDER RIGHT NOW ... just add whole data folder heirarchy to path above -- see code line 1 atop!
-animals = {'HPa','HPb'};
-day_set = [5 6];			% set of days to analyze for all animals ... 
+animal_set = {'HPa'};
+day_set = [2:5];			% set of days to analyze for all animals ... 
 epoch_set = [2 4];		% set of epochs to analyze for all animals ... 
-tetrode_set = [1 2];		% set of tetrodes to analyze for all animals ... 
+tetrode_set = [1:7];
 
-						% .. these could in theory be set individually per
-						% animal so that different sets analyzed for
-						% different animals
+% Parameters for controlling what data to window, and how to pad samples
+% --------
+% specify which electrophysiology data to window!
+dataToProcess.datType = 'eeggnd';
+% specify padding if any. gatherWindowsOfData requires NaN padding right now.
+processOptions.windowPadding = NaN;
 
+% Where to save data
+% ---------------------
+%
+saveFolder = './';
+
+%% Pre-processing for Gathering Data Windows
+
+dataToProcess.sampleParams = sampleParams;
 
 % set .animals field to contain who, which day, which epoch, and which
 % tetrodes
-for a = 1:numel(animals)
+for a = 1:numel(animal_set)
 	
-	dataToGet.animals.(animals{a}).days = day_set;
-	dataToGet.animals.(animals{a}).epochs = epoch_set;
-	dataToGet.animals.(animals{a}).tetrodes = tetrode_set;
+	dataToProcess.animals.(animal_set{a}).days = day_set;
+	dataToProcess.animals.(animal_set{a}).epochs = epoch_set;
+	dataToProcess.animals.(animal_set{a}).tetrodes = tetrode_set;
 	
 end
 
-% set dataToGet.sampleParams, from the above section
-dataToGet.sampleParams = sampleParams;
+%% Gather Windows of Data
 
-% specify which electrophysiology data to window!
-dataToGet.datType = 'eeg';
-
-% specify process options if any
-processOptions.windowPadding = NaN;
-
-
-% RUN FUNCTION!
 tic
-acquisition = gatherWindowsOfData(dataFolder, dataToGet, processOptions);
+acquisition = gatherWindowsOfData(saveFolder, dataToProcess,...
+	processOptions);
 toc
-
-%% TEST SECTION: Getting second acquisition
-
-% dataFolder = './';	% DOES NOT HAVE TO BE IN DATA FOLDER RIGHT NOW ... just add whole data folder heirarchy to path above -- see code line 1 atop!
-% animals = {'HPa'};
-% day_set = [5];			% set of days to analyze for all animals ... 
-% epoch_set = [2];		% set of epochs to analyze for all animals ... 
-% tetrode_set = [16];		% set of tetrodes to analyze for all animals ... 
-% 
-% 						% .. these could in theory be set individually per
-% 						% animal so that different sets analyzed for
-% 						% different animals
-% 
-% 
-% % set .animals field to contain who, which day, which epoch, and which
-% % tetrodes
-% for a = 1:numel(animals)
-% 	
-% 	dataToGet.animals.(animals{a}).days = day_set;
-% 	dataToGet.animals.(animals{a}).epochs = epoch_set;
-% 	dataToGet.animals.(animals{a}).tetrodes = tetrode_set;
-% 	
-% end
-% 
-% 
-% % RUN FUNCTION!
-% acquisition2 = gatherWindowsOfData(dataFolder, dataToGet, processOptions);
-
-%% Debug generate_xGrams
-
-dataToProcess.days = [5 6]; dataToProcess.epochs = [2 4]; 
-dataToProcess.tetrodes = [1 2]; dataToProcess.tetrodes2 = 16; 
-
-dataToProcess.save = 0;
-
-Output= generate_xGrams(acquisition,dataToProcess);		% add acquisition2 for coherograms
-
-% Run function
 
 %% Description of Tetrodes
 % From tetinfo files
@@ -153,8 +107,31 @@ Output= generate_xGrams(acquisition,dataToProcess);		% add acquisition2 for cohe
 % 1-7		...		CA1
 % 8-14		...		iCA1
 % 15-20		...		PFC
+%
+% -----------------------
+% ANIMAL, HPa
+% -----------------------
+% Tetrodes			Area
+% -----------------------
+% 1-7		...		CA1
+% 8-14		...		PFC
+% 15-20		...		iCA1
 
 
-%% MAIN ANALYSIS SECTION -- Theta Coherence Analysis Guts
+%% Generate Spectrograms
+
+% Of the acquisition, what to turn into spectrograms
+dataToProcess.days = day_set; dataToProcess.epochs = epoch_set; 
+dataToProcess.tetrodes = tet; 
+dataToProcess.tetrodes2 = 16; % tetrodes2 controls tetrodes in operand 2 of coherogram
+
+% Options that control functional output
+dataToProcess.save = 0; dataToProcess.output = 0; dataToProcess.plot = 0;
+
+output = generate_xGrams(acquisition,dataToProcess); % add acquisition2 for coherograms
+
+%% Average Across Spectrograms
+
+
 
 

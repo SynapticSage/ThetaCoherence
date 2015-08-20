@@ -12,9 +12,6 @@ function [params] = baselinecoherogram(prefix, days, epochs, tets, ...
 % sj_HPexpt_baselinespecgram('HPb', 2, [1:5], [4,9,16], 0);
 % sj_HPexpt_baselinespecgram('HPb', 6, [1:5], [4,9,16], 0);
 
-% RY 2015 - Used baselinespecgram as a template for baselinecoherogram.
-% Kept original overall coding style intact, as much as possible.
-
 directoryname = pwd;
 
 if nargin<1,
@@ -97,7 +94,7 @@ end
 % userange = ranges(epoch+1,:); % 1st row is allepochs. So you need +1
 % usename = names{epoch+1}(end-15:end);
 
-% Get EEGs and spectrogram it
+% Get EEGs and coheregram them
 % ------------------------------
 % cd([directoryname,'/EEG/']);
 savedir = [directoryname,'/EEGCoh/'];
