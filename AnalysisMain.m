@@ -53,8 +53,8 @@ sampleParams.trajbound_type = 0 ;            % 0 denotes outbound
 % entrance or exit. Its unit is frames.  For 30hz sample rate, [15 15]
 % grabs 15 frames in front and behind boundary crossing. entranceOrExit
 % subfield controls whether to sample entrance or exit.
-%  sampleParams.edgeMode.window = [150 150];
-%  sampleParams.edgeMode.entranceOrExit = 'entrance';
+ sampleParams.edgeMode.window = [15 15];
+ sampleParams.edgeMode.entranceOrExit = 'entrance';
  
  % Parmeters for controlling which data to acquire spec or coheregrams from
  % ------------------------------------------------------------------------
