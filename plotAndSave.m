@@ -41,6 +41,7 @@ for a= sets.animals;
                 
 				if ispc
 					savepath= '/home/mcz/Desktop/GitProj/Images/';
+                    savepath = './Specgrams';
 				elseif ismac
 					savepath= '~/Documents/MATLAB/LabProjects/Data/LongerLowerPassSpecsHpa5/';
 				end

@@ -136,7 +136,7 @@ end
 if ~ismember('datType', fields(dataToGet)) ...
 		|| isempty(dataToGet.datType)
 	
-	dataToGet.datType = 'eeg';
+	dataToGet.datType = 'eeggnd';
 end
 % if did not pass output option, set
 if ~ismember('output', fields(processOptions) )

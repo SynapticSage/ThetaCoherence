@@ -39,10 +39,10 @@ anim_num = numel(animals);
 %% Define Chronux params
 % -------------------------------------------  
 params.Fs = 1500;
-params.fpass = [0 40];		% params.fpass = [0 400];
+params.fpass = [0 20];		% params.fpass = [0 400];
 params.tapers = [3 5];
 params.err = [2 0.05];
-if params.fpass(2) == 400
+if params.fpass(2) >= 400
     movingwin = [100 10]/1000; 
 end
 if params.fpass(2) == 100
@@ -51,7 +51,10 @@ end
 if params.fpass(2) == 40
     movingwin = [1000 100]/1000;
 end
-if params.fpass(2) <= 10
+if params.fpass(2) == 20
+    movingwin = [4000 400]/1000;
+end
+if params.fpass(2) == 10
     movingwin = [8000 800]/1000; 
 end
 
@@ -78,7 +81,7 @@ if nargin < 3
 
 for a = 1:anim_num
     
-	grams(a).animal = animals(a,:);
+	grams(a).animal = animals{a};
 	if ~file_read; assert(isequal(animals{a},acquisition(a).animal)); end
     
     for d = dataToProcess.days
@@ -104,12 +107,13 @@ for a = 1:anim_num
 					
 					% set specgram data
 					specgram_data = data(trial,:);
+%                     specgram_data = cast(specgram_data,'double');
 						
 					% Subset out relevant indices and plot
                     if any(isnan(specgram_data))
                         subset = ~isnan(specgram_data);
                         [S, Stime, Sfreq, Serror] = ...
-                            mtspecgramc(specgram_data(subset)', movingwin, params);
+                            mtspecgramc(specgram_data(subset)' , movingwin, params);
                     else
                         subset = find(acquisition(a).data{d,e,t}(trial,:) ~= 0);
                         [S, Stime, Sfreq, Serror] = ...
