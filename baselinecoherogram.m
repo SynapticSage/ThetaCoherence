@@ -141,21 +141,26 @@ for d=1:length(days)
 				
 				disp(['Doing Day ',num2str(day) ', Ep ',num2str(epoch),...
 					', Tet1 ',num2str(tet1), ', Tet2 ' num2str(tet2)]);
-				eeg1f = [prefix,'eeg',daystring,'-', ...
-					num2str(epoch),'-',tetstring1];
-				eeg2f = [prefix,'eeg',daystring,'-', ...
-					num2str(epoch),'-',tetstring2];
-				eeg1 = load(eeg1f);
-				eeg2 = load(eeg2f);
-				
-				coherogram = ...
-					cohgramc( eeg1.eeg{day}{epoch}{tet1}.data, ...
-					eeg2.eeg{day}{epoch}{tet2}.data,movingwin,params);
-				
-				% --------------------------------------------
-				eegcoh{day}{epoch}{tet1}{tet2}.meanspec = mean(coherogram,1);
-				eegcoh{day}{epoch}{tet1}{tet2}.stdspec = std(coherogram,1);
-				dummy=[dummy; coherogram]; % For combining across epochs            
+                
+                 eeg1f = [prefix,'eeg',daystring,'-', ...
+                        num2str(epoch),'-',tetstring1 '.mat'];
+                eeg2f = [prefix,'eeg',daystring,'-', ...
+                    num2str(epoch),'-',tetstring2 '.mat'];
+                
+                if exist(eeg1f,'file') && exist(eeg2f,'file') 
+                   
+                    eeg1 = load(eeg1f);
+                    eeg2 = load(eeg2f);
+
+                    coherogram = ...
+                        cohgramc( eeg1.eeg{day}{epoch}{tet1}.data, ...
+                        eeg2.eeg{day}{epoch}{tet2}.data,movingwin,params);
+
+                    % --------------------------------------------
+                    eegcoh{day}{epoch}{tet1}{tet2}.meanspec = mean(coherogram,1);
+                    eegcoh{day}{epoch}{tet1}{tet2}.stdspec = std(coherogram,1);
+                    dummy=[dummy; coherogram]; % For combining across epochs  
+                end
 
 				% If do the gnd channel also          
 				if do_wrtgnd==1
@@ -199,7 +204,7 @@ for d=1:length(days)
 			eegcoh{day}{1}{tet1}{tet2}.stddayspec=std(dummy,1); 
 			% Save File for current day and tet
 			savefile = [savedir,prefix,'eegcoh',savetag,daystring,...
-				'-Tet1',tetstring1, '-Tet2', tetstring2]
+				'-Tet1-',tetstring1, '-Tet2-', tetstring2]
 			save(savefile,'eegcoh');
 
 			if ((do_wrtgnd==1) && (flaggnd==1))

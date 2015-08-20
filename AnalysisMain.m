@@ -57,7 +57,6 @@ sampleParams.trajbound_type = 0 ;            % 0 denotes outbound
  % Parmeters for controlling which data to acquire spec or coheregrams from
  % ------------------------------------------------------------------------
  %
-
 animal_set = {'HPa'};
 day_set = [2:5];			% set of days to analyze for all animals ... 
 epoch_set = [2 4];		% set of epochs to analyze for all animals ... 
@@ -128,10 +127,45 @@ dataToProcess.tetrodes2 = 16; % tetrodes2 controls tetrodes in operand 2 of cohe
 % Options that control functional output
 dataToProcess.save = 0; dataToProcess.output = 0; dataToProcess.plot = 0;
 
-output = generate_xGrams(acquisition,dataToProcess); % add acquisition2 for coherograms
+output = generate_xGrams(acquisition,dataToProcess);
 
 %% Average Across Spectrograms
 
+sets = 'trial';
 
+avg_specgram = averageAcross(specgrams,sets);
 
+%% Plotting and saving
+
+for a= [1 2];
+    for d= [5 6];
+        for e= [2 4];
+            for t= [1 2];
+                
+                temp= avg_specgram(a).output{d, e, t};
+                adjust=(max(temp.Stime)-min(temp.Stime))/2;
+                
+                temp.Stime=temp.Stime-min(temp.Stime)-adjust;
+                
+                q= figure; hold on;
+                set(gcf,'Position',[55 660 560 420]);
+                imagesc(temp.Stime,temp.Sfreq,temp.meanS'); colorbar;
+                title([avg_specgram(a).animal '- Day:' num2str(d)...
+                    ' Epoch:' num2str(e)...
+                    ' Tet:' num2str(t)...
+                    ],'FontSize',18,'Fontweight','normal');
+                ylabel('Freq','FontSize',20,'Fontweight','normal');
+                xlabel('Time(s)','FontSize',20,'Fontweight','normal');
+                set(gca,'XLim',[min(temp.Stime) max(temp.Stime)]);
+                set(gca,'YLim',[min(temp.Sfreq) max(temp.Sfreq)]);
+                
+                savepath= '/home/mcz/Desktop/GitProj/Images/';
+                
+                saveas(gcf, [savepath avg_specgram(a).animal '_' num2str(d) '_' num2str(e) '_' num2str(t) '.png']);
+                
+                close
+            end
+        end
+    end
+end
 
