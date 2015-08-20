@@ -53,16 +53,16 @@ sampleParams.trajbound_type = 0 ;            % 0 denotes outbound
 % entrance or exit. Its unit is frames.  For 30hz sample rate, [15 15]
 % grabs 15 frames in front and behind boundary crossing. entranceOrExit
 % subfield controls whether to sample entrance or exit.
- sampleParams.edgeMode.window = [150 150];
- sampleParams.edgeMode.entranceOrExit = 'entrance';
+%  sampleParams.edgeMode.window = [150 150];
+%  sampleParams.edgeMode.entranceOrExit = 'entrance';
  
  % Parmeters for controlling which data to acquire spec or coheregrams from
  % ------------------------------------------------------------------------
  %
-animal_set = {'HPb'};
-day_set = [5];			% set of days to analyze for all animals ... 
+animal_set = {'HPc'};
+day_set = [4:5];			% set of days to analyze for all animals ... 
 epoch_set = [2 4];		% set of epochs to analyze for all animals ... 
-tetrode_set = [1 3 4 6 9 12 14];
+tetrode_set = [1 2];
 
 % Parameters for controlling what data to window, and how to pad samples
 % --------
@@ -129,7 +129,7 @@ dataToProcess.tetrodes = tetrode_set;
 dataToProcess.tetrodes2 = 16; % tetrodes2 controls tetrodes in operand 2 of coherogram
 
 % Options that control functional output
-dataToProcess.save = 0; dataToProcess.output = 1; dataToProcess.plot = 1;
+dataToProcess.save = 0; dataToProcess.output = 1; dataToProcess.plot = 0;
 
 tic
 specgrams = generate_xGrams(acquisition,dataToProcess);
