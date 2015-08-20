@@ -4,6 +4,18 @@ function [grams] = generate_xGrams(acquisition, dataToProcess, ...
 % data and from it compute either a spectrogram per set of data in
 % acquision or some combination of spectrograms.
 %
+% Acquisition can be one of two things. For one, it can be the output from
+% gatherWindowsOfData. It is an an array, where the animal field describes
+% the animal, and the data field describes acquisitions of data for that
+% animal.
+%
+% Two, acquisition can be a folder, containing the saved files from
+% gatherWindowsOfData. Either will do.
+%
+% dataToProcess contains options about which data to process. Fields
+% contain sets of days, epochs, tetrodes to create spectrograms for. If
+% coherence, then add a tetrodes2 field containing the set of tetrodes to
+% generate coherences against in the second operand.
 %
 % Calculates specgram unless user passes in a second acquisition structure.
 
@@ -13,14 +25,23 @@ if ismac || ispc
     set(groot,'DefaultFigureWindowStyle','docked');
 end
 
+% if user passed in folder instead of acquisition structure, cd into folder
+file_read = false;
+if ischar(acquisition)
+	% if file reading mode, add to BEGINNING of path, so it's searched
+	% first
+	path(acquisition,path);
+	file_read = true;
+end
+
 %% Define Chronux params
 % -------------------------------------------
-movingwin = [400 40]/1000; %movingwin = [100 10]/1000;                
+movingwin = [400 40]/1000;	%movingwin = [100 10]/1000;                
 params.Fs = 1500;
-params.fpass = [0 100]; % params.fpass = [0 400];
+params.fpass = [0 100];		% params.fpass = [0 400];
 params.tapers = [3 5];
 params.err = [2 0.05];
-%params.pad = 7;
+% params.pad = 7;			% smooths frequency representation
 
 %% Default parameters if not inputted
 if ~ismember('output', fields(dataToProcess))
@@ -51,31 +72,49 @@ for a = 1:numel(acquisition)
                 for trial = 1:size(acquisition(a).data{d,e,t},1)
 					
 					%% Acquire spectrograms for trial
-                    specgram_data = acquisition(a).data{d,e,t}(trial,:);
+					
+					% Set specgram data, either from file or from
+					% acquisition struct
+					if file_read
+						
+						% select file and load
+						file_string = [acquisition(a).animal ...
+							'acquisition' num2str(d) num2str(e) ...
+							num2str(t)];
+						temp = load(file_string);
+						
+						% set specgram data
+						specgram_data = temp.data(trial,:);
+						
+					else
+						specgram_data = acquisition(a).data{d,e,t}(trial,:);
+					end
 
+					% Subset out relevant indices and plot
                     if any(isnan(specgram_data))
-                        logicalvec = ~isnan(specgram_data);
+                        subset = ~isnan(specgram_data);
                         [S, Stime, Sfreq, Serror] = ...
-                            mtspecgramc(specgram_data(logicalvec)', movingwin, params);
+                            mtspecgramc(specgram_data(subset)', movingwin, params);
                     else
-                        indices = find(acquisition(a).data{d,e,t}(trial,:) ~= 0);
+                        subset = find(acquisition(a).data{d,e,t}(trial,:) ~= 0);
                         [S, Stime, Sfreq, Serror] = ...
-                            mtspecgramc(specgram_data(indices(1):indices(end))', movingwin,params);
-                    end
+                            mtspecgramc(specgram_data(subset(1):subset(end))', movingwin,params);
+					end
 		  
-		  % Unable to test atm, draft code
-		  %Stime = Stime - length(Stime)/(params.Fs * 2); % This will make time start -win(1) instead of 0
-		  
-		  % Unable to test atm, draft code
-%		  % to figure out- importing relevant mean data, or meangrnd data. Differentiate between S and Sgrnd?
-%		  if zscore == 1
-%			meanspecgnd = eeggndspec{d}{e}{t}.meanspec;
-%        		stdspecgnd = eeggndspec{d}{e}{t}.stdspec;
-%        		
-%			% Z-score
-%			S_zscr = bsxfun(@minus,S,meanspecgnd(1:size(S,2))); 
-%        		S_zscr = bsxfun(@rdivide,S,stdspecgnd(1:size(S,2)));
-%		  end
+				  %% Z-score
+				  % Unable to test atm, draft code
+				  %Stime = Stime - length(Stime)/(params.Fs * 2); % This will make time start -win(1) instead of 0
+
+				  % Unable to test atm, draft code
+		%		  % to figure out- importing relevant mean data, or meangrnd data. Differentiate between S and Sgrnd?
+		%		  if zscore == 1
+		%			meanspecgnd = eeggndspec{d}{e}{t}.meanspec;
+		%        		stdspecgnd = eeggndspec{d}{e}{t}.stdspec;
+		%        		
+		%			% Z-score
+		%			S_zscr = bsxfun(@minus,S,meanspecgnd(1:size(S,2))); 
+		%        		S_zscr = bsxfun(@rdivide,S,stdspecgnd(1:size(S,2)));
+		%		  end
 
                     %% If plot option is on, plot each one
                     if dataToProcess.plot
@@ -92,7 +131,7 @@ for a = 1:numel(acquisition)
                     end
 
                     %% If user asks for output to RAM or harddrive
-					if (dataToProcess.output || dataToProcess.save)
+					if dataToProcess.output || dataToProcess.save
 						Output.S = S;
 						Output.Stime = Stime;
 						Output.Sfreq = Sfreq;
@@ -144,11 +183,11 @@ for a = 1:numel(acquisition)
 
                     if sum(isnan(specgram_data)) > 0
                         
-                        logicalvec = ~isnan(specgram_data);
+                        subset = ~isnan(specgram_data);
                         logicalvec2 = ~isnan(specgram_data2);
                         
                         [C,phi,S12,S1,S2,Stime,Sfreq,confC,phistd,Cerr] = ...
-                            cohgramc(specgram_data(logicalvec)',...
+                            cohgramc(specgram_data(subset)',...
                             specgram_data2(logicalvec2)', movingwin,params);
                     else
                         
@@ -246,11 +285,18 @@ catch ME				% if screws up in for-loop, reset figure style.
     set(groot,'DefaultFigureWindowStyle',default_fig)
 	disp(ME.message);
 	
+	if file_read
+		rmpath(acquisition);
+	end
 end
 
 %% Post-processing
 
 %set(groot,'DefaultFigureWindowStyle',default_fig)
+if file_read		% return to calling directory if file_read mode on
+	rmpath(acquisition);
+end
+
 return;
 
 %% HELPER FUNCTIONS

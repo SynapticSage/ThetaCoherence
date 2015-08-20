@@ -58,7 +58,7 @@ sampleParams.trajbound_type = 0 ;            % 0 denotes outbound
  % ------------------------------------------------------------------------
  %
 animal_set = {'HPa'};
-day_set = [2:5];			% set of days to analyze for all animals ... 
+day_set = [6:8];			% set of days to analyze for all animals ... 
 epoch_set = [2 4];		% set of epochs to analyze for all animals ... 
 tetrode_set = [1:7];
 
@@ -121,13 +121,13 @@ toc
 
 % Of the acquisition, what to turn into spectrograms
 dataToProcess.days = day_set; dataToProcess.epochs = epoch_set; 
-dataToProcess.tetrodes = tet; 
+dataToProcess.tetrodes = tetrode_set; 
 dataToProcess.tetrodes2 = 16; % tetrodes2 controls tetrodes in operand 2 of coherogram
 
 % Options that control functional output
-dataToProcess.save = 0; dataToProcess.output = 0; dataToProcess.plot = 0;
+dataToProcess.save = 0; dataToProcess.output = 1; dataToProcess.plot = 0;
 
-output = generate_xGrams(acquisition,dataToProcess);
+specgrams = generate_xGrams(acquisition,dataToProcess);
 
 %% Average Across Spectrograms
 
@@ -137,10 +137,10 @@ avg_specgram = averageAcross(specgrams,sets);
 
 %% Plotting and saving
 
-for a= [1 2];
-    for d= [5 6];
+for a= [1];
+    for d= [6:8];
         for e= [2 4];
-            for t= [1 2];
+            for t= [1:7];
                 
                 temp= avg_specgram(a).output{d, e, t};
                 adjust=(max(temp.Stime)-min(temp.Stime))/2;
@@ -159,7 +159,11 @@ for a= [1 2];
                 set(gca,'XLim',[min(temp.Stime) max(temp.Stime)]);
                 set(gca,'YLim',[min(temp.Sfreq) max(temp.Sfreq)]);
                 
-                savepath= '/home/mcz/Desktop/GitProj/Images/';
+				if ispc
+					savepath= '/home/mcz/Desktop/GitProj/Images/';
+				elseif ismac
+					savepath= '~/Documents/MATLAB/LabProjects/DATA/Specs';
+				end
                 
                 saveas(gcf, [savepath avg_specgram(a).animal '_' num2str(d) '_' num2str(e) '_' num2str(t) '.png']);
                 
