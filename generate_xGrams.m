@@ -36,6 +36,8 @@ end
 animals = fields(dataToProcess.animals);
 anim_num = numel(animals);
 
+zscore =1; 
+
 %% Define Chronux params
 % -------------------------------------------  
 params.Fs = 1500;
@@ -58,7 +60,18 @@ if params.fpass(2) == 10
     movingwin = [8000 800]/1000; 
 end
 
- params.pad = 1;			% smooths frequency representation
+if zscore ==1 % from shantanu's code, zscoring eeg ground needs this to match!
+    
+movingwin = [100 10]/1000; %movingwin = [100 10]/1000;          
+params.Fs = 1500;
+params.fpass = [0 400]; % params.fpass = [0 400];
+params.tapers = [3 5];
+params.err = [2 0.05];
+    
+end
+
+
+ %params.pad = 1;			% smooths frequency representation
 
 %% Default parameters if not inputted
 if ~ismember('output', fields(dataToProcess))
@@ -125,15 +138,24 @@ for a = 1:anim_num
 				  %Stime = Stime - length(Stime)/(params.Fs * 2); % This will make time start -win(1) instead of 0
 
 				  % Unable to test atm, draft code
-		%		  % to figure out- importing relevant mean data, or meangrnd data. Differentiate between S and Sgrnd?
-		%		  if zscore == 1
-		%			meanspecgnd = eeggndspec{d}{e}{t}.meanspec;
-		%        		stdspecgnd = eeggndspec{d}{e}{t}.stdspec;
-		%        		
-		%			% Z-score
-		%			S_zscr = bsxfun(@minus,S,meanspecgnd(1:size(S,2))); 
-		%        		S_zscr = bsxfun(@rdivide,S,stdspecgnd(1:size(S,2)));
-		%		  end
+		 		  % to figure out- importing relevant mean data, or meangrnd data. Differentiate between S and Sgrnd?
+				  if zscore == 1
+                      
+                     if d< 10; dstr= ['0' num2str(d)]; else distr= num2str(d); end;
+                     if t< 10; tstr= ['0' num2str(t)]; else tistr= num2str(t); end;
+
+                    zscoredir= ['/home/mcz/DataShare/DATA/sjadhav/HPExpt/' animals{1} '_direct/EEGSpec/'];
+                    datadir= [animals{1} 'eeggndspec' dstr '-Tet' tstr '.mat' ];
+                    
+                    load([ zscoredir datadir]);
+                    
+					meanspecgnd = eeggndspec{d}{e}{t}.meanspec;
+		       		stdspecgnd =  eeggndspec{d}{e}{t}.stdspec;
+		       		
+					% Z-score
+					S = bsxfun(@minus,S,meanspecgnd(1:size(S,2))); 
+		       		S = bsxfun(@rdivide,S,stdspecgnd(1:size(S,2)));
+				  end
 
                     %% If plot option is on, plot each one
                     if dataToProcess.plot
