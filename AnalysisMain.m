@@ -32,7 +32,7 @@ clear all;
 % Parameters for circumscribing sample around a point
 % --------------------------------------------------------
 % How large of radius should we sample
-sampleParams.circleParams.radius = 10;       % 20 pixel radius
+sampleParams.circleParams.radius = 20;       % 20 pixel radius
 % Where to sample
 % [1 0] denotes end (1) of segment number 1;
 sampleParams.circleParams.segment = [1 1];  
@@ -53,7 +53,7 @@ sampleParams.trajbound_type = 0 ;            % 0 denotes outbound
 % entrance or exit. Its unit is frames.  For 30hz sample rate, [15 15]
 % grabs 15 frames in front and behind boundary crossing. entranceOrExit
 % subfield controls whether to sample entrance or exit.
- sampleParams.edgeMode.window = [90 90];
+ sampleParams.edgeMode.window = [150 150];
  sampleParams.edgeMode.entranceOrExit = 'entrance';
  
  % Parmeters for controlling which data to acquire spec or coheregrams from
