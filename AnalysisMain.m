@@ -51,16 +51,16 @@ sampleParams.trajbound_type = 0 ;            % 0 denotes outbound
 % entrance or exit. Its unit is frames.  For 30hz sample rate, [15 15]
 % grabs 15 frames in front and behind boundary crossing. entranceOrExit
 % subfield controls whether to sample entrance or exit.
- sampleParams.edgeMode.window = [15 15];
+ sampleParams.edgeMode.window = [75 75];
  sampleParams.edgeMode.entranceOrExit = 'entrance';
  
  % Parmeters for controlling which data to acquire spec or coheregrams from
  % ------------------------------------------------------------------------
  %
 animal_set = {'HPa'};
-day_set = [6:8];			% set of days to analyze for all animals ... 
+day_set = [5];			% set of days to analyze for all animals ... 
 epoch_set = [2 4];		% set of epochs to analyze for all animals ... 
-tetrode_set = [1:7];
+tetrode_set = [1:3];
 
 % Parameters for controlling what data to window, and how to pad samples
 % --------
@@ -127,7 +127,9 @@ dataToProcess.tetrodes2 = 16; % tetrodes2 controls tetrodes in operand 2 of cohe
 % Options that control functional output
 dataToProcess.save = 0; dataToProcess.output = 1; dataToProcess.plot = 0;
 
+tic
 specgrams = generate_xGrams(acquisition,dataToProcess);
+toc
 
 %% Average Across Spectrograms
 
@@ -137,39 +139,10 @@ avg_specgram = averageAcross(specgrams,sets);
 
 %% Plotting and saving
 
-for a= [1];
-    for d= [6:8];
-        for e= [2 4];
-            for t= [1:7];
-                
-                temp= avg_specgram(a).output{d, e, t};
-                adjust=(max(temp.Stime)-min(temp.Stime))/2;
-                
-                temp.Stime=temp.Stime-min(temp.Stime)-adjust;
-                
-                q= figure; hold on;
-                set(gcf,'Position',[55 660 560 420]);
-                imagesc(temp.Stime,temp.Sfreq,temp.meanS'); colorbar;
-                title([avg_specgram(a).animal '- Day:' num2str(d)...
-                    ' Epoch:' num2str(e)...
-                    ' Tet:' num2str(t)...
-                    ],'FontSize',18,'Fontweight','normal');
-                ylabel('Freq','FontSize',20,'Fontweight','normal');
-                xlabel('Time(s)','FontSize',20,'Fontweight','normal');
-                set(gca,'XLim',[min(temp.Stime) max(temp.Stime)]);
-                set(gca,'YLim',[min(temp.Sfreq) max(temp.Sfreq)]);
-                
-				if ispc
-					savepath= '/home/mcz/Desktop/GitProj/Images/';
-				elseif ismac
-					savepath= '~/Documents/MATLAB/LabProjects/DATA/Specs';
-				end
-                
-                saveas(gcf, [savepath avg_specgram(a).animal '_' num2str(d) '_' num2str(e) '_' num2str(t) '.png']);
-                
-                close
-            end
-        end
-    end
-end
+sets=[];
+sets.animals = [1];
+sets.days = day_set; sets.epochs = epoch_set; sets.tetrodes = tetrode_set;
+sets.trials = false;
+
+plotAndSave(avg_specgram,sets);
 

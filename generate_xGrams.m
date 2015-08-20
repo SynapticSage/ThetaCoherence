@@ -35,12 +35,24 @@ if ischar(acquisition)
 end
 
 %% Define Chronux params
-% -------------------------------------------
-movingwin = [400 40]/1000;	%movingwin = [100 10]/1000;                
+% -------------------------------------------  
 params.Fs = 1500;
-params.fpass = [0 100];		% params.fpass = [0 400];
+params.fpass = [0 40];		% params.fpass = [0 400];
 params.tapers = [3 5];
 params.err = [2 0.05];
+if params.fpass(2) == 400
+    movingwin = [100 10]/1000; 
+end
+if params.fpass(2) == 100
+    movingwin = [400 40]/1000;
+end
+if params.fpass(2) == 40
+    movingwin = [1000 100]/1000;
+end
+if params.fpass(2) <= 10
+    movingwin = [8000 800]/1000; 
+end
+
 % params.pad = 7;			% smooths frequency representation
 
 %% Default parameters if not inputted

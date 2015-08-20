@@ -38,8 +38,8 @@ if ismember('trial',sets);
                     tempSerror(r,:,:,:)= specgrams(a).output{d,e,t,r}.Serror;
                     
                     % package mean Specs and SpecErrors, squeeze out singleton
-                    avg_specgram(a).output{d,e,t}.meanS=     squeeze(mean(tempS     ,1));
-                    avg_specgram(a).output{d,e,t}.meanSerror=squeeze(mean(tempSerror,1));
+                    avg_specgram(a).output{d,e,t}.S=     squeeze(mean(tempS     ,1));
+                    avg_specgram(a).output{d,e,t}.Serror=squeeze(mean(tempSerror,1));
                     
                     % package rest
                     avg_specgram(a).output{d,e,t}.Stime= specgrams(a).output{d,e,t,1}.Stime;
