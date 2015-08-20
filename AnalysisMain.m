@@ -8,15 +8,17 @@ if ispc; files_dot_brandeis_edu = '\\files.brandeis.edu\jadhav-lab';
 elseif ismac; files_dot_brandeis_edu = '/Volumes/jadhav-lab/';
 else files_dot_brandeis_edu = '/home/mcz/DataShare'; end;
 path_str = [d 'DATA' d 'sjadhav' d 'HPexpt' d];
+path_added = false;
 
 
-if(exist(files_dot_brandeis_edu, 'dir'))
+if path_added || (~path_added && exist(files_dot_brandeis_edu, 'dir'))
 	
 	% Adds all data folders to path and subfolders. For now this is
 	% how functions will find data.
 	path(path,genpath([files_dot_brandeis_edu path_str 'HPa_direct'])) 
 	path(path,genpath([files_dot_brandeis_edu path_str 'HPb_direct']))
 	path(path,genpath([files_dot_brandeis_edu path_str 'HPc_direct']))
+    path_added = true;
 end
 
 clear all;
@@ -30,7 +32,7 @@ clear all;
 % Parameters for circumscribing sample around a point
 % --------------------------------------------------------
 % How large of radius should we sample
-sampleParams.circleParams.radius = 20;       % 20 pixel radius
+sampleParams.circleParams.radius = 10;       % 20 pixel radius
 % Where to sample
 % [1 0] denotes end (1) of segment number 1;
 sampleParams.circleParams.segment = [1 1];  
@@ -51,7 +53,7 @@ sampleParams.trajbound_type = 0 ;            % 0 denotes outbound
 % entrance or exit. Its unit is frames.  For 30hz sample rate, [15 15]
 % grabs 15 frames in front and behind boundary crossing. entranceOrExit
 % subfield controls whether to sample entrance or exit.
- sampleParams.edgeMode.window = [150 150];
+ sampleParams.edgeMode.window = [90 90];
  sampleParams.edgeMode.entranceOrExit = 'entrance';
  
  % Parmeters for controlling which data to acquire spec or coheregrams from
@@ -60,7 +62,7 @@ sampleParams.trajbound_type = 0 ;            % 0 denotes outbound
 animal_set = {'HPb'};
 day_set = [5];			% set of days to analyze for all animals ... 
 epoch_set = [2 4];		% set of epochs to analyze for all animals ... 
-tetrode_set = [1 3 4 6];
+tetrode_set = [1 3 4 6 9 12 14];
 
 % Parameters for controlling what data to window, and how to pad samples
 % --------
@@ -127,7 +129,7 @@ dataToProcess.tetrodes = tetrode_set;
 dataToProcess.tetrodes2 = 16; % tetrodes2 controls tetrodes in operand 2 of coherogram
 
 % Options that control functional output
-dataToProcess.save = 1; dataToProcess.output = 1; dataToProcess.plot = 0;
+dataToProcess.save = 0; dataToProcess.output = 1; dataToProcess.plot = 1;
 
 tic
 specgrams = generate_xGrams(acquisition,dataToProcess);

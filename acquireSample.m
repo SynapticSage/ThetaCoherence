@@ -168,7 +168,10 @@ if(isfield(sampleParams,'trajbound_type'))
         % Subset out so that only one occurs per trajcetory
         diff_onepath = diff(logical_onepath);
         % initial point of only first path
-        initial = find(diff_onepath == 1); 
+        initial = find(diff_onepath == 1);
+        if isempty(initial)
+            continue;
+        end
         initial = initial(1) + 1;
         % end point of only first path
         final = find(diff_onepath == -1);
@@ -200,6 +203,14 @@ if(isfield(sampleParams,'trajbound_type'))
 	
 end
 
+%% Remove empty indices, samples that didn't match criteria
+removal = start_stop_indices == 0;
+if any(removal)
+    start_stop_indices(removal) = [];
+    start_stop_indices = reshape(start_stop_indices, numel(start_stop_indices)/2,2);
+    start_stop_times(removal) = [];
+    start_stop_times = reshape(start_stop_times, numel(start_stop_times)/2,2);
+end
 
 %% If edgeMode on, then transform into edge sample
 
@@ -207,10 +218,15 @@ if ismember('edgeMode', fields(sampleParams))
 
 % This recasts all times and indices in the manner described in the
 % function header of generateTimeAroundEdges
+
 [times, indices, start_stop_times, start_stop_indices] = ...
     generateTimeAroundEdge(all_times, start_stop_indices, ...
     sampleParams.edgeMode.window, ...
 	sampleParams.edgeMode.entranceOrExit);
+else
+    
+    indices = find(sample);
+    times = all_times(indices);
 
 end
 

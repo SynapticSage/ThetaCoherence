@@ -58,7 +58,7 @@ if params.fpass(2) == 10
     movingwin = [8000 800]/1000; 
 end
 
-% params.pad = 7;			% smooths frequency representation
+ params.pad = 1;			% smooths frequency representation
 
 %% Default parameters if not inputted
 if ~ismember('output', fields(dataToProcess))
@@ -138,6 +138,7 @@ for a = 1:anim_num
                     %% If plot option is on, plot each one
                     if dataToProcess.plot
                         input('Press return to continue');
+                        clf
                         i = imagesc(Stime,Sfreq,S');
                         i.Parent.YDir = 'normal';       % images invert by 
                         figure(1);                       % place figure at top of stack
