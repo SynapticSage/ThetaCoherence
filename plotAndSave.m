@@ -1,4 +1,4 @@
-function plotAndSave( gram, sets )
+function plotAndSave( gram, sets)
 %PLOTANDSAVE Literally does what it says!
 %   pass in spectrograms or coherograms in gram 
 %	pass in sets struct containing information about what days, epochs and
