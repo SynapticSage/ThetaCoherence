@@ -49,27 +49,21 @@ if params.fpass(2) >= 400
 end
 if params.fpass(2) == 100
     movingwin = [400 40]/1000;
+    savetag = '';
 end
 if params.fpass(2) == 40
     movingwin = [1000 100]/1000;
+    savetag = 'mid';
 end
 if params.fpass(2) == 20
     movingwin = [4000 400]/1000;
+    savetag = 'low';
 end
 if params.fpass(2) == 10
     movingwin = [8000 800]/1000; 
-end
+    savetag = 'floor';
 
-if zscore ==1 % from shantanu's code, zscoring eeg ground needs this to match!
-    
-movingwin = [100 10]/1000; %movingwin = [100 10]/1000;          
-params.Fs = 1500;
-params.fpass = [0 400]; % params.fpass = [0 400];
-params.tapers = [3 5];
-params.err = [2 0.05];
-    
 end
-
 
  %params.pad = 1;			% smooths frequency representation
 
@@ -145,7 +139,7 @@ for a = 1:anim_num
                      if t< 10; tstr= ['0' num2str(t)]; else tistr= num2str(t); end;
 
                     zscoredir= ['/home/mcz/DataShare/DATA/sjadhav/HPExpt/' animals{1} '_direct/EEGSpec/'];
-                    datadir= [animals{1} 'eeggndspec' dstr '-Tet' tstr '.mat' ];
+                    datadir= [animals{1} 'eeggndspec' savetag dstr '-Tet' tstr '.mat' ];
                     
                     load([ zscoredir datadir]);
                     
