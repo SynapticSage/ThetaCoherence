@@ -33,6 +33,8 @@ if ischar(acquisition)
 	path(acquisition,path);
 	file_read = true;
 end
+animals = fields(dataToProcess.animals);
+anim_num = numel(animals);
 
 %% Define Chronux params
 % -------------------------------------------  
@@ -74,34 +76,35 @@ try
 if nargin < 3
 
 
-for a = 1:numel(acquisition)
+for a = 1:anim_num
     
-    grams(a).animal = acquisition(a).animal;
+	grams(a).animal = animals(a,:);
+	if ~file_read; assert(isequal(animals{a},acquisition(a).animal)); end
     
     for d = dataToProcess.days
         for e = dataToProcess.epochs
             for t = dataToProcess.tetrodes
-                for trial = 1:size(acquisition(a).data{d,e,t},1)
+				
+				% If file, read in, else access address in acquisition
+				% struct
+				if file_read
+					% select file and load
+					file_string = [animals{a} ...
+						'acquisition' num2str(d) '-' num2str(e) '-' ...
+						num2str(t) '.mat'];
+					temp = load(file_string);
+					data =temp.data;
+				else
+					data = acquisition(a).data{d,e,t};	
+				end
+				
+                for trial = 1:size(data,1)
 					
 					%% Acquire spectrograms for trial
 					
-					% Set specgram data, either from file or from
-					% acquisition struct
-					if file_read
+					% set specgram data
+					specgram_data = data(trial,:);
 						
-						% select file and load
-						file_string = [acquisition(a).animal ...
-							'acquisition' num2str(d) num2str(e) ...
-							num2str(t)];
-						temp = load(file_string);
-						
-						% set specgram data
-						specgram_data = temp.data(trial,:);
-						
-					else
-						specgram_data = acquisition(a).data{d,e,t}(trial,:);
-					end
-
 					% Subset out relevant indices and plot
                     if any(isnan(specgram_data))
                         subset = ~isnan(specgram_data);
@@ -294,9 +297,15 @@ end
 
 catch ME				% if screws up in for-loop, reset figure style.
 	%% Error post-processing
-    set(groot,'DefaultFigureWindowStyle',default_fig)
+    % Display error data
 	disp(ME.message);
-	
+	line = {ME.stack.line}; name= {ME.stack.name};
+    for section = 1:numel(line)
+        disp(sprintf('Line %d: %s', ...
+            line{section}, name{section}));
+	end
+	% Reset what function changed
+	set(groot,'DefaultFigureWindowStyle',default_fig)
 	if file_read
 		rmpath(acquisition);
 	end

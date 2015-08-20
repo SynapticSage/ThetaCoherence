@@ -90,6 +90,8 @@ end
 
 %% Gather Windows of Data
 
+processOptions.output = true; processOptions.save = true;
+
 tic
 acquisition = gatherWindowsOfData(saveFolder, dataToProcess,...
 	processOptions);

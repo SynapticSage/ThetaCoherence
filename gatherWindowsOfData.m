@@ -256,11 +256,11 @@ for a = 1:numel(animal_list)
 					OutputsToSave.data = windowedData;
 					OutputsToSave.time_vec = time_vec;
 					
-					SaveFileCharacteristics.animal='HPa';
+					SaveFileCharacteristics.animal = acquisition(a).animal;
 					SaveFileCharacteristics.data_name = 'acquisition';
 					SaveFileCharacteristics.numerical_address = [d e t];
 					
-					saveOutput(OutputsToSave, SaveFileCharacteristics);
+					saveOutput(SaveFileCharacteristics, OutputsToSave);
 					
 				end
                 
@@ -278,10 +278,11 @@ catch ME
     disp('Throwing exception data...');
     rmpath(genpath(dataFolder));
     cd(initial_folder);
-
-    for section = 1:numel(ME.stack.line)
+	
+	line = {ME.stack.line}; name= {ME.stack.name};
+    for section = 1:numel(line)
         disp(sprintf('Line %d: %s', ...
-            ME.stack.line(section), ME.stack.name(section,:)));
+            line{section}, name{section}));
     end
 
     throw(ME);
