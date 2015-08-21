@@ -36,12 +36,12 @@ end
 animals = fields(dataToProcess.animals);
 anim_num = numel(animals);
 
-zscore =1; 
+zscore =0; 
 
 %% Define Chronux params
 % -------------------------------------------  
 params.Fs = 1500;
-params.fpass = [0 20];		% params.fpass = [0 400];
+params.fpass = [0 40];		% params.fpass = [0 400];
 params.tapers = [3 5];
 params.err = [2 0.05];
 if params.fpass(2) >= 400
@@ -118,11 +118,15 @@ for a = 1:anim_num
 						
 					% Subset out relevant indices and plot
                     if any(isnan(specgram_data))
+						
                         subset = ~isnan(specgram_data);
+						
                         [S, Stime, Sfreq, Serror] = ...
                             mtspecgramc(specgram_data(subset)' , movingwin, params);
-                    else
+					else
+						
                         subset = find(acquisition(a).data{d,e,t}(trial,:) ~= 0);
+						
                         [S, Stime, Sfreq, Serror] = ...
                             mtspecgramc(specgram_data(subset(1):subset(end))', movingwin,params);
 					end
@@ -203,21 +207,41 @@ end
 %
 if nargin == 3
 
-for a = 1:numel(acquisition)
+for a = 1:anim_num
     
-    grams(a).animal = acquisition(a).animal;
+    grams(a).animal = animals{a};
+	if ~file_read; assert(isequal(animals{a},acquisition(a).animal)); end
     
     for d = dataToProcess.days
         for e = dataToProcess.epochs
             for t = dataToProcess.tetrodes
             for t2 = dataToProcess.tetrodes2
-                for trial = 1:size(acquisition(a).data{d,e,t},1)
+				
+				% If file, read in, else access address in acquisition
+					% struct
+					if file_read
+						% select file and load
+						file_string = [animals{a} ...
+							'acquisition' num2str(d) '-' num2str(e) '-' ...
+							num2str(t) '.mat'];
+						temp = load(file_string);
+						data =temp.data;
+					else
+						data = acquisition(a).data{d,e,t};	
+						data2= acquisition2(a).data{d,e,t2};
+					end
+				
+                for trial = 1:size(data,1)
 
+				
+					
+					
 					%% Acquire coherence and spectrograms for trial
-                    specgram_data = acquisition(a).data{d,e,t}(trial,:);
-                    specgram_data2 = acquisition2(a).data{d,e,t2}(trial,:);
+					
+					specgram_data=data(trial,:);
+					specgram_data2=data2(trial,:);
 
-                    if sum(isnan(specgram_data)) > 0
+                    if any(isnan(specgram_data))
                         
                         subset = ~isnan(specgram_data);
                         logicalvec2 = ~isnan(specgram_data2);

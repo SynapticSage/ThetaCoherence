@@ -53,16 +53,16 @@ sampleParams.trajbound_type = 0 ;            % 0 denotes outbound
 % entrance or exit. Its unit is frames.  For 30hz sample rate, [15 15]
 % grabs 15 frames in front and behind boundary crossing. entranceOrExit
 % subfield controls whether to sample entrance or exit.
- sampleParams.edgeMode.window = [15 15];
+ sampleParams.edgeMode.window = [150 150];
  sampleParams.edgeMode.entranceOrExit = 'entrance';
  
  % Parmeters for controlling which data to acquire spec or coheregrams from
  % ------------------------------------------------------------------------
  %
-animal_set = {'HPc'};
-day_set = [4:5];			% set of days to analyze for all animals ... 
+animal_set = {'HPa'};
+day_set = [5];			% set of days to analyze for all animals ... 
 epoch_set = [2 4];		% set of epochs to analyze for all animals ... 
-tetrode_set = [1 2];
+tetrode_set = [9 12 14];
 
 % Parameters for controlling what data to window, and how to pad samples
 % --------
@@ -124,9 +124,10 @@ toc
 %% Generate Spectrograms
 
 % Of the acquisition, what to turn into spectrograms
-dataToProcess.days = day_set; dataToProcess.epochs = epoch_set; 
+dataToProcess.days = day_set; 
+dataToProcess.epochs = epoch_set; 
 dataToProcess.tetrodes = tetrode_set; 
-dataToProcess.tetrodes2 = 16; % tetrodes2 controls tetrodes in operand 2 of coherogram
+dataToProcess.tetrodes2 = 9; % tetrodes2 controls tetrodes in operand 2 of coherogram
 
 % Options that control functional output
 dataToProcess.save = 0; dataToProcess.output = 1; dataToProcess.plot = 0;
@@ -139,14 +140,14 @@ toc
 
 sets = 'trial';
 
-avg_specgram = averageAcross(specgrams,sets);
+avg_specgrams = averageAcross(specgrams,sets);
 
 %% Plotting and saving
 
-sets=[];
+w=[];
 sets.animals = [1];
-sets.days = day_set; sets.epochs = epoch_set; sets.tetrodes = tetrode_set;
-sets.trials = false;
+sets.days = day_set;sets.epochs = epoch_set; 
+sets.tetrodes = tetrode_set;sets.tetrodes2=9;
 
-plotAndSave(avg_specgram,sets);
+plotAndSave(avg_specgrams,sets);
 
