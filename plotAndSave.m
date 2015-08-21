@@ -4,6 +4,7 @@ function plotAndSave( gram, sets)
 %	pass in sets struct containing information about what days, epochs and
 %	tetrodes to average over in sets
 
+%% Setting default options
 if ~ismember('trials',fields(sets))
 	sets.trials = false;
 end
@@ -15,11 +16,16 @@ if ~ismember('spectrograms',fields(sets))
 	sets.spectrograms = true;
 end
 
+%% Simplifying variable names detailing what to get
+animals = fields(sets.animals);
+toProcess = sets.animals;
+
+%% Plotting over all requested data
 if sets.spectrograms
-for a= sets.animals;
-    for d= sets.days;
-        for e= sets.epochs;
-            for t= sets.tetrodes;
+for a = animals
+    for d = toProcess.(animals(a)).days;
+        for e = toProcess.(animals(a)).epochs;
+            for t= toProcess.(animals(a)).tetrodes;
 				
 				for t2 = sets.tetrodes2;
 				
@@ -76,13 +82,14 @@ end
 end
 
 if sets.coherograms
-for a= sets.animals;
-    for d= sets.days;
-        for e= sets.epochs;
-            for t= sets.tetrodes;
-			for t2 = sets.tetrodes2;
-				for tr = 1:sum(~cellfun(@isempty,{gram(a).output{d, e, t,:}}))
+for a = animals
+    for d = toProcess.(animals(a)).days
+        for e = toProcess.(animals(a)).epochs
+            for t= toProcess.(animals(a)).tetrodes
+			for t2 = toProcess.(animals(a)).tetrodes2
                 
+				for tr = 1:sum(~cellfun(@isempty,{gram(a).output{d, e, t,:}}))
+                    
                 temp= gram(a).output{d, e, t,t2, tr};
                 adjust=(max(temp.Stime)-min(temp.Stime))/2;
                 

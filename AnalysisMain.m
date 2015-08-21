@@ -1,3 +1,24 @@
+%% Description of Tetrodes
+% From tetinfo files
+%
+% -----------------------
+% ANIMAL, HPa
+% -----------------------
+% Tetrodes			Area
+% -----------------------
+% 1-7		...		CA1
+% 8-14		...		iCA1
+% 15-20		...		PFC
+%
+% -----------------------
+% ANIMAL, HPa
+% -----------------------
+% Tetrodes			Area
+% -----------------------
+% 1-7		...		CA1
+% 8-14		...		PFC
+% 15-20		...		iCA1
+
 %% Putting Data Files on Path and Clearing Variables
 
 
@@ -67,9 +88,9 @@ tetrode_set = [9 12 14];
 % Parameters for controlling what data to window, and how to pad samples
 % --------
 % specify which electrophysiology data to window!
-dataToProcess.datType = 'eeggnd';
+sets.datType = 'eeggnd';
 % specify padding if any. gatherWindowsOfData requires NaN padding right now.
-processOptions.windowPadding = NaN;
+processOpt.windowPadding = NaN;
 
 % Where to save data
 % ---------------------
@@ -78,76 +99,47 @@ saveFolder = './';
 
 %% Pre-processing for Gathering Data Windows
 
-dataToProcess.sampleParams = sampleParams;
+sets.sampleParams = sampleParams;
 
 % set .animals field to contain who, which day, which epoch, and which
 % tetrodes
 for a = 1:numel(animal_set)
 	
-	dataToProcess.animals.(animal_set{a}).days = day_set;
-	dataToProcess.animals.(animal_set{a}).epochs = epoch_set;
-	dataToProcess.animals.(animal_set{a}).tetrodes = tetrode_set;
+	sets.animals.(animal_set{a}).days = day_set;
+	sets.animals.(animal_set{a}).epochs = epoch_set;
+	sets.animals.(animal_set{a}).tetrodes = tetrode_set;
+    if exist('tetrode2_set')
+        sets.animals.(animal_set{a}).tetrodes2 = tetrode2_set;
+    end
 	
 end
 
 %% Gather Windows of Data
 
-processOptions.output = true; processOptions.save = false;
+processOpt.output = true; processOpt.save = false;
 
 tic
-acquisition = gatherWindowsOfData(saveFolder, dataToProcess,...
-	processOptions);
+acquisition = gatherWindowsOfData(saveFolder, sets,...
+	processOpt);
 toc
-
-%% Description of Tetrodes
-% From tetinfo files
-%
-% -----------------------
-% ANIMAL, HPa
-% -----------------------
-% Tetrodes			Area
-% -----------------------
-% 1-7		...		CA1
-% 8-14		...		iCA1
-% 15-20		...		PFC
-%
-% -----------------------
-% ANIMAL, HPa
-% -----------------------
-% Tetrodes			Area
-% -----------------------
-% 1-7		...		CA1
-% 8-14		...		PFC
-% 15-20		...		iCA1
 
 
 %% Generate Spectrograms
 
-% Of the acquisition, what to turn into spectrograms
-dataToProcess.days = day_set; 
-dataToProcess.epochs = epoch_set; 
-dataToProcess.tetrodes = tetrode_set; 
-dataToProcess.tetrodes2 = 9; % tetrodes2 controls tetrodes in operand 2 of coherogram
-
 % Options that control functional output
-dataToProcess.save = 0; dataToProcess.output = 1; dataToProcess.plot = 0;
+processOpt.save = 0; processOpt.output = 1; processOpt.plot = 0;
 
 tic
-specgrams = generate_xGrams(acquisition,dataToProcess);
+specgrams = generate_xGrams(acquisition,sets,processOpt);
 toc
 
 %% Average Across Spectrograms
 
-sets = 'trial';
+sets.average = {'trial'};
 
 avg_specgrams = averageAcross(specgrams,sets);
 
 %% Plotting and saving
-
-w=[];
-sets.animals = [1];
-sets.days = day_set;sets.epochs = epoch_set; 
-sets.tetrodes = tetrode_set;sets.tetrodes2=9;
 
 plotAndSave(avg_specgrams,sets);
 

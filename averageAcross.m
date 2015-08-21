@@ -3,7 +3,7 @@ function [avg_specgram] = averageAcross(specgrams, sets)
 
 % if flag== trials, Output = Output(animals).{day,epoch,tetrode}
 
-sets={'trial'};
+sets.average={'trial'};
 animNum= length(specgrams);
 for a= 1:animNum;
     avg_specgram(a).animal= specgrams(a).animal;

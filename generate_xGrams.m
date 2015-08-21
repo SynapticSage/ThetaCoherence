@@ -1,4 +1,4 @@
-function [grams] = generate_xGrams(acquisition, dataToProcess, ...
+function [grams] = generate_xGrams(acquisition, sets, processOpt, ...
     acquisition2)
 % Function that will accept 'acquisition' structure from gather windows of
 % data and from it compute either a spectrogram per set of data in
@@ -22,7 +22,7 @@ function [grams] = generate_xGrams(acquisition, dataToProcess, ...
 % Store figure window style
 if ismac || ispc
     default_fig = get(groot, 'DefaultFigureWindowStyle');
-    set(groot,'DefaultFigureWindowStyle','docked');
+    set(0,'DefaultFigureWindowStyle','docked');
 end
 
 % if user passed in folder instead of acquisition structure, cd into folder
@@ -32,10 +32,8 @@ if ischar(acquisition)
 	% first
 	path(acquisition,path);
 	file_read = true;
+    read_loc = acquisition;
 end
-animals = fields(dataToProcess.animals);
-anim_num = numel(animals);
-
 zscore =0; 
 
 %% Define Chronux params
@@ -68,38 +66,45 @@ end
  %params.pad = 1;			% smooths frequency representation
 
 %% Default parameters if not inputted
-if ~ismember('output', fields(dataToProcess))
-	dataToProcess.output = true;
+if ~ismember('output', fields(sets))
+	processOpt.output = true;
 end
-if ~ismember('save', fields(dataToProcess))
-	dataToProcess.save = false;
+if ~ismember('save', fields(sets))
+	processOpt.save = false;
 end
-if ~ismember('plot', fields(dataToProcess))
-	dataToProcess.plot = false;
+if ~ismember('plot', fields(sets))
+	processOpt.plot = false;
 end
 
 %%
+% Simplify variables
+animals = fields(sets.animals);
+animalcount = numel(animals);
+sets = sets.animals;
+
+
+
 try
 	
 	
 %% Spectrograms! For-loooping over acquisitions
-if nargin < 3
+if nargin < 4
 
 
-for a = 1:anim_num
+for a = 1:animalcount
     
 	grams(a).animal = animals{a};
 	if ~file_read; assert(isequal(animals{a},acquisition(a).animal)); end
     
-    for d = dataToProcess.days
-        for e = dataToProcess.epochs
-            for t = dataToProcess.tetrodes
+    for d = sets.(animals{a}).days
+        for e = sets.(animals{a}).epochs
+            for t = sets.(animals{a}).tetrodes
 				
 				% If file, read in, else access address in acquisition
 				% struct
 				if file_read
 					% select file and load
-					file_string = [animals{a} ...
+					file_string = [read_loc animals{a} ...
 						'acquisition' num2str(d) '-' num2str(e) '-' ...
 						num2str(t) '.mat'];
 					temp = load(file_string);
@@ -156,7 +161,7 @@ for a = 1:anim_num
 				  end
 
                     %% If plot option is on, plot each one
-                    if dataToProcess.plot
+                    if processOpt.plot
                         input('Press return to continue');
                         clf
                         i = imagesc(Stime,Sfreq,S');
@@ -171,7 +176,7 @@ for a = 1:anim_num
                     end
 
                     %% If user asks for output to RAM or harddrive
-					if dataToProcess.output || dataToProcess.save
+					if processOpt.output || processOpt.save
 						Output.S = S;
 						Output.Stime = Stime;
 						Output.Sfreq = Sfreq;
@@ -179,12 +184,12 @@ for a = 1:anim_num
 					end
 					
 					%% If user asks to output to RAM
-					if dataToProcess.output
+					if processOpt.output
 						grams(a).output{d,e,t,trial} = Output;
 					end
 					
 					%% If user asks to save to harddrive, then do
-					if dataToProcess.save
+					if processOpt.save
 						
 						SaveFileCharacteristics.animal = ...
 							acquisition(a).animal;
@@ -205,17 +210,17 @@ end
 
 %% Coherograms! (and spectrograms)
 %
-if nargin == 3
+if nargin == 4
 
-for a = 1:anim_num
+for a = 1:animalcount
     
     grams(a).animal = animals{a};
 	if ~file_read; assert(isequal(animals{a},acquisition(a).animal)); end
     
-    for d = dataToProcess.days
-        for e = dataToProcess.epochs
-            for t = dataToProcess.tetrodes
-            for t2 = dataToProcess.tetrodes2
+    for d = sets.(animals{a}).days
+        for e = sets.(animals{a}).epochs
+            for t = sets.(animals{a}).tetrodes
+            for t2 = sets.(animals{a}).tetrodes2
 				
 				% If file, read in, else access address in acquisition
 					% struct
@@ -260,7 +265,7 @@ for a = 1:anim_num
                     end
 
                     %% If plot option is on, plot each one
-                    if dataToProcess.plot
+                    if processOpt.plot
                         input('Press return to continue');
                         i = imagesc(Stime,Sfreq,C');
                         i.Parent.YDir = 'normal';       % images invert by 
@@ -274,7 +279,7 @@ for a = 1:anim_num
 					end
 
 					%% If user asks for output, then add to proper cell locs
-					if dataToProcess.output || dataToProcess.save
+					if processOpt.output || processOpt.save
 						% Cross-tetrode informations
 						Output12.C = C;
 						Output12.cerror = Cerr;
@@ -297,14 +302,14 @@ for a = 1:anim_num
 					end
 					
 					%% If user asks to output from function/RAM
-					if dataToProcess.output
+					if processOpt.output
 						grams(a).output{d,e,t,t2,trial} = Output12;
 						grams(a).output{d,e,t,t,trial} = Output1;
 						grams(a).output{d,e,t2,t2,trial} = Output2;
 					end
 					
 					%% If user asks to save data to harddrive, then do
-					if dataToProcess.save
+					if processOpt.save
 						
 						% Save coherence for t & t2
 						SaveFileCharacteristics.animal = ...
