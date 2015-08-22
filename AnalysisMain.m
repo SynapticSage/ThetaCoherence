@@ -93,7 +93,7 @@ epoch_set = [2 4];		% set of epochs to analyze for all animals ...
 tetrode_set = [1 4];
 tetrode_set2 = [17];
 
-averaged_trials = true;
+averaged_trials = false;
 
 % Parameters for controlling what data to window, and how to pad samples
 % --------
@@ -178,8 +178,12 @@ avg_grams = averageAcross(grams,sets);
 
 if averaged_trials
     sets.trials = false;
+    plotAndSave(avg_grams,sets);
+else
+    sets.trials = true;
+    plotAndSave(grams,sets);
 end
     
 disp('Plotting and saving data...');
-plotAndSave(avg_grams,sets);
+
 
