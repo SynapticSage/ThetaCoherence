@@ -22,12 +22,12 @@ toProcess = sets.animals;
 
 %% Plotting over all requested data
 if sets.spectrograms
-for a = animals
-    for d = toProcess.(animals(a)).days;
-        for e = toProcess.(animals(a)).epochs;
-            for t= toProcess.(animals(a)).tetrodes;
+for a = 1:numel(animals)
+    for d = toProcess.(animals{a}).days;
+        for e = toProcess.(animals{a}).epochs;
+            for t= toProcess.(animals{a}).tetrodes;
 				
-				for t2 = sets.tetrodes2;
+				for t2 = toProcess.(animals{a}).tetrodes2;
 				
 				for tr = 1:sum(~cellfun(@isempty,{gram(a).output{d, e, t,:}}))
                 
@@ -82,13 +82,13 @@ end
 end
 
 if sets.coherograms
-for a = animals
-    for d = toProcess.(animals(a)).days
-        for e = toProcess.(animals(a)).epochs
-            for t= toProcess.(animals(a)).tetrodes
-			for t2 = toProcess.(animals(a)).tetrodes2
+for a = 1:numel(animals)
+    for d = toProcess.(animals{a}).days
+        for e = toProcess.(animals{a}).epochs
+            for t= toProcess.(animals{a}).tetrodes
+			for t2 = toProcess.(animals{a}).tetrodes2
                 
-				for tr = 1:sum(~cellfun(@isempty,{gram(a).output{d, e, t,:}}))
+				for tr = 1:sum(~cellfun(@isempty,{gram(a).output{d, e, t,t2,:}}))
                     
                 temp= gram(a).output{d, e, t,t2, tr};
                 adjust=(max(temp.Stime)-min(temp.Stime))/2;

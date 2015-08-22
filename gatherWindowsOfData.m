@@ -1,5 +1,5 @@
 function [acquisition] = ...
-	gatherWindowsOfData(dataFolder,dataToGet, processOptions)
+	gatherWindowsOfData(dataFolder,dataToGet, processOpt)
 % function gatherWindowsOfData
 % for gathering all data for an (animal/prefix epoch day tet) tuple or set of
 % tuples. This function will be used to gather up all of the eeg data
@@ -91,10 +91,10 @@ function [acquisition] = ...
 %		window of time when the animal enters or exits the boundary region.
 %
 %
-%	'.processOptions' .. struct containing options for the process of
+%	'.processOpt' .. struct containing options for the process of
 %	sample triggered data windowing.
 %
-%		'.processOptions.windowPadding' .. If not provided, automatically
+%		'.processOpt.windowPadding' .. If not provided, automatically
 %		set to 0, in which case time points outside sample are set to 0's,
 %		and length of complete trace of data is preserved. If padding is
 %		set to [], it deletes non-sample data, removing padding. This has
@@ -105,7 +105,7 @@ function [acquisition] = ...
 %		memory-efficient acquisitions.
 %
 %
-%       '.processOptions.singleTrace' .. If provided, grabs a single trace
+%       '.processOpt.singleTrace' .. If provided, grabs a single trace
 %       containing all windows of data.
 %
 %
@@ -139,16 +139,16 @@ if ~ismember('datType', fields(dataToGet)) ...
 	dataToGet.datType = 'eeggnd';
 end
 % if did not pass output option, set
-if ~ismember('output', fields(processOptions) )
-	processOptions.output = true;
+if ~ismember('output', fields(processOpt) )
+	processOpt.output = true;
 end
 % if did not pass save option, set
-if ~ismember('save', fields(processOptions) )
-	processOptions.save = false;
+if ~ismember('save', fields(processOpt) )
+	processOpt.save = false;
 end
 
 if nargin < 3
-	processOptions.windowPadding = 0;
+	processOpt.windowPadding = 0;
 end
 
 
@@ -231,7 +231,16 @@ for a = 1:numel(animal_list)
 			% Get list of continuous time windows - we pass in sample times
 			% and well as a list of all times
 			
-            for t = dataToGet.animals.(anim).tetrodes
+            
+            if exist('processOpt') && ...
+                    ismember('otherTetrodes',fields(processOpt)) && ...
+                    processOpt.otherTetrodes
+                tetrodes = dataToGet.animals.(anim).tetrodes2;
+            else
+                tetrodes = dataToGet.animals.(anim).tetrodes;
+            end
+            
+            for t = tetrodes
                 
 				%% Window out the correct data per tetrode
 				% Acquire matrix of windowed data
@@ -240,10 +249,10 @@ for a = 1:numel(animal_list)
 					dataToGet.datType, dataToGet.datType_sub, dataToGet.datType_indices, ...
 					anim,d,e,t,...
 					start_stop_times, indicesInSample, ...
-					processOptions);
+					processOpt);
 				
 				%% Add to output if requested
-				if processOptions.output
+				if processOpt.output
 					
 					acquisition(a).data{d,e,t} = windowedData;
 					acquisition(a).time_vec{d,e,t} = windowedData;
@@ -251,7 +260,7 @@ for a = 1:numel(animal_list)
 				end
 				
 				%% Add to save if requested
-				if processOptions.save
+				if processOpt.save
 					
 					OutputsToSave.data = windowedData;
 					OutputsToSave.time_vec = time_vec;
@@ -310,7 +319,7 @@ return;		% Exit function
 function [winData, time_vec] = windowData(dat, dat_sub, dat_ind,...
 		anim, day, epo, tet, ...
 		windowTimes, indicesInSample, ...
-		processOptions)
+		processOpt)
 	
 	%% Pre-processing
     % Preprocess the day string to add a 0 before the number if it's less
@@ -359,11 +368,11 @@ function [winData, time_vec] = windowData(dat, dat_sub, dat_ind,...
     
     
     % Grab all of the data in the windows of time
-    if ismember('singleTrace',fields(processOptions)) && ...
-            processOptions.singleTrace % SINGLE-TRACE MODE
+    if ismember('singleTrace',fields(processOpt)) && ...
+            processOpt.singleTrace % SINGLE-TRACE MODE
         
         temp =  temp.(dat_sub)(I{1},I{2});
-        temp(~indicesInSample) = processOptions.windowPadding;
+        temp(~indicesInSample) = processOpt.windowPadding;
         winData = temp;
         
     else % MULTI-TRACE MODE
@@ -372,7 +381,7 @@ function [winData, time_vec] = windowData(dat, dat_sub, dat_ind,...
         % detected by segment transitions
         winData = zeros( size(windowTimes,1), numel(time_vec) ); 
         
-        if ~isempty(processOptions.windowPadding)
+        if ~isempty(processOpt.windowPadding)
             for ind = 1:size(windowTimes,1)
 
                 % Create logical vector for selecting the proper data to store
@@ -385,9 +394,9 @@ function [winData, time_vec] = windowData(dat, dat_sub, dat_ind,...
                     temp.(dat_sub)(I{1},I{2});
 
                 % Add padding if it's specified
-                if processOptions.windowPadding ~= 0			
+                if processOpt.windowPadding ~= 0			
                     winData(ind,~single_trial_of_interest) = ...
-                        processOptions.windowPadding;
+                        processOpt.windowPadding;
                 end
 
             end
