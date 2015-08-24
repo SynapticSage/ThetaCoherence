@@ -120,12 +120,22 @@ if(isfield(sampleParams, 'circleParams'))
             
         end
     end
+    
 	
 	% feed animal (x,y) position list and selection parameters
     trajectoryData= data.pos.data(:,2:3);
     xc = sampleParams.circleParams.center(1); yc = sampleParams.circleParams.center(2);
     x_pos = trajectoryData(:,1); y_pos = trajectoryData(:,2);
     distance_from_center = sqrt(( x_pos - xc ).^2 + (y_pos - yc).^2);
+    error_term = mean(abs(trajectoryData(:,1).^2+...
+        trajectoryData(:,2).^2),'omitnan');
+    % if user selected radius smaller than typical positional change in pos
+    % data then add an error term to their radius
+    if(sampleParams.circleParams.radius < error_term)
+        sampleParams.circleParams.radius = ...
+            sampleParams.circleParams.radius + error_term;
+    end
+    
     circ_subset_indices = find(distance_from_center <= sampleParams.circleParams.radius);
 	
 	% WE have indices that belong, but we need a logical vector
@@ -175,7 +185,11 @@ if(isfield(sampleParams,'trajbound_type'))
         initial = initial(1) + 1;
         % end point of only first path
         final = find(diff_onepath == -1);
-        final = final(1);
+        if isempty(final)
+            final = initial + 1;
+        else
+            final = final(1);
+        end
         % change logical to reflect only the first found trajcetory
         logical_onepath = zeros(size(logical_onepath));
         logical_onepath(initial:final) = 1;

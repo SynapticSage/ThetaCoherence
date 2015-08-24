@@ -39,7 +39,7 @@ zscore =0;
 %% Define Chronux params
 % -------------------------------------------  
 params.Fs = 1500;
-params.fpass = [0 40];		% params.fpass = [0 400];
+params.fpass = [0 20];		% params.fpass = [0 400];
 params.tapers = [3 5];
 params.err = [2 0.05];
 if params.fpass(2) >= 400
@@ -248,12 +248,12 @@ for a = 1:animalcount
 
                     if any(isnan(specgram_data))
                         
-                        subset = ~isnan(specgram_data);
-                        logicalvec2 = ~isnan(specgram_data2);
+                       logicalvec1 = ~isnan(specgram_data);
+%                      logicalvec2 = ~isnan(specgram_data2);
                         
                         [C,phi,S12,S1,S2,Stime,Sfreq,confC,phistd,Cerr] = ...
-                            cohgramc(specgram_data(subset)',...
-                            specgram_data2(logicalvec2)', movingwin,params);
+                            cohgramc(specgram_data(logicalvec1)',...
+                            specgram_data2(logicalvec1)', movingwin,params);
                     else
                         
                         indices = find(acquisition.data{d,e,t}(trial,:) ~= 0);

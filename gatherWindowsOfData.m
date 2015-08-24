@@ -135,7 +135,6 @@ end
 % if user did not pass data type, set it
 if ~ismember('datType', fields(dataToGet)) ...
 		|| isempty(dataToGet.datType)
-	
 	dataToGet.datType = 'eeggnd';
 end
 % if did not pass output option, set

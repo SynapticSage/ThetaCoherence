@@ -50,7 +50,9 @@ if path_added || (~path_added && exist(files_dot_brandeis_edu, 'dir'))
     
     path_added = true;
 end
-
+for dy = 1:8
+    
+clear sampleParams acquisition acquisition2 grams avg_grams
 
 %% Parameter Section
 % This is where we specifiy which parameters we're interested ... which
@@ -87,13 +89,19 @@ sampleParams.trajbound_type = 0 ;            % 0 denotes outbound
  % Parmeters for controlling which data to acquire spec or coheregrams from
  % ------------------------------------------------------------------------
  %
-animal_set = {'HPa'};
-day_set = [5];			% set of days to analyze for all animals ... 
-epoch_set = [2 4];		% set of epochs to analyze for all animals ... 
-tetrode_set = [1 2 3];
-% tetrode_set2 = [18];
 
-averaged_trials = true;
+
+animal_set = {'HPb'};       
+day_set = dy;			% set of days to analyze for all animals ...
+if dy == 1
+    epoch_set= [4];
+else
+    epoch_set = [2];		% set of epochs to analyze for all animals ...
+end
+tetrode_set = [1 4];
+tetrode_set2 = [17];
+
+averaged_trials = 'both';
 
 % Parameters for controlling what data to window, and how to pad samples
 % --------
@@ -101,11 +109,6 @@ averaged_trials = true;
 paramSet.datType = 'eeggnd';
 % specify padding if any. gatherWindowsOfData requires NaN padding right now.
 processOpt.windowPadding = NaN;
-
-% Where to save data
-% ---------------------
-%
-saveFolder = './';
 
 % Pre-processing for Gathering Data Windows
 
@@ -123,6 +126,10 @@ for a = 1:numel(animal_set)
     end
 	
 end
+
+% Where to save data
+% ---------------------
+saveFolder = ['./'];
 
 %% Gather Windows of Data
 
@@ -177,12 +184,19 @@ avg_grams = averageAcross(grams,paramSet);
 
 disp('Plotting and saving data...');
 
-if averaged_trials
-    paramSet.trials = false;
-    plotAndSave(avg_grams,paramSet);
+if averaged_trials == true
+    sets.trials = false;
+    plotAndSave(avg_grams,sets);
+elseif averaged_trials == false
+    sets.trials = true;
+    plotAndSave(grams,sets);
 else
-    paramSet.trials = true;
-    plotAndSave(grams,paramSet);
+     sets.trials = false;
+    plotAndSave(avg_grams,sets);
+    
+     sets.trials = true;
+    plotAndSave(grams,sets);
 end
 
-
+disp('FINISHED DAY');
+end

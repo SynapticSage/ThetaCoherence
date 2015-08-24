@@ -11,9 +11,13 @@ end
 
 if ~ismember('coherograms',fields(sets))
 	sets.coherograms = false;
+else
+    coherograms = sets.coherograms;
 end
 if ~ismember('spectrograms',fields(sets))
-	sets.spectrograms = true;
+	spectrograms = true;
+else
+    spectrograms = sets.spectrograms;
 end
 
 %% Simplifying variable names detailing what to get
@@ -30,12 +34,15 @@ for a = 1:numel(animals)
 				for t2 = toProcess.(animals{a}).tetrodes2;
 				
 				for tr = 1:sum(~cellfun(@isempty,{gram(a).output{d, e, t,:}}))
+                    
                 
+                %% Adjust data
                 temp= gram(a).output{d, e, t, tr};
                 adjust=(max(temp.Stime)-min(temp.Stime))/2;
                 
                 temp.Stime=temp.Stime-min(temp.Stime)-adjust;
                 
+                %% Plot
                 q= figure; hold on;
                 set(gcf,'Position',[55 660 560 420]);
                 imagesc(temp.Stime,temp.Sfreq,temp.S'); colorbar;
@@ -56,17 +63,31 @@ for a = 1:numel(animals)
                 set(gca,'XLim',[min(temp.Stime) max(temp.Stime)]);
                 set(gca,'YLim',[min(temp.Sfreq) max(temp.Sfreq)]);
                 
+                %% Save
 				if ispc
 					savepath= '/home/mcz/Desktop/GitProj/Images/';
-                    savepath = './';
+                    savepath = ['.' filesep];
 				elseif ismac
 					savepath= '~/Documents/MATLAB/LabProjects/Data/LongerLowerPassSpecsHpa5/';
-				end
+                end
                 
 				if ~sets.trials
+                    specific_folder = [gram(a).animal num2str(d) '_' ...
+                        num2str(e)];
+                    
+                    mkdir(savepath, specific_folder);
+                    savepath = [savepath specific_folder filesep];
+                    
 					saveas(gcf, [savepath gram(a).animal '_' ...
 					num2str(d) '_' num2str(e) '_' num2str(t) '.png']);
-				else
+                else
+                    
+                    specific_folder = [gram(a).animal num2str(d) '_' ...
+                        num2str(e) '_' num2str(t)];
+                    
+                    mkdir(savepath, specific_folder);
+                    savepath = [savepath specific_folder filesep];
+                    
 					saveas(gcf, [savepath gram(a).animal '_' ...
 					num2str(d) '_' num2str(e) '_' num2str(t) ...
 					'_' num2str(tr) '.png']);
@@ -89,12 +110,14 @@ for a = 1:numel(animals)
 			for t2 = toProcess.(animals{a}).tetrodes2
                 
 				for tr = 1:sum(~cellfun(@isempty,{gram(a).output{d, e, t,t2,:}}))
-                    
+                
+                %% Adjust data axes
                 temp= gram(a).output{d, e, t,t2, tr};
                 adjust=(max(temp.Stime)-min(temp.Stime))/2;
                 
                 temp.Stime=temp.Stime-min(temp.Stime)-adjust;
                 
+                %% Plot
                 q= figure; hold on;
                 set(gcf,'Position',[55 660 560 420]);
                 imagesc(temp.Stime,temp.Sfreq,temp.C'); colorbar;
@@ -120,19 +143,33 @@ for a = 1:numel(animals)
                 set(gca,'XLim',[min(temp.Stime) max(temp.Stime)]);
                 set(gca,'YLim',[min(temp.Sfreq) max(temp.Sfreq)]);
                 
+                %% Save
 				if ispc
 					savepath= '/home/mcz/Desktop/GitProj/Images/';
-                    savepath = './';
+                    savepath = ['.' filesep];
 				elseif ismac
 					savepath= '~/Documents/MATLAB/LabProjects/Data/LongerLowerPassSpecsHpa5/';
 				end
                 
 				if ~sets.trials
+                     specific_folder = [gram(a).animal num2str(d) '_' ...
+                        num2str(e)];
+                    
+                    mkdir(savepath, specific_folder);
+                    savepath = [savepath specific_folder filesep];
+                    
 					saveas(gcf, [savepath gram(a).animal '_' ...
 					num2str(d) '_' num2str(e) '_' ...
 					'TetX=' num2str(t) ', TetY=' num2str(t2) ...
 					'.png']);
-				else
+                else
+                    specific_folder = [gram(a).animal num2str(d) '_' ...
+                        num2str(e) '_TetX=' num2str(t) ...
+                        '_TetY=' num2str(t2)];
+                    
+                    mkdir(savepath, specific_folder);
+                    savepath = [savepath specific_folder filesep];
+                    
 					saveas(gcf, [savepath gram(a).animal '_' ...
 					num2str(d) '_' num2str(e) '_' ...
 					'TetX=' num2str(t) ', TetY=' num2str(t2) ...
