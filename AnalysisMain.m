@@ -169,6 +169,7 @@ end
 
 if exist('tetrode_set2','var')
     sets.coherograms=true;
+    sets.spectrograms=false;
  else
     sets.spectrograms=true;
     sets.coherograms=false;
