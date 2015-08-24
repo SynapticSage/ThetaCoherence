@@ -11,7 +11,7 @@
 % 15-20		...		PFC
 %
 % -----------------------
-% ANIMAL, HPa
+% ANIMAL, HPb
 % -----------------------
 % Tetrodes			Area
 % -----------------------
@@ -91,7 +91,6 @@ sampleParams.trajbound_type = 0 ;            % 0 denotes outbound
  %
 
 
-
 animal_set = {'HPb'};       
 day_set = dy;			% set of days to analyze for all animals ...
 if dy == 1
@@ -107,23 +106,23 @@ averaged_trials = 'both';
 % Parameters for controlling what data to window, and how to pad samples
 % --------
 % specify which electrophysiology data to window!
-sets.datType = 'eeggnd';
+paramSet.datType = 'eeggnd';
 % specify padding if any. gatherWindowsOfData requires NaN padding right now.
 processOpt.windowPadding = NaN;
 
 % Pre-processing for Gathering Data Windows
 
-sets.sampleParams = sampleParams;
+paramSet.sampleParams = sampleParams;
 
 % set .animals field to contain who, which day, which epoch, and which
 % tetrodes
 for a = 1:numel(animal_set)
 	
-	sets.animals.(animal_set{a}).days = day_set;
-	sets.animals.(animal_set{a}).epochs = epoch_set;
-	sets.animals.(animal_set{a}).tetrodes = tetrode_set;
+	paramSet.animals.(animal_set{a}).days = day_set;
+	paramSet.animals.(animal_set{a}).epochs = epoch_set;
+	paramSet.animals.(animal_set{a}).tetrodes = tetrode_set;
     if exist('tetrode_set2','var')
-        sets.animals.(animal_set{a}).tetrodes2 = tetrode_set2;
+        paramSet.animals.(animal_set{a}).tetrodes2 = tetrode_set2;
     end
 	
 end
@@ -134,38 +133,39 @@ saveFolder = ['./'];
 
 %% Gather Windows of Data
 
-processOpt.output = true; processOpt.save = false;
-
-tic
 disp('Acquiring windows of data at requested sample points...');
+
+processOpt.output = true; processOpt.save = false;
 
 % Acquire from first set of tetrodes
 
 processOpt.otherTetrodes = false;
-acquisition = gatherWindowsOfData(saveFolder, sets,...
+acquisition = gatherWindowsOfData(saveFolder, paramSet,...
 	processOpt);
 
 if exist('tetrode_set2','var')
     processOpt.otherTetrodes = true;
-    acquisition2 = gatherWindowsOfData(saveFolder, sets,...
+    acquisition2 = gatherWindowsOfData(saveFolder, paramSet,...
         processOpt);
 end
 
 
 %% Generate Spectrograms
 
+disp('Generating spec- or coherograms...');
+
 % Options that control functional output
 processOpt.save = 0; processOpt.output = 1; processOpt.plot = 0;
 
-disp('Generating spec- or coherograms...');
-
 if exist('tetrode_set2','var')
-    grams = generate_xGrams(acquisition,sets,processOpt,acquisition2);
+    grams = generate_xGrams(acquisition,paramSet,processOpt,acquisition2);
 else
-    grams = generate_xGrams(acquisition,sets,processOpt);
+    grams = generate_xGrams(acquisition,paramSet,processOpt);
 end
 
 %% Average Across Spectrograms
+
+disp('Averaging data...');
 
 if exist('tetrode_set2','var')
     sets.coherograms=true;
@@ -175,10 +175,9 @@ if exist('tetrode_set2','var')
     sets.coherograms=false;
 end
 
-sets.average = {'trial'};
+paramSet.average = {'trial'};
 
-disp('Averaging data...');
-avg_grams = averageAcross(grams,sets);
+avg_grams = averageAcross(grams,paramSet);
 
 
 %% Plotting and saving
