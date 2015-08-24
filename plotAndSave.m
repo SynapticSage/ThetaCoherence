@@ -25,7 +25,7 @@ animals = fields(sets.animals);
 toProcess = sets.animals;
 
 %% Plotting over all requested data
-if sets.spectrograms
+if spectrograms
 for a = 1:numel(animals)
     for d = toProcess.(animals{a}).days;
         for e = toProcess.(animals{a}).epochs;
@@ -102,7 +102,7 @@ end
 end
 end
 
-if sets.coherograms
+if coherograms
 for a = 1:numel(animals)
     for d = toProcess.(animals{a}).days
         for e = toProcess.(animals{a}).epochs

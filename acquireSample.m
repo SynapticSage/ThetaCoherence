@@ -127,8 +127,8 @@ if(isfield(sampleParams, 'circleParams'))
     xc = sampleParams.circleParams.center(1); yc = sampleParams.circleParams.center(2);
     x_pos = trajectoryData(:,1); y_pos = trajectoryData(:,2);
     distance_from_center = sqrt(( x_pos - xc ).^2 + (y_pos - yc).^2);
-    error_term = mean(abs(trajectoryData(:,1).^2+...
-        trajectoryData(:,2).^2),'omitnan');
+    error_term = mean(diff(abs(sqrt(diff(trajectoryData(:,1).^2+...
+        trajectoryData(:,2).^2)))),'omitnan');
     % if user selected radius smaller than typical positional change in pos
     % data then add an error term to their radius
     if(sampleParams.circleParams.radius < error_term)

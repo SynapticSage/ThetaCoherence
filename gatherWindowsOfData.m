@@ -255,6 +255,8 @@ for a = 1:numel(animal_list)
 					
 					acquisition(a).data{d,e,t} = windowedData;
 					acquisition(a).time_vec{d,e,t} = windowedData;
+                    acquisition(a).sst{d,e,t} = start_stop_times;
+                    acquisition(a).ssi{d,e,t} = start_stop_times;
 					
 				end
 				
@@ -263,6 +265,8 @@ for a = 1:numel(animal_list)
 					
 					OutputsToSave.data = windowedData;
 					OutputsToSave.time_vec = time_vec;
+                    OutputsToSave.sst = start_stop_times;
+                    OutputsToSave.ssi = start_stop_indices;
 					
 					SaveFileCharacteristics.animal = acquisition(a).animal;
 					SaveFileCharacteristics.data_name = 'acquisition';

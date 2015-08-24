@@ -181,6 +181,9 @@ for a = 1:animalcount
 						Output.Stime = Stime;
 						Output.Sfreq = Sfreq;
 						Output.Serror = Serror;
+                        Output.acquis.sst=acquisition(a).sst{d,e,t};
+                        Output.acquis.ssi=acquisition(a).ssi{d,e,t};
+
 					end
 					
 					%% If user asks to output to RAM
@@ -289,16 +292,24 @@ for a = 1:animalcount
 						Output12.S12 = S12;
 						Output12.Stime = Stime;
 						Output12.Sfreq = Sfreq;
+                        Output12.acquis.sst=acquisition(a).sst{d,e,t};
+                        Output12.acquis.ssi=acquisition(a).ssi{d,e,t};
 
 						% Single tetrode t information
 						Output1.S = S1;
 						Output1.Stime = Stime;
 						Output1.Sfreq = Stime;
+                        Output1.acquis.sst=acquisition(a).sst{d,e,t};
+                        Output1.acquis.ssi=acquisition(a).ssi{d,e,t};
+
 
 						% Single tetrode t2 information
 						Output2.S = S2;
 						Output2.Stime = Stime;
 						Output2.Sfreq = Stime;
+                        Output12.acquis.sst=acquisition2(a).sst{d,e,t};
+                        Output12.acquis.ssi=acquisition2(a).ssi{d,e,t};
+
 					end
 					
 					%% If user asks to output from function/RAM
