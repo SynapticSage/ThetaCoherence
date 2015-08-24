@@ -62,7 +62,7 @@ clear sampleParams acquisition acquisition2 grams avg_grams
 % Parameters for circumscribing sample around a point
 % --------------------------------------------------------
 % How large of radius should we sample
-sampleParams.circleParams.radius = 1;       % 20 pixel radius
+sampleParams.circleParams.radius = 20;       % 20 pixel radius
 % Where to sample
 % [1 0] denotes end (1) of segment number 1;
 sampleParams.circleParams.segment = [1 1];  

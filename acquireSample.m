@@ -185,7 +185,11 @@ if(isfield(sampleParams,'trajbound_type'))
         initial = initial(1) + 1;
         % end point of only first path
         final = find(diff_onepath == -1);
-        final = final(1);
+        if isempty(final)
+            final = initial + 1;
+        else
+            final = final(1);
+        end
         % change logical to reflect only the first found trajcetory
         logical_onepath = zeros(size(logical_onepath));
         logical_onepath(initial:final) = 1;
