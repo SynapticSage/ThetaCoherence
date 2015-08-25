@@ -122,10 +122,6 @@ function [avg_grams] = averageAcross2(grams,paramSet)
 		data.(field{1}) = sum_store./sum_count;
 	end
 	
-	% TODO ... what if I sum over two dimensions in a row? Needs to be able
-	% to store sum and keep track of how many elements are getting summed
-	% per dimension!!!!
-	
 	%% Re-assign to output structure
 	sieve = [inf inf inf inf inf];
 	sieve(dim2avg) = 1;
