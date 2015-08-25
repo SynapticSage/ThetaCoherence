@@ -4,9 +4,9 @@ function [avg_specgram] = averageAcross(grams, sets)
 % if flag== trials, Output = Output(animals).{day,epoch,tetrode}
 
 if ~ismember('coherograms',fields(sets))
-    coherence = false;
+    coherograms = false;
 else
-    coherence = true;
+    coherograms = sets.coherograms;
 end
 
 sets.average={'trial'};
@@ -30,7 +30,7 @@ idx=[temp_idx{:}]; clear temp_idx
 % % get unique values from each dimension where data is stored
 for u=1:datDims; uVals{u,:}=unique(idx(:,u),'rows')'; end;
 
-if ismember('trial',sets.average) && coherence==false
+if ismember('trial',sets.average) && coherograms==false
     for d= uVals{1}
         for e= uVals{2}
             for t= uVals{3}
@@ -56,7 +56,7 @@ if ismember('trial',sets.average) && coherence==false
             end
         end
     end
-elseif ismember('trial',sets.average) && coherence==true
+elseif ismember('trial',sets.average) && coherograms==true
     
     animals = fields(sets.animals);
     

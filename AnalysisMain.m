@@ -26,7 +26,6 @@
 %  1,3,4,6 for CA1; 9 for PFC
 
 %% Putting Data Files on Path and Clearing Variables
-for dy = 1:8
 
 % if files.brandeis.edu is in the file system, then add data to path
 d = filesep;
@@ -90,7 +89,6 @@ sampleParams.trajbound_type = 0 ;            % 0 denotes outbound
  % ------------------------------------------------------------------------
  %
 
-for dy = 1:8
     
 animal_set = {'HPb'};       
 day_set = dy;			% set of days to analyze for all animals ...
@@ -169,10 +167,6 @@ disp('Averaging data...');
 
 if exist('tetrode_set2','var')
     paramSet.coherograms=true;
-    paramSet.spectrograms=false;
- else
-    paramSet.spectrograms=true;
-    paramSet.coherograms=false;
 end
 
 paramSet.average = {'trial'};
@@ -184,23 +178,9 @@ avg_grams = averageAcross(grams,paramSet);
 
 disp('Plotting and saving data...');
 
-
-
-if averaged_trials == true
-    paramSet.trials = false;
-    plotAndSave(avg_grams,paramSet);
-elseif averaged_trials == false
-    paramSet.trials = true;
-    plotAndSave(grams,paramSet);
-else
-     paramSet.trials = false;
-    plotAndSave(avg_grams,paramSet);
     
-     paramSet.trials = true;
-    plotAndSave(grams,paramSet);
-end
+paramSet.trials = true;
+plotAndSave(grams,paramSet);
 
 disp('FINISHED DAY');
 
-end
-end

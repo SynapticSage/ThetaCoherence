@@ -2,7 +2,9 @@ function [avg_grams] = averageAcross2(grams,paramSet)
 
 	%% Default options
 	if ~ismember('average_dat_type', fields(paramSet))
-		averaging_fields = {'S'};		% What fields to average
+% 		averaging_fields = {'S'};		% What fields to average
+		disp('No averaging fields provided! Entering keyboard mode to allow fix.');
+		keyboard;
 	else
 		averaging_fields = paramSet.average_dat_type;
 	end
@@ -36,8 +38,8 @@ function [avg_grams] = averageAcross2(grams,paramSet)
 				dim2avg = 2;
 				dimension_inputted = true;
 			otherwise
-				disp('Error: Improper input')
-				in = input('trials, tetrodes, days, epochs?');
+				disp('Error: No dimension inputted, please assist:')
+				keyboard;
 		end
 	end
 
@@ -49,6 +51,12 @@ function [avg_grams] = averageAcross2(grams,paramSet)
 	temp_struct = [];
 	allocated_data = false;
 	
+	num_i1 = size(spec_cell,1);
+	num_i2 = size(spec_cell,2);
+	num_i3 = size(spec_cell,3);
+	num_i4 = size(spec_cell,4);
+	num_i5 = size(spec_cell,5);
+	
 	for field = averaging_fields
 	for i1 = 1:size(spec_cell,1)
 	for i2 = 1:size(spec_cell,2)
@@ -56,16 +64,26 @@ function [avg_grams] = averageAcross2(grams,paramSet)
 	for i4 = 1:size(spec_cell,4)
 	for i5 = 1:size(spec_cell,5)
 		
-		if ~allocated_data
-			% ALLOCATE and set all zero data to NaN
-		end
 		
 		maybe_spec_data = spec_cell{i1,i2,i3,i4,i5};
 		
 		if isstruct(maybe_spec_data)
+			
+			if ismember(field, fields(maybe_spec_data))
+			if ~allocated_data
+				spec_gram_size = size(maybe_spec_data.(field{1}));
+			% ALLOCATE and set all zero data to NaN
+				data.(field{1}) = NaN * ones(num_i1, num_i2, num_i3, ...
+					num_i4, num_i4, spec_gram_size(end-1), ...
+					spec_gram_size(end));
+				allocated_data=true;
+			end
+			
 			disp([i1 i2 i3 i4 i5]);
 			data.(field{1})(i1,i2,i3,i4,i5,:,:) = ...
 				maybe_spec_data.(field{1}); 
+			end
+			
 		end
 		
 	end
@@ -77,11 +95,36 @@ function [avg_grams] = averageAcross2(grams,paramSet)
 	
 	
 	%% Average data
-	for dim		= dim2avg
-		for field	= averaging_fields
-				data.(field{1}) = mean(data.(field{1}),dim);
+	for field	= averaging_fields
+		
+	sum_count = ~isnan(data.(field{1})(:,:,:,:,:,:,:));
+	sum_store = data.(field{1});
+	
+		for dim		= dim2avg
+			
+			% sum across dimension
+			sum_store = sum(sum_store,dim,'omitnan');
+			
+			% at the same time, we sum across a matrix that has marked all
+			% non-NaN numbers with a 1. This means, the sum for any
+			% particular element IS THE NUMBER OF SPECTROGRAMS that have
+			% been summed to create a particular element in sum_store!
+			sum_count = sum(sum_count,dim);
+			
 		end
+		
+		% Here, we divide sum_store by (per element!) the number of
+		% elements that have contributed to each elements sum. sum_count
+		% has tracked this on an element by element basis. In other words,
+		% for each (i1,i2,i3,i4,i5,x,y) sum_count has tracked the number of
+		% elements summed in parallel with the summing on spectrograms or
+		% coherograms.
+		data.(field{1}) = sum_store./sum_count;
 	end
+	
+	% TODO ... what if I sum over two dimensions in a row? Needs to be able
+	% to store sum and keep track of how many elements are getting summed
+	% per dimension!!!!
 	
 	%% Re-assign to output structure
 	sieve = [inf inf inf inf inf];
