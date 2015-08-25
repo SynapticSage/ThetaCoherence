@@ -26,7 +26,7 @@
 %  1,3,4,6 for CA1; 9 for PFC
 
 %% Putting Data Files on Path and Clearing Variables
-
+for dy = 1:8
 
 % if files.brandeis.edu is in the file system, then add data to path
 d = filesep;
@@ -50,11 +50,11 @@ if path_added || (~path_added && exist(files_dot_brandeis_edu, 'dir'))
     
     path_added = true;
 end
-for dy = 1:8
     
 clear sampleParams acquisition acquisition2 grams avg_grams
 
 %% Parameter Section
+
 % This is where we specifiy which parameters we're interested ... which
 % animals, which days/epochs, which tetrodes, and what types of maze and
 % electrophysiology parameters to select for.
@@ -90,16 +90,16 @@ sampleParams.trajbound_type = 0 ;            % 0 denotes outbound
  % ------------------------------------------------------------------------
  %
 
-
+for dy = 1:8
+    
 animal_set = {'HPb'};       
 day_set = dy;			% set of days to analyze for all animals ...
+epoch_set = 2;
 if dy == 1
-    epoch_set= [4];
-else
-    epoch_set = [2];		% set of epochs to analyze for all animals ...
+    epoch_set = 4;
 end
-tetrode_set = [1 4];
-tetrode_set2 = [17];
+tetrode_set = [1];
+tetrode_set2 = [9];
 
 averaged_trials = 'both';
 
@@ -168,11 +168,11 @@ end
 disp('Averaging data...');
 
 if exist('tetrode_set2','var')
-    sets.coherograms=true;
-    sets.spectrograms=false;
+    paramSet.coherograms=true;
+    paramSet.spectrograms=false;
  else
-    sets.spectrograms=true;
-    sets.coherograms=false;
+    paramSet.spectrograms=true;
+    paramSet.coherograms=false;
 end
 
 paramSet.average = {'trial'};
@@ -184,19 +184,23 @@ avg_grams = averageAcross(grams,paramSet);
 
 disp('Plotting and saving data...');
 
+
+
 if averaged_trials == true
-    sets.trials = false;
-    plotAndSave(avg_grams,sets);
+    paramSet.trials = false;
+    plotAndSave(avg_grams,paramSet);
 elseif averaged_trials == false
-    sets.trials = true;
-    plotAndSave(grams,sets);
+    paramSet.trials = true;
+    plotAndSave(grams,paramSet);
 else
-     sets.trials = false;
-    plotAndSave(avg_grams,sets);
+     paramSet.trials = false;
+    plotAndSave(avg_grams,paramSet);
     
-     sets.trials = true;
-    plotAndSave(grams,sets);
+     paramSet.trials = true;
+    plotAndSave(grams,paramSet);
 end
 
 disp('FINISHED DAY');
+
+end
 end
