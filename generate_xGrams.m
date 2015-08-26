@@ -149,8 +149,8 @@ for a = 1:animalcount
 		 		  % to figure out- importing relevant mean data, or meangrnd data. Differentiate between S and Sgrnd?
 				  if zscore == 1
                       
-                     if d< 10; dstr= ['0' num2str(d)]; else distr= num2str(d); end;
-                     if t< 10; tstr= ['0' num2str(t)]; else tistr= num2str(t); end;
+                     if d< 10; dstr= ['0' num2str(d)]; else dstr= num2str(d); end;
+                     if t< 10; tstr= ['0' num2str(t)]; else tstr= num2str(t); end;
 
                     zscoredir= ['/home/mcz/DataShare/DATA/sjadhav/HPExpt/' animals{1} '_direct/EEGSpec/'];
                     datadir= [animals{1} 'eeggndspec' savetag dstr '-Tet' tstr '.mat' ];
