@@ -64,7 +64,8 @@ clear sampleParams acquisition acquisition2 grams avg_grams
 sampleParams.circleParams.radius = 15;       % 20 pixel radius
 % Where to sample
 % [1 1] denotes [segment_1 end_of_it]
-sampleParams.circleParams.segment = [1 1];  
+% sampleParams.circleParams.segment = [1 1];
+sampleParams.circleParams.segment = {1, 'final'};
 % Note: Second number encodes start and end of segment in 0 and 1.
 % Eventually we may extend function to request a point that is some
 % fraction, e.g. 0.75 from start (0) to end (1) of segment

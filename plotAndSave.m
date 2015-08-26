@@ -128,13 +128,13 @@ for a = 1:numel(animals)
         for e = toProcess.(animals{a}).epochs
             for t= toProcess.(animals{a}).tetrodes
 			for t2 = toProcess.(animals{a}).tetrodes2
-                
-				for tr = 1:sum(~cellfun(@isempty,{gram(a).output{d, e, t,t2,:}}))
-                
+				
 				% If there's an exception in handling, enforce it. It's a
 				% temporary solution, hopefully, until a more elegant one
 				% presents.
 				EnforceException;
+                
+				for tr = 1:sum(~cellfun(@isempty,{gram(a).output{d, e, t,t2,:}}))
                 
 				%% Adjust data axes
                 temp= gram(a).output{d, e, t,t2, tr};

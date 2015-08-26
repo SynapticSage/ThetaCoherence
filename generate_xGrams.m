@@ -230,6 +230,11 @@ for a = 1:animalcount
             for t = sets.(animals{a}).tetrodes
             for t2 = sets.(animals{a}).tetrodes2
 				
+				% If there's an exception in handling, enforce it. It's a
+				% temporary solution, hopefully, until a more elegant one
+				% presents.
+				EnforceException;
+				
 				% If file, read in, else access address in acquisition
 					% struct
 					if file_read
