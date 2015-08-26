@@ -12,7 +12,10 @@
 % functions. If you want to stop the exception, you just go to one place,
 % here, and comment it out.
 
-if d == 1
+if d == 1 && e == 2;
 	e = 4;
-end
-	
+end;
+
+if d == 1 && e == 4;
+    e = 6;
+end;
