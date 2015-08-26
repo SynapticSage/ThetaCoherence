@@ -198,6 +198,10 @@ for a = 1:numel(animal_list)
 		
         for e = dataToGet.animals.(anim).epochs
 			
+			% If there's an exception, where we for a single day
+			% process a different epoch, enforce it
+			EnforceException;
+			
 			%% Acquire run data for (animal, day, epoch)
             
 			% Generate the file string from each of the cell elements passed from
@@ -209,7 +213,12 @@ for a = 1:numel(animal_list)
 			
 			% load it all up
 			for i = 1:numel(file_cell)
+				try
 				load(file_cell{i});
+				catch ME
+					disp('File not found !!! Check your path.');
+					throw(ME)
+				end
 			end
 			
 			% Get epoch of linearized position data!

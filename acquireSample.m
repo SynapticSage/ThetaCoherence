@@ -111,12 +111,23 @@ if(isfield(sampleParams, 'circleParams'))
             segmentCoords = data.linpos.segmentInfo.segmentCoords;
 			segment = sampleParams.circleParams.segment;
 			
-            % Acquire the x coordinate of the segment
-            sampleParams.circleParams.center(1) = ...
-                segmentCoords(segment(1), segment(2)*2 + 1);
-            % Acquire the y coordinate of the segment
-            sampleParams.circleParams.center(2) = ...
-                segmentCoords(segment(1), segment(2)*2 + 2);
+			% If segment is a cell, then parse it
+			if iscell(segment)
+				if ischar(segment{2}) && strcmp(segment{2},'initial')
+					segment = [segment{1} 0];
+				elseif ischar(segment{2}) && strcmp(segment{2},'final')
+					segment = [segment{1} 1];
+				else
+					disp('ERROR! You passed a cell with an invalid input.');
+				end
+			end
+			
+			% Acquire the x coordinate of the segment
+			sampleParams.circleParams.center(1) = ...
+				segmentCoords(segment(1), segment(2)*2 + 1);
+			% Acquire the y coordinate of the segment
+			sampleParams.circleParams.center(2) = ...
+				segmentCoords(segment(1), segment(2)*2 + 2);
             
         end
     end
@@ -280,6 +291,14 @@ function [times, indices, start_stop_times, start_stop_indices] = ...
     
 	% Create entrance window .. the start and stop time
 	start_stop_indices = [ssi(:,edge) - window(1), ssi(:,edge) + window(2)];
+	
+	% When we investigate other segments, other than 1, windows can go out
+	% of bounds! Make any that do NaN. This is because pos starts at the
+	% moment the tracker starts. TODO not sure if best solution .. but is a
+	% problem. Must be set []. If simply move -x into range, it throws off
+	% sampling later down the pipeline.
+	illegal_indices = start_stop_indices(:,1) < 1;
+	start_stop_indices(illegal_indices,:) = [];
 	
     % NOW WE HAVE TO RE-DO all other representations of sample times ..
     % they are equivalent forms, but this function must return them.

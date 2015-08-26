@@ -2,7 +2,7 @@ function [avg_specgram] = averageAcross(grams, sets)
 % Function controls the averaging across spectrograms.
 
 % if flag== trials, Output = Output(animals).{day,epoch,tetrode}
-
+try
 if ~ismember('coherograms',fields(sets))
     coherograms = false;
 else
@@ -107,8 +107,9 @@ elseif ismember('trial',sets.average) && coherograms==true
 end 
     
 end
-
-
+catch ME
+	disp(ME);
+end
 end
 
 

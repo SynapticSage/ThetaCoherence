@@ -63,7 +63,7 @@ clear sampleParams acquisition acquisition2 grams avg_grams
 % How large of radius should we sample
 sampleParams.circleParams.radius = 15;       % 20 pixel radius
 % Where to sample
-% [1 0] denotes end (1) of segment number 1;
+% [1 1] denotes [segment_1 end_of_it]
 sampleParams.circleParams.segment = [1 1];  
 % Note: Second number encodes start and end of segment in 0 and 1.
 % Eventually we may extend function to request a point that is some
@@ -91,7 +91,7 @@ sampleParams.trajbound_type = 0 ;            % 0 denotes outbound
 
     
 animal_set = {'HPa'};       
-day_set = 2:8;			% set of days to analyze for all animals ...
+day_set = 1:8;			% set of days to analyze for all animals ...
 epoch_set = 2;
 tetrode_set = [1];
 tetrode_set2 = [17];
@@ -186,16 +186,19 @@ end
 disp('Grouping desired frequencies and averaging per day...');
 
 % Place desired bandwidth here
-paramSet.lower_freq = 7;
-paramSet.upper_freq = 9;
+i = 1;
+for l = 4:11
+paramSet.lower_freq = l;
+paramSet.upper_freq = l+1;
 
 [grams S_summary C_summary] = ...
 	meanFreqBand(avg_grams, paramSet);
 
 
 %% Plot the binned out stuff
-
+hold on;
 PlotSummaryBars;
-
+end
+i
 disp('FINISHED DAY');
 

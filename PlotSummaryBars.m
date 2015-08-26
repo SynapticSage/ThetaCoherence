@@ -15,12 +15,14 @@ end
 if exist('C_summary') && ~isempty(C_summary)
 	
 	%% Plot
-	bar(day_set, C_summary);
-	
+	subplot(4,3,i);
+	bar(day_set, C_summary,'b');
+	title([num2str(l) '-' num2str(l+1)]);
+	i=i+1;
 	%% Label
 	
 	xlabel('Day');
 	ylabel('Coherence Strength');
-	axis([1 inf 0 1]);
+	axis([1 inf 0 0.8]);
 	
 end
