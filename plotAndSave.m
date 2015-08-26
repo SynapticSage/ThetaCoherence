@@ -1,4 +1,4 @@
-function plotAndSave( gram, sets)
+function plotAndSave( gram, sets, acquisition, acquisition2)
 %PLOTANDSAVE Literally does what it says!
 %   pass in spectrograms or coherograms in gram 
 %	pass in sets struct containing information about what days, epochs and
@@ -34,6 +34,17 @@ if ismember('meanFreqPlot', fields(sets))
 else
     meanFreqPlot = false;
 end
+
+% if ismember('plotAvgVelocity', fields(sets))
+%    
+%     coherograms = sets.coherograms;
+%     spectrograms = false;
+%     avgVelocity = true;
+%     
+% else
+%     avgVelocity= false;
+%     
+% end
 
 %% Simplifying variable names detailing what to get
 animals = fields(sets.animals);
@@ -298,8 +309,102 @@ if meanFreqPlot
 
         close
     
+    end
 end
 
 
-end
+% if avgVelocity
+% for a = 1:numel(animals)
+%     for d = toProcess.(animals{a}).days
+%         for e = toProcess.(animals{a}).epochs
+%             for t= toProcess.(animals{a}).tetrodes
+% 			for t2 = toProcess.(animals{a}).tetrodes2
+% 				
+% 				% If there's an exception in handling, enforce it. It's a
+% 				% temporary solution, hopefully, until a more elegant one
+% 				% presents.
+% 				EnforceException;
+%                 
+% 				for tr = 1:sum(~cellfun(@isempty,{gram(a).output{d, e, t,t2,:}}))
+%                 
+% 				%% Adjust data axes
+%                 temp= gram(a).output{d, e, t,t2, tr};
+%                 adjust=(max(temp.Stime)-min(temp.Stime))/2;
+%                 
+%                 temp.Stime=temp.Stime-min(temp.Stime)-adjust;
+%                 
+%                 %% Plot
+%                 q= figure; hold on;
+%                 set(gcf,'Position',[55 660 560 420]);
+%                 subplot(1,1,2);
+%                 imagesc(temp.Stime,temp.Sfreq,temp.C'); colorbar;
+% 				if ~sets.trials
+% 					title([sprintf('Coherence, \n') ...
+% 						gram(a).animal '- Day:' num2str(d)...
+% 						' Epoch:' num2str(e) sprintf('\n')...
+% 						' Tet_X:' num2str(t)...
+% 						'Tet_Y:' num2str(t2) ...
+% 						],'FontSize',16,'Fontweight','light');
+% 				else
+% 					title([ sprintf('Coherence, ') ...
+% 						gram(a).animal '- Day:' num2str(d)...
+% 						' Epoch:' num2str(e) ...
+% 						' Trial: ' num2str(tr) ...
+% 						 sprintf('\n')...
+% 						' Tet_X =' num2str(t)...
+% 						' Tet_Y =' num2str(t2) ...
+% 						],'FontSize',16,'Fontweight','light');
+% 				end
+%                 ylabel('Freq','FontSize',15,'Fontweight','normal');
+%                 xlabel('Time(s)','FontSize',15,'Fontweight','normal');
+%                 set(gca,'XLim',[min(temp.Stime) max(temp.Stime)]);
+%                 set(gca,'YLim',[min(temp.Sfreq) max(temp.Sfreq)]);
+%                 
+%                 subplot(2,1,2);
+%                 
+%                 
+%                 %% Save
+% 				if ispc
+% 					savepath= '/home/mcz/Desktop/GitProj/Images/';
+%                     savepath = ['.' filesep];
+% 				elseif ismac
+% 					savepath= '~/Documents/MATLAB/LabProjects/Data/LongerLowerPassSpecsHpa5/';
+% 				end
+%                 
+% 				if ~sets.trials
+%                      specific_folder = [gram(a).animal num2str(d) '_' ...
+%                         num2str(e)];
+%                     
+%                     mkdir(savepath, specific_folder);
+%                     savepath = [savepath specific_folder filesep];
+%                     
+% 					saveas(gcf, [savepath gram(a).animal '_' ...
+% 					num2str(d) '_' num2str(e) '_' ...
+% 					'TetX=' num2str(t) ', TetY=' num2str(t2) ...
+% 					'.png']);
+%                 else
+%                     specific_folder = [gram(a).animal num2str(d) '_' ...
+%                         num2str(e) '_TetX=' num2str(t) ...
+%                         '_TetY=' num2str(t2)];
+%                     
+%                     mkdir(savepath, specific_folder);
+%                     savepath = [savepath specific_folder filesep];
+%                     
+% 					saveas(gcf, [savepath gram(a).animal '_' ...
+% 					num2str(d) '_' num2str(e) '_' ...
+% 					'TetX=' num2str(t) ', TetY=' num2str(t2) ...
+% 					'_' 'Trial' num2str(tr) '.png']);
+% 				end
+%                 
+%                 close
+% 				end
+% 			end
+% 			end
+%         end
+%     end
+% end
+%     
+%     
+%     
+% end
 

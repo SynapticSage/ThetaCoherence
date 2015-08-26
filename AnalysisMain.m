@@ -179,7 +179,7 @@ disp('Plotting and saving data...');
     
 for trials = [true false]
 	paramSet.trials = trials;
-	plotAndSave(grams,paramSet);
+	plotAndSave(grams,paramSet, acquisition, acquisition2);
 end
 
 %% Binning-out and averaging fequency if desired -- comment below here if not
