@@ -15,14 +15,12 @@ end
 if exist('C_summary') && ~isempty(C_summary)
 	
 	%% Plot
-	subplot(4,3,i);
-	bar(day_set, C_summary,'b');
-	title([num2str(l) '-' num2str(l+1)]);
-	i=i+1;
+	bar(1:numel(C_summary), C_summary,'b');
+	title([num2str(paramSet.lower_freq) '-' num2str(paramSet.upper_freq)]);
 	%% Label
 	
-	xlabel('Day');
+	xlabel('Epoch wrt All Days');
 	ylabel('Coherence Strength');
-	axis([1 inf 0 0.8]);
+	axis([0 inf 0 1]);
 	
 end

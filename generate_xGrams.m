@@ -103,6 +103,7 @@ for a = 1:animalcount
 				% If there's an exception in handling, enforce it. It's a
 				% temporary solution, hopefully, until a more elegant one
 				% presents.
+                exception=[];
 				EnforceException;
 				
 				% If file, read in, else access address in acquisition
@@ -233,6 +234,7 @@ for a = 1:animalcount
 				% If there's an exception in handling, enforce it. It's a
 				% temporary solution, hopefully, until a more elegant one
 				% presents.
+                exception=[];
 				EnforceException;
 				
 				% If file, read in, else access address in acquisition

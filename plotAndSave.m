@@ -53,6 +53,7 @@ for a = 1:numel(animals)
 				% If there's an exception in handling, enforce it. It's a
 				% temporary solution, hopefully, until a more elegant one
 				% presents.
+                exception=[];
 				EnforceException;
                 
                 %% Adjust data
@@ -132,6 +133,7 @@ for a = 1:numel(animals)
 				% If there's an exception in handling, enforce it. It's a
 				% temporary solution, hopefully, until a more elegant one
 				% presents.
+                exception=[];
 				EnforceException;
                 
 				for tr = 1:sum(~cellfun(@isempty,{gram(a).output{d, e, t,t2,:}}))

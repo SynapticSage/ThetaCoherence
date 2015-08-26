@@ -200,6 +200,7 @@ for a = 1:numel(animal_list)
 			
 			% If there's an exception, where we for a single day
 			% process a different epoch, enforce it
+            exception=[];
 			EnforceException;
 			
 			%% Acquire run data for (animal, day, epoch)
