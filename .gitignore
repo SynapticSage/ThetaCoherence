@@ -3,3 +3,6 @@
 *.asv
 *.mat
 *.png
+*.bmp
+*/States
+*.svg
