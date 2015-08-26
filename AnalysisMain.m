@@ -90,14 +90,11 @@ sampleParams.trajbound_type = 0 ;            % 0 denotes outbound
  %
 
     
-animal_set = {'HPb'};       
-day_set = dy;			% set of days to analyze for all animals ...
+animal_set = {'HPa'};       
+day_set = 2:8;			% set of days to analyze for all animals ...
 epoch_set = 2;
-if dy == 1
-    epoch_set = 4;
-end
 tetrode_set = [1];
-tetrode_set2 = [9];
+tetrode_set2 = [17];
 
 averaged_trials = 'both';
 
@@ -179,24 +176,26 @@ avg_grams = averageAcross(grams,paramSet);
 disp('Plotting and saving data...');
 
     
-paramSet.trials = true;
-plotAndSave(grams,paramSet);
+for trials = [true false]
+	paramSet.trials = trials;
+	plotAndSave(grams,paramSet);
+end
 
-%% Binning-out/averaging fequency if desired -- comment below here if not
+%% Binning-out and averaging fequency if desired -- comment below here if not
 
 disp('Grouping desired frequencies and averaging per day...');
 
 % Place desired bandwidth here
-paramSet.lower_freq = 8;
-paramSet.higher_freq = 12;
+paramSet.lower_freq = 7;
+paramSet.upper_freq = 9;
 
-[grams summary_powers_S summary_powers_C] = ...
+[grams S_summary C_summary] = ...
 	meanFreqBand(avg_grams, paramSet);
 
 
 %% Plot the binned out stuff
 
-
+PlotSummaryBars;
 
 disp('FINISHED DAY');
 

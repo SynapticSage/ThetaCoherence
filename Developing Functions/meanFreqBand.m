@@ -10,8 +10,12 @@ if ~ismember('upper_freq',fields(paramSet))
     disp('Define the upper frequency:');
     keyboard;
 end
-upper_freq = paramSet.upper_freq;
-lower_freq = paramSet.lower_freq;
+if ~exist('upper_freq')
+	upper_freq = paramSet.upper_freq;
+end
+if ~exist('lower_freq')
+	lower_freq = paramSet.lower_freq;
+end
 
 %% Initialize outputs
 S_summary = [];
