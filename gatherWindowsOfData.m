@@ -269,7 +269,7 @@ for a = 1:numel(animal_list)
 					acquisition(a).data{d,e,t} = windowedData;
 					acquisition(a).time_vec{d,e,t} = windowedData;
                     acquisition(a).sst{d,e,t} = start_stop_times;
-                    acquisition(a).ssi{d,e,t} = start_stop_times;
+                    acquisition(a).ssi{d,e,t} = start_stop_indices;
 					
 				end
 				
