@@ -1,10 +1,11 @@
-function [grams] = meanFreqBand(grams,paramSet)
+function [grams S_summary C_summary] = meanFreqBand(grams,paramSet)
 %
 % Function that cuts out a relevant region and/or collapses averages that
 % signal over its y-axis or its x-axis. In spectrogram land, this means,
 % cutting out the bandwidth you care about, and averaging it in frequency
 % and/or in time, to create summaries for each sample.
 
+%% Handle parametric inputs
 if ~ismember('upper_freq',fields(paramSet))
     disp('Define the upper frequency:');
     keyboard;
@@ -12,7 +13,11 @@ end
 upper_freq = paramSet.upper_freq;
 lower_freq = paramSet.lower_freq;
 
+%% Initialize outputs
+S_summary = [];
+C_summary = [];
 
+%% Process!
 animals = fields(paramSet.animals);
 for a = 1:numel(animals)
     
@@ -54,6 +59,15 @@ spec_cell = grams(a).output;
             
             % put result into output struct
             grams(a).output{i1,i2,i3,i4,i5}.freqSmean = s;
+			
+			% add results to summary
+			S_summary = [S_summary s];
+			
+			% add information about lower and upper frequency
+			grams(a).output{i1,i2,i3,i4,i5}.freqSmean_lower = ...
+				lower_freq;
+			grams(a).output{i1,i2,i3,i4,i5}.freqSmean_upper = ...
+				upper_freq;
             
             end
             
@@ -74,7 +88,16 @@ spec_cell = grams(a).output;
             
             % put result into output struct
             grams(a).output{i1,i2,i3,i4,i5}.freqCmean = c;
-            
+			
+			% add results to summary
+			C_summary = [C_summary c];
+			
+			% add information about lower and upper frequency
+            grams(a).output{i1,i2,i3,i4,i5}.freqCmean_lower = ...
+				lower_freq;
+			grams(a).output{i1,i2,i3,i4,i5}.freqCmean_upper = ...
+				upper_freq;
+			
             end
             
             

@@ -49,7 +49,11 @@ for a = 1:numel(animals)
 				for t2 = toProcess.(animals{a}).tetrodes2;
 				
 				for tr = 1:sum(~cellfun(@isempty,{gram(a).output{d, e, t,:}}))
-                    
+                
+				% If there's an exception in handling, enforce it. It's a
+				% temporary solution, hopefully, until a more elegant one
+				% presents.
+				EnforceException;
                 
                 %% Adjust data
                 temp= gram(a).output{d, e, t, tr};
@@ -127,7 +131,12 @@ for a = 1:numel(animals)
                 
 				for tr = 1:sum(~cellfun(@isempty,{gram(a).output{d, e, t,t2,:}}))
                 
-                %% Adjust data axes
+				% If there's an exception in handling, enforce it. It's a
+				% temporary solution, hopefully, until a more elegant one
+				% presents.
+				EnforceException;
+                
+				%% Adjust data axes
                 temp= gram(a).output{d, e, t,t2, tr};
                 adjust=(max(temp.Stime)-min(temp.Stime))/2;
                 

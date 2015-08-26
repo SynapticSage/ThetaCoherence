@@ -240,6 +240,10 @@ for a = 1:numel(animal_list)
             end
             
             for t = tetrodes
+				
+				% If there's an exception, where we for a single day
+				% process a different epoch, enforce it
+				EnforceException;
                 
 				%% Window out the correct data per tetrode
 				% Acquire matrix of windowed data

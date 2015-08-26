@@ -182,5 +182,21 @@ disp('Plotting and saving data...');
 paramSet.trials = true;
 plotAndSave(grams,paramSet);
 
+%% Binning-out/averaging fequency if desired -- comment below here if not
+
+disp('Grouping desired frequencies and averaging per day...');
+
+% Place desired bandwidth here
+paramSet.lower_freq = 8;
+paramSet.higher_freq = 12;
+
+[grams summary_powers_S summary_powers_C] = ...
+	meanFreqBand(avg_grams, paramSet);
+
+
+%% Plot the binned out stuff
+
+
+
 disp('FINISHED DAY');
 
