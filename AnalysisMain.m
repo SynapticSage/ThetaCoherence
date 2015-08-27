@@ -100,12 +100,12 @@ sampleParams.trajbound_type = 0 ;            % 0 denotes outbound
  % --------------------------------------------------------------------
  % Parmeters for controlling which data to acquire spec or coheregrams
  % ------------------------------------------------------------------------
-  
-animal_set = {'HPa'};       
-day_set = 5;			% set of days to analyze for all animals ...
-epoch_set = 2;
+    
+animal_set = {'HPb'};       
+day_set = 1:8;			% set of days to analyze for all animals ...
+epoch_set = [2 4];
 tetrode_set = [1];
-tetrode_set2 = [17];
+tetrode_set2 = [9];
 
 averaged_trials = 'both';
 
@@ -187,10 +187,10 @@ disp('Plotting and saving data...');
     
 for trials = [true false]
 	paramSet.trials = trials;
-	plotAndSave(grams,paramSet);
+	plotAndSave(grams,paramSet, acquisition, acquisition2);
 end
 
-%% Binning-out and averaging fequency if desired -- comment below here if not
+%% Binning-out and averaging fequency i f desired -- comment below here if not
 
 disp('Grouping desired frequencies and averaging per day...');
 
@@ -205,10 +205,12 @@ paramSet.estimate_best_freq = true;
 	meanInFreqBand(avg_grams, paramSet);
 
 
+
 %% Plot the binned out stuff
 hold on;
 PlotSummaryBars;
 % end
 % i
+
 disp('FINISHED DAY');
 

@@ -12,10 +12,21 @@
 % functions. If you want to stop the exception, you just go to one place,
 % here, and comment it out.
 
-if d == 1 && e == 2;
-	e = 4;
-end;
+% Stores which exceptions have been applied in a function
+if ~isstruct(exception)
+    exception.init=[];
+end
 
-if d == 1 && e == 4;
-    e = 6;
-end;
+if d == 1 && e == 4 && ~ismember('d14',fields(exception))
+	e = 6;
+    exception.d16 = true;
+end
+
+if d == 1 && e == 2 && ~ismember('d16',fields(exception))
+	e = 4;
+    exception.d14 = true;
+end
+
+if d >=6 && d<=8 && e == 4
+    e = 2;
+end

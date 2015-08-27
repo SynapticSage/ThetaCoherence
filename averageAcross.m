@@ -38,6 +38,7 @@ if ismember('trial',sets.average) && coherograms==false
 				% If there's an exception in handling, enforce it. It's a
 				% temporary solution, hopefully, until a more elegant one
 				% presents.
+                exception=[];
 				EnforceException;
                 
                 % get the indices for all relevant inputs for this operation (avg across trials)
@@ -73,6 +74,7 @@ elseif ismember('trial',sets.average) && coherograms==true
 				% If there's an exception in handling, enforce it. It's a
 				% temporary solution, hopefully, until a more elegant one
 				% presents.
+                exception=[];
 				EnforceException;
                 
                 % get the indices for all relevant inputs for this
