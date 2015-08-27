@@ -20,10 +20,10 @@ function [grams] = generate_xGrams(acquisition, sets, processOpt, ...
 % Calculates specgram unless user passes in a second acquisition structure.
 
 % Store figure window style
-if ismac || ispc
-    default_fig = get(groot, 'DefaultFigureWindowStyle');
-    set(0,'DefaultFigureWindowStyle','docked');
-end
+% if ismac || ispc
+%     default_fig = get(groot, 'DefaultFigureWindowStyle');
+%     set(0,'DefaultFigureWindowStyle','docked');
+% end
 
 % if user passed in folder instead of acquisition structure, cd into folder
 file_read = false;
@@ -381,7 +381,7 @@ catch ME				% if screws up in for-loop, reset figure style.
             line{section}, name{section}));
 	end
 	% Reset what function changed
-	set(groot,'DefaultFigureWindowStyle',default_fig)
+% 	set(groot,'DefaultFigureWindowStyle',default_fig)
 	if file_read
 		rmpath(acquisition);
 	end

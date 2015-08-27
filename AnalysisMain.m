@@ -62,11 +62,11 @@ clear sampleParams acquisition acquisition2 grams avg_grams
 % Parameters for circumscribing sample around a point
 % --------------------------------------------------------
 % How large of radius should we sample
-% sampleParams.circleParams.radius = 15;       % 20 pixel radius
+ sampleParams.circleParams.radius = 15;       % 20 pixel radius
 % Where to sample
 % [1 1] denotes [segment_1 end_of_it]
-% % sampleParams.circleParams.segment = [1 1];
-% sampleParams.circleParams.segment = {1, 'final'};
+% sampleParams.circleParams.segment = [1 1];
+ sampleParams.circleParams.segment = {1, 'final'};
 
 % Note: Second number encodes start and end of segment in 0 and 1.
 % Eventually we may extend function to request a point that is some
@@ -75,7 +75,7 @@ clear sampleParams acquisition acquisition2 grams avg_grams
 % ----------------------------------------------------------
 % Parameters for controlling which segment transitions to sample
 % ----------------------------------------------------------
-sampleParams.segmentTransition = [1 4; 1 5];
+%sampleParams.segmentTransition = [1 4; 1 5];
 
 % ----------------------------------------------------------
 % Parameters for selecting trajectory type to sample
@@ -93,7 +93,7 @@ sampleParams.trajbound_type = 0 ;            % 0 denotes outbound
 % entrance or exit. Its unit is frames.  For 30hz sample rate, [15 15]
 % grabs 15 frames in front and behind boundary crossing. entranceOrExit
 % subfield controls whether to sample entrance or exit.
- sampleParams.edgeMode.window = [45 45];
+ sampleParams.edgeMode.window = [150 150];
  sampleParams.edgeMode.entranceOrExit = 'entrance';
  
 
@@ -105,7 +105,7 @@ animal_set = {'HPb'};
 day_set = 1:8;			% set of days to analyze for all animals ...
 epoch_set = [2 4];
 tetrode_set = [1];
-tetrode_set2 = [9];
+tetrode_set2 = [17];
 
 averaged_trials = 'both';
 

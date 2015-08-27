@@ -27,6 +27,6 @@ if d == 1 && e == 2 && ~ismember('d16',fields(exception))
     exception.d14 = true;
 end
 
-if d >=6 && d<=8 && e == 4
-    e = 2;
-end
+% if d >=6 && d<=8 && e == 4
+%     e = 2;
+% end
