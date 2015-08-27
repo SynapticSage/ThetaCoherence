@@ -23,6 +23,6 @@ if exist('C_summary') && ~isempty(C_summary)
 	
 	xlabel('Day');
 	ylabel('Coherence Strength');
-	axis([1 inf 0 0.8]);
+	axis([0.5 inf 0 1]);
 	
 end

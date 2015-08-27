@@ -58,24 +58,34 @@ clear sampleParams acquisition acquisition2 grams avg_grams
 % animals, which days/epochs, which tetrodes, and what types of maze and
 % electrophysiology parameters to select for.
 
+% ----------------------------------------------------------
 % Parameters for circumscribing sample around a point
 % --------------------------------------------------------
 % How large of radius should we sample
-sampleParams.circleParams.radius = 15;       % 20 pixel radius
+% sampleParams.circleParams.radius = 15;       % 20 pixel radius
 % Where to sample
 % [1 1] denotes [segment_1 end_of_it]
-% sampleParams.circleParams.segment = [1 1];
-sampleParams.circleParams.segment = {1, 'final'};
+% % sampleParams.circleParams.segment = [1 1];
+% sampleParams.circleParams.segment = {1, 'final'};
+
 % Note: Second number encodes start and end of segment in 0 and 1.
 % Eventually we may extend function to request a point that is some
 % fraction, e.g. 0.75 from start (0) to end (1) of segment
 
-% Parameters for selecting trajectory type
+% ----------------------------------------------------------
+% Parameters for controlling which segment transitions to sample
+% ----------------------------------------------------------
+sampleParams.segmentTransition = [1 4; 1 5];
+
+% ----------------------------------------------------------
+% Parameters for selecting trajectory type to sample
 % ---------------------------------------------------------
 % Which trajectory type to sample?
 sampleParams.trajbound_type = 0 ;            % 0 denotes outbound
 
-% Pameters for controlling edge mode
+
+% ---------------------------------------------------------------------
+% Pameters for controlling edge mode, i.e. triggering on entrance/exit
 % ----------------------------------------------------------------------
 % Edge mode refers to a mode where we sample from the edges of a choice
 % region. Adding it into the struct activates it. Placing a window subfield
@@ -83,46 +93,44 @@ sampleParams.trajbound_type = 0 ;            % 0 denotes outbound
 % entrance or exit. Its unit is frames.  For 30hz sample rate, [15 15]
 % grabs 15 frames in front and behind boundary crossing. entranceOrExit
 % subfield controls whether to sample entrance or exit.
- sampleParams.edgeMode.window = [150 150];
+ sampleParams.edgeMode.window = [45 45];
  sampleParams.edgeMode.entranceOrExit = 'entrance';
  
- % Parmeters for controlling which data to acquire spec or coheregrams from
- % ------------------------------------------------------------------------
- %
 
-    
+ % --------------------------------------------------------------------
+ % Parmeters for controlling which data to acquire spec or coheregrams
+ % ------------------------------------------------------------------------
+  
 animal_set = {'HPa'};       
-day_set = 1:8;			% set of days to analyze for all animals ...
+day_set = 5;			% set of days to analyze for all animals ...
 epoch_set = 2;
 tetrode_set = [1];
 tetrode_set2 = [17];
 
 averaged_trials = 'both';
 
+% ----------------------------------------------------------------------
 % Parameters for controlling what data to window, and how to pad samples
-% --------
+% -----------------------------------------------------------------------
 % specify which electrophysiology data to window!
 paramSet.datType = 'eeggnd';
 % specify padding if any. gatherWindowsOfData requires NaN padding right now.
 processOpt.windowPadding = NaN;
 
-% Pre-processing for Gathering Data Windows
-
+%%%%%%%% PRE-PROCESSING SUB-SECTION %%%%%%%%%
 paramSet.sampleParams = sampleParams;
-
 % set .animals field to contain who, which day, which epoch, and which
 % tetrodes
 for a = 1:numel(animal_set)
-	
 	paramSet.animals.(animal_set{a}).days = day_set;
 	paramSet.animals.(animal_set{a}).epochs = epoch_set;
 	paramSet.animals.(animal_set{a}).tetrodes = tetrode_set;
     if exist('tetrode_set2','var')
         paramSet.animals.(animal_set{a}).tetrodes2 = tetrode_set2;
-    end
-	
+	end
 end
-
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% ---------------------
 % Where to save data
 % ---------------------
 saveFolder = ['./'];
@@ -187,19 +195,20 @@ end
 disp('Grouping desired frequencies and averaging per day...');
 
 % Place desired bandwidth here
-i = 1;
-for l = 4:11
-paramSet.lower_freq = l;
-paramSet.upper_freq = l+1;
+% i = 1;
+% for l = 4:11
+paramSet.lower_freq = 6;
+paramSet.upper_freq = 12;
+paramSet.estimate_best_freq = true;
 
 [grams S_summary C_summary] = ...
-	meanFreqBand(avg_grams, paramSet);
+	meanInFreqBand(avg_grams, paramSet);
 
 
 %% Plot the binned out stuff
 hold on;
 PlotSummaryBars;
-end
-i
+% end
+% i
 disp('FINISHED DAY');
 

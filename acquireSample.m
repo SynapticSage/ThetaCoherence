@@ -97,7 +97,7 @@ sample_times = all_times;
 
 % Subset out circle of data IF user has provided the field. Do not
 % circumscribe if the user has not provided it.
-if(isfield(sampleParams, 'circleParams'))
+if isfield(sampleParams, 'circleParams')
     
     % If the user specifies the point to sample in the parameters, use
     % that, otherwise, use other criteria. For now, this other criteria can
@@ -160,9 +160,40 @@ if(isfield(sampleParams, 'circleParams'))
 	
 end
 
+%% Subset out segment transition, if requested
+% If segment transition filtering is turned on, then the function will
+% operate to grab time points where exiting a segment x and starting a
+% sample y. If edge mode is turned on 'entrace' option, will give you
+% window around exiting x and 'exit' will give you a window of times around
+% the first detection on y.
+
+if isfield(sampleParams,'segmentTransitions')
+	
+	transitions = sampleParams.segmentTransitions;
+	traj = data.linpos.statematrix.traj;
+	
+	traj_diff = diff(traj);
+	requested_diff = transitions(:,2) - transitions(:,1);
+	
+	logical_singtrans		= zeros(size(all_times));	% detects all segment transitions of certain type at all times per loop iteration
+	logical_alltrans	= zeros(size(all_times));	% updates to catalogue all points per iteration
+	for i = 1:numel(requested_diff)
+		
+		logical_singtrans = traj_diff == requested_diff(i);
+		logical_alltrans = logical_singtrans | logical_alltrans;
+	end
+	
+	
+	clear traj transitions traj_diff requested_diff;
+	clear logical_matchtrans;
+	
+	% Adjust the sample
+	sample = sample & logical_alltrans;
+end
+
 %% Subset out the trajectory
 
-if(isfield(sampleParams,'trajbound_type'))
+if isfield(sampleParams,'trajbound_type')
 	
 	% Grab a subset of times corresponding to the starts and stops for the
 	% particular trajectory type
@@ -175,19 +206,19 @@ if(isfield(sampleParams,'trajbound_type'))
 	% describing which elements are in the pair of times. Use logical OR to
 	% gradually create a picture of all times to be investigated.
 	
-	logical_onepath			= zeros(size(all_times));	% detects points in a single trajectory per loop iteration
-	logical_times			= zeros(size(all_times));	% updates to catalogue all points per iteration
+	logical_onetraj			= zeros(size(all_times));	% detects points in a single trajectory per loop iteration
+	logical_alltraj			= zeros(size(all_times));	% updates to catalogue all points per iteration
 	
 	for i = 1:size(trajbound_startStops,1)
 		
 		% Find which times in the (start, stop) boundary
         % EDIT: changed to sample so that we have a sense of the existing
         % sample already
-		logical_onepath = ( sample_times >= trajbound_startStops(i,1) ) & ...
+		logical_onetraj = ( sample_times >= trajbound_startStops(i,1) ) & ...
 			( sample_times <= trajbound_startStops(i,2) );
         
         % Subset out so that only one occurs per trajcetory
-        diff_onepath = diff(logical_onepath);
+        diff_onepath = diff(logical_onetraj);
         % initial point of only first path
         initial = find(diff_onepath == 1);
         if isempty(initial)
@@ -202,8 +233,8 @@ if(isfield(sampleParams,'trajbound_type'))
             final = final(1);
         end
         % change logical to reflect only the first found trajcetory
-        logical_onepath = zeros(size(logical_onepath));
-        logical_onepath(initial:final) = 1;
+        logical_onetraj = zeros(size(logical_onetraj));
+        logical_onetraj(initial:final) = 1;
         
 %         logical_onepath = logical(logical_onepath);
 %         hold off;
@@ -212,7 +243,7 @@ if(isfield(sampleParams,'trajbound_type'))
 %         plot(data.pos.data(logical_onepath,2),data.pos.data(logical_onepath,3),'-*');
 		
 		% Add the points found for ith trajectory to total record of times
-		logical_times = logical_times | logical_onepath;
+		logical_alltraj = logical_alltraj | logical_onetraj;
 		
         start_stop_indices(i,:)= [initial final];
         start_stop_times(i,:)= [all_times(initial) all_times(final)];
@@ -220,13 +251,14 @@ if(isfield(sampleParams,'trajbound_type'))
 	end
 	
 	% Update the sample
-	sample = sample & logical_times;
+	sample = sample & logical_alltraj;
 	
 	% Remove variables just used from namespace
 	clear logical_start_stop subset_trajbound_indices ...
 		trajbound_startStops;
 	
 end
+
 
 %% Remove empty indices, samples that didn't match criteria
 removal = start_stop_indices == 0;
@@ -239,7 +271,7 @@ end
 
 %% If edgeMode on, then transform into edge sample
 
-if ismember('edgeMode', fields(sampleParams))
+if isfield(sampleParams,'edgeMode')
 
 % This recasts all times and indices in the manner described in the
 % function header of generateTimeAroundEdges
