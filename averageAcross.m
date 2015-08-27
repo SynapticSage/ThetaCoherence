@@ -71,11 +71,11 @@ elseif ismember('trial',sets.average) && coherograms==true
             for t= sets.animals.(animals{a}).tetrodes
                 for t2 = sets.animals.(animals{a}).tetrodes2
 					
-				% If there's an exception in handling, enforce it. It's a
-				% temporary solution, hopefully, until a more elegant one
-				% presents.
-                exception=[];
-				EnforceException;
+% 				% If there's an exception in handling, enforce it. It's a
+% 				% temporary solution, hopefully, until a more elegant one
+% 				% presents.
+%                 exception=[];
+% 				EnforceException;
                 
                 % get the indices for all relevant inputs for this
                 % operation (avg across trials)

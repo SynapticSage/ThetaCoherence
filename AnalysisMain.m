@@ -39,6 +39,8 @@ path_added = false;
 
 if path_added || (~path_added && exist(files_dot_brandeis_edu, 'dir'))
 	
+	disp('Adding animal folders to path! ...');
+	
 	% Adds all data folders to path and subfolders. For now this is
 	% how functions will find data.
 	path(path,genpath([files_dot_brandeis_edu path_str 'HPa_direct'])) 
@@ -62,11 +64,11 @@ clear sampleParams acquisition acquisition2 grams avg_grams
 % Parameters for circumscribing sample around a point
 % --------------------------------------------------------
 % How large of radius should we sample
-% sampleParams.circleParams.radius = 15;       % 20 pixel radius
+sampleParams.circleParams.radius = 20;       % 20 pixel radius
 % Where to sample
 % [1 1] denotes [segment_1 end_of_it]
 % % sampleParams.circleParams.segment = [1 1];
-% sampleParams.circleParams.segment = {1, 'final'};
+sampleParams.circleParams.segment = {1, 'final'};
 
 % Note: Second number encodes start and end of segment in 0 and 1.
 % Eventually we may extend function to request a point that is some
@@ -75,7 +77,7 @@ clear sampleParams acquisition acquisition2 grams avg_grams
 % ----------------------------------------------------------
 % Parameters for controlling which segment transitions to sample
 % ----------------------------------------------------------
-sampleParams.segmentTransition = [1 4; 1 5];
+% sampleParams.segmentTransition = [1 4; 1 5];
 
 % ----------------------------------------------------------
 % Parameters for selecting trajectory type to sample
@@ -93,7 +95,7 @@ sampleParams.trajbound_type = 0 ;            % 0 denotes outbound
 % entrance or exit. Its unit is frames.  For 30hz sample rate, [15 15]
 % grabs 15 frames in front and behind boundary crossing. entranceOrExit
 % subfield controls whether to sample entrance or exit.
- sampleParams.edgeMode.window = [45 45];
+ sampleParams.edgeMode.window = [150 150];
  sampleParams.edgeMode.entranceOrExit = 'entrance';
  
 
@@ -102,8 +104,8 @@ sampleParams.trajbound_type = 0 ;            % 0 denotes outbound
  % ------------------------------------------------------------------------
     
 animal_set = {'HPb'};       
-day_set = 1:8;			% set of days to analyze for all animals ...
-epoch_set = [2 4];
+day_set = 1;			% set of days to analyze for all animals ...
+epoch_set = [2];
 tetrode_set = [1];
 tetrode_set2 = [9];
 
@@ -153,6 +155,7 @@ if exist('tetrode_set2','var')
         processOpt);
 end
 
+beep
 
 %% Generate Spectrograms
 
@@ -166,6 +169,8 @@ if exist('tetrode_set2','var')
 else
     grams = generate_xGrams(acquisition,paramSet,processOpt);
 end
+
+beep
 
 %% Average Across Spectrograms
 
@@ -187,7 +192,8 @@ disp('Plotting and saving data...');
     
 for trials = [true false]
 	paramSet.trials = trials;
-	plotAndSave(grams,paramSet, acquisition, acquisition2);
+	if trials; g = grams; else; g = avg_grams; end
+	plotAndSave(g,paramSet, acquisition, acquisition2);
 end
 
 %% Binning-out and averaging fequency i f desired -- comment below here if not
