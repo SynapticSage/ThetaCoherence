@@ -1,4 +1,4 @@
-function [speed, error, sem] =getAvgVelocity(grams, sets, acquisition, a, d, e, t, t2, tr)
+function [speed, sem] =getAvgVelocity(acquisition, a, d, e, t, t2, tr)
 %GETAVGVELOCITY Get average velocity across trials
 %   pass in spectrograms or coherograms in gram 
 %	pass in sets struct containing information about what days, epochs and
@@ -6,6 +6,11 @@ function [speed, error, sem] =getAvgVelocity(grams, sets, acquisition, a, d, e, 
 
 
 if d< 10; dstr= ['0' num2str(d)]; else dstr= num2str(d); end;
+
+% fix this later
+if d == 1 && e==2; e=4; end;
+if d == 1 && e==4; e=6; end;
+
 
 posPath= [acquisition.animal 'pos' dstr '.mat'];
 load(posPath);
@@ -19,7 +24,5 @@ end
 
 speed= mean(velVector);
 sem= std(velVector) ./ sqrt(size(velVector,1));
-
-errorbar(1:301,speed,sem);
 
 end
