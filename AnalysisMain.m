@@ -69,7 +69,7 @@ sampleParams.circleParams.radius = 20;       % 20 pixel radius
 % Where to sample
 % [1 1] denotes [segment_1 end_of_it]
 % % sampleParams.circleParams.segment = [1 1];
-sampleParams.circleParams.segment = {1, 'final'};
+sampleParams.circleParams.segment = {1, 'final'}; % end of segment 1
 
 
 % Note: Second number encodes start and end of segment in 0 and 1.
@@ -117,9 +117,13 @@ averaged_trials = 'both';
 % ----------------------------------------------------------------------
 % Parameters for controlling what data to window, and how to pad samples
 % -----------------------------------------------------------------------
+
 % specify which electrophysiology data to window!
-paramSet.datType = 'eeggnd';
-% specify padding if any. gatherWindowsOfData requires NaN padding right now.
+paramSet.datType = 'eeggnd';	% this can read any wave data type
+
+% specify padding if any. gatherWindowsOfData requires NaN padding right
+% now, as this tells lets downstream code quickly ignore parts of the eeg
+% data that are not relevant to sampling above.
 processOpt.windowPadding = NaN;
 
 %%%%%%%% PRE-PROCESSING SUB-SECTION %%%%%%%%%
@@ -145,6 +149,7 @@ saveFolder = ['./'];
 % ---------------------
 
 processOpt.output = true; processOpt.save = false;
+processOpt.plot = false;					% Controls plotting during spectrogram extraction -- Section D plots now, so this is an easter egg.
 paramSet.processOpt = processOpt;
 
 
@@ -157,10 +162,9 @@ disp('Acquiring windows of data at requested sample points...');
 processOpt.otherTetrodes = false;
 acquisition = gatherWindowsOfData(saveFolder, paramSet);
 
-if exist('tetrode_set2','var')
-    processOpt.otherTetrodes = true;
-    acquisition2 = gatherWindowsOfData(saveFolder, paramSet,...
-        processOpt);
+if exist('tetrode_set2','var')		% Acquire for TetrodeY Set, if user asked for it
+    paramSet.processOpt.otherTetrodes = true;
+    acquisition2 = gatherWindowsOfData(saveFolder, paramSet);
 end
 
 %% B. Generate Spectrograms
@@ -168,9 +172,9 @@ end
 disp('Generating spec- or coherograms...');
 
 if exist('tetrode_set2','var')		% TETRODE PAIRS - Coherence
-    grams = generate_xGrams(acquisition,paramSet,processOpt,acquisition2);
+    grams = generate_xGrams(acquisition,paramSet,acquisition2);
 else								% TETRODE SET	- Spectrogram
-    grams = generate_xGrams(acquisition,paramSet,processOpt);
+    grams = generate_xGrams(acquisition,paramSet);
 end
 
 

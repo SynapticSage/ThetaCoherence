@@ -139,6 +139,9 @@ if ~ismember('datType', fields(dataToGet)) ...
 		|| isempty(dataToGet.datType)
 	dataToGet.datType = 'eeggnd';
 end
+if isfield(dataToGet, 'processOpt')
+	processOpt = dataToGet.processOpt;
+end
 % if did not pass output option, set
 if ~ismember('output', fields(processOpt) )
 	processOpt.output = true;
@@ -147,11 +150,8 @@ end
 if ~ismember('save', fields(processOpt) )
 	processOpt.save = false;
 end
-if isfield('processOptions', sampleParams)
-	processOpt = sampleParams.processOpt;
-end
 
-if nargin < 3
+if nargin < 2				% TODO .. bad way to detect default .. fix
 	processOpt.windowPadding = 0;
 end
 

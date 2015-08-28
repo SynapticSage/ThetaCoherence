@@ -1,4 +1,4 @@
-function [grams] = generate_xGrams(acquisition, paramSets...
+function [grams] = generate_xGrams(acquisition, paramSets,...
     acquisition2)
 % Function that will accept 'acquisition' structure from gather windows of
 % data and from it compute either a spectrogram per set of data in
@@ -100,7 +100,7 @@ try
 	
 	
 %% Spectrograms! For-loooping over acquisitions
-if nargin < 4
+if nargin < 3
 
 
 for a = 1:animalcount
@@ -231,7 +231,7 @@ end
 
 %% Coherograms! (and spectrograms)
 %
-if nargin == 4
+if nargin == 3
 
 for a = 1:animalcount
     
