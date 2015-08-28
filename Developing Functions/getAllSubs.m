@@ -1,12 +1,13 @@
-function subs = getAllSubs(object, animalField, dataField)
+function [complete_sub_list] = getAllSubs(object, animalField, dataField)
 % Function finds all subscripts in our objects that have data. In a
 % forthcoming special mode, there will also be an ability to find out who
 % who have specific types of data, e.g. coherograms. I intend to use this
-% method to get a pretty trivial list of subs to for-loop over, instead of
-% painfully having to rely on paramSets to pass in hard-coded subs to
-% process. This will be unavoidable for the very first object that's
-% generated, the acquisition, but subsequent downstream functions will not
-% have to rely so heavily on it.
+% method just to test if its easier to get subs to for-loop over, instead
+% of painfully having to rely on paramSets to pass in hard-coded subs to
+% process, after acquisition is made. This will be unavoidable for the very
+% first object that's generated, the acquisition, but subsequent downstream
+% functions, depending on how easy this is, may not have to so heavily on
+% it.
 
 
 if isstruct(object)					% if users pass in parrent structure
@@ -36,15 +37,13 @@ else
 	disp('Invalid data type provided to getAllSubs');
 end
 
-sub = complete_sub_list;
-
-return;			% true end of parent function
+complete_sub_list;
 
 %% HELPER FUNCTIONS
 
 	function idx_list = getCellSubs(object)
 	
-	idx_list = []
+	idx_list = [];
 	
 	num_i1 = size(object,1);
 	num_i2 = size(object,2);

@@ -69,7 +69,7 @@ sampleParams.circleParams.radius = 20;       % 20 pixel radius
 % Where to sample
 % [1 1] denotes [segment_1 end_of_it]
 % % sampleParams.circleParams.segment = [1 1];
-sampleParams.circleParams.segment = {1, 'final'};
+sampleParams.circleParams.segment = {1, 'final'}; % end of segment 1
 
 
 % Note: Second number encodes start and end of segment in 0 and 1.
@@ -106,6 +106,7 @@ sampleParams.trajbound_type = 0 ;            % 0 denotes outbound
  % Parmeters for controlling which data to acquire spec or coheregrams
  % ------------------------------------------------------------------------
     
+
 animal_set = {'HPb'};       
 day_set = 1:8;			% set of days to analyze for all animals ...
 epoch_set = [2 4];
@@ -117,9 +118,13 @@ averaged_trials = 'both';
 % ----------------------------------------------------------------------
 % Parameters for controlling what data to window, and how to pad samples
 % -----------------------------------------------------------------------
+
 % specify which electrophysiology data to window!
-paramSet.datType = 'eeggnd';
-% specify padding if any. gatherWindowsOfData requires NaN padding right now.
+paramSet.datType = 'eeggnd';	% this can read any wave data type
+
+% specify padding if any. gatherWindowsOfData requires NaN padding right
+% now, as this tells lets downstream code quickly ignore parts of the eeg
+% data that are not relevant to sampling above.
 processOpt.windowPadding = NaN;
 
 %%%%%%%% PRE-PROCESSING SUB-SECTION %%%%%%%%%
@@ -140,42 +145,41 @@ end
 % ---------------------
 saveFolder = ['./'];
 
-%% Gather Windows of Data
-
-disp('Acquiring windows of data at requested sample points...');
+% ---------------------
+% Processing options -- whether to output to file, to RAM, or plot
+% ---------------------
 
 processOpt.output = true; processOpt.save = false;
+processOpt.plot = false;					% Controls plotting during spectrogram extraction -- Section D plots now, so this is an easter egg.
+paramSet.processOpt = processOpt;
+
+
+%% A. Gather Windows of Data
+
+disp('Acquiring windows of data at requested sample points...');
 
 % Acquire from first set of tetrodes
 
 processOpt.otherTetrodes = false;
-acquisition = gatherWindowsOfData(saveFolder, paramSet,...
-	processOpt);
+acquisition = gatherWindowsOfData(saveFolder, paramSet);
 
-if exist('tetrode_set2','var')
-    processOpt.otherTetrodes = true;
-    acquisition2 = gatherWindowsOfData(saveFolder, paramSet,...
-        processOpt);
+if exist('tetrode_set2','var')		% Acquire for TetrodeY Set, if user asked for it
+    paramSet.processOpt.otherTetrodes = true;
+    acquisition2 = gatherWindowsOfData(saveFolder, paramSet);
 end
 
-beep
-
-%% Generate Spectrograms
+%% B. Generate Spectrograms
 
 disp('Generating spec- or coherograms...');
 
-% Options that control functional output
-processOpt.save = 0; processOpt.output = 1; processOpt.plot = 0;
-
-if exist('tetrode_set2','var')
-    grams = generate_xGrams(acquisition,paramSet,processOpt,acquisition2);
-else
-    grams = generate_xGrams(acquisition,paramSet,processOpt);
+if exist('tetrode_set2','var')		% TETRODE PAIRS - Coherence
+    grams = generate_xGrams(acquisition,paramSet,acquisition2);
+else								% TETRODE SET	- Spectrogram
+    grams = generate_xGrams(acquisition,paramSet);
 end
 
-beep
 
-%% Average Across Spectrograms
+%% C. Average Spectrograms/Coherograms
 
 disp('Averaging data...');
 
@@ -188,7 +192,7 @@ paramSet.average = {'trial'};
 avg_grams = averageAcross(grams,paramSet);
 
 
-%% Plotting and saving
+%% D. Plot and Save Spectrograms/Coherograms
 
 disp('Plotting and saving data...');
 
@@ -199,13 +203,13 @@ for trials = [true false]
 	plotAndSave(g,paramSet, acquisition, acquisition2);
 end
 
-%% Binning-out and averaging fequency i f desired -- comment below here if not
+%% E. Analyze Spectrograms/Coherograms Components
+% This script in this section are temporary and will be replaced by a
+% better-designed, more well-commented function.
 
 disp('Grouping desired frequencies and averaging per day...');
 
 % Place desired bandwidth here
-% i = 1;
-% for l = 4:11
 paramSet.lower_freq = 6;
 paramSet.upper_freq = 12;
 paramSet.estimate_best_freq = true;
@@ -214,12 +218,12 @@ paramSet.estimate_best_freq = true;
 	meanInFreqBand(avg_grams, paramSet);
 
 
+%% F. Plot Analyzed Components
+% This script in this section are temporary and will be replaced by a
+% better-designed, more well-commented function.
 
-%% Plot the binned out stuff
 hold on;
 PlotSummaryBars;
-% end
-% i
 
 disp('FINISHED DAY');
 

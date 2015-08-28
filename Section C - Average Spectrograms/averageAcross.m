@@ -35,11 +35,6 @@ if ismember('trial',sets.average) && coherograms==false
         for e= uVals{2}
             for t= uVals{3}
 				
-				% If there's an exception in handling, enforce it. It's a
-				% temporary solution, hopefully, until a more elegant one
-				% presents.
-                exception=[];
-				EnforceException;
                 
                 % get the indices for all relevant inputs for this operation (avg across trials)
                 idxs= idx( (idx(:,1)==d & idx(:,2)==e & idx(:,3)==t),:);
@@ -70,12 +65,6 @@ elseif ismember('trial',sets.average) && coherograms==true
         for e= uVals{2}
             for t= sets.animals.(animals{a}).tetrodes
                 for t2 = sets.animals.(animals{a}).tetrodes2
-					
-% 				% If there's an exception in handling, enforce it. It's a
-% 				% temporary solution, hopefully, until a more elegant one
-% 				% presents.
-%                 exception=[];
-% 				EnforceException;
                 
                 % get the indices for all relevant inputs for this
                 % operation (avg across trials)
