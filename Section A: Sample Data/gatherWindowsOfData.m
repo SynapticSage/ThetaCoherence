@@ -217,7 +217,7 @@ for a = 1:numel(animal_list)
 				try
 				load(file_cell{i});
 				catch ME
-					disp('File not found !!! Check your path.');
+					disp([file_cell{i} ' not found !!! Check your path.']);
 					throw(ME)
 				end
 			end

@@ -106,8 +106,8 @@ sampleParams.trajbound_type = 0 ;            % 0 denotes outbound
  % Parmeters for controlling which data to acquire spec or coheregrams
  % ------------------------------------------------------------------------
     
-animal_set = {'HPb'};       
-day_set = 1;			% set of days to analyze for all animals ...
+animal_set = {'HPa'};       
+day_set = 2:4;			% set of days to analyze for all animals ...
 epoch_set = [2];
 tetrode_set = [1];
 tetrode_set2 = [17];
@@ -140,7 +140,7 @@ end
 % ---------------------
 saveFolder = ['./'];
 
-%% Gather Windows of Data
+%% A. Gather Windows of Data
 
 disp('Acquiring windows of data at requested sample points...');
 
@@ -160,7 +160,7 @@ end
 
 beep
 
-%% Generate Spectrograms
+%% B. Generate Spectrograms
 
 disp('Generating spec- or coherograms...');
 
@@ -175,7 +175,7 @@ end
 
 beep
 
-%% Average Across Spectrograms
+%% C. Average Spectrograms/Coherograms
 
 disp('Averaging data...');
 
@@ -188,7 +188,7 @@ paramSet.average = {'trial'};
 avg_grams = averageAcross(grams,paramSet);
 
 
-%% Plotting and saving
+%% D. Plot and Save Spectrograms/Coherograms
 
 disp('Plotting and saving data...');
 
@@ -199,7 +199,7 @@ for trials = [true false]
 	plotAndSave(g,paramSet, acquisition, acquisition2);
 end
 
-%% Binning-out and averaging fequency i f desired -- comment below here if not
+%% E. Analyze Spectrograms/Coherograms Components
 
 disp('Grouping desired frequencies and averaging per day...');
 
@@ -214,12 +214,9 @@ paramSet.estimate_best_freq = true;
 	meanInFreqBand(avg_grams, paramSet);
 
 
-
-%% Plot the binned out stuff
+%% F. Plot Analyzed Components
 hold on;
 PlotSummaryBars;
-% end
-% i
 
 disp('FINISHED DAY');
 
