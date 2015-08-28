@@ -140,17 +140,22 @@ end
 % ---------------------
 saveFolder = ['./'];
 
+% ---------------------
+% Processing options -- whether to output to file, to RAM, or plot
+% ---------------------
+
+processOpt.output = true; processOpt.save = false;
+paramSet.processOpt = processOpt;
+
+
 %% A. Gather Windows of Data
 
 disp('Acquiring windows of data at requested sample points...');
 
-processOpt.output = true; processOpt.save = false;
-
 % Acquire from first set of tetrodes
 
 processOpt.otherTetrodes = false;
-acquisition = gatherWindowsOfData(saveFolder, paramSet,...
-	processOpt);
+acquisition = gatherWindowsOfData(saveFolder, paramSet);
 
 if exist('tetrode_set2','var')
     processOpt.otherTetrodes = true;
@@ -158,22 +163,16 @@ if exist('tetrode_set2','var')
         processOpt);
 end
 
-beep
-
 %% B. Generate Spectrograms
 
 disp('Generating spec- or coherograms...');
 
-% Options that control functional output
-processOpt.save = 0; processOpt.output = 1; processOpt.plot = 0;
-
-if exist('tetrode_set2','var')
+if exist('tetrode_set2','var')		% TETRODE PAIRS - Coherence
     grams = generate_xGrams(acquisition,paramSet,processOpt,acquisition2);
-else
+else								% TETRODE SET	- Spectrogram
     grams = generate_xGrams(acquisition,paramSet,processOpt);
 end
 
-beep
 
 %% C. Average Spectrograms/Coherograms
 
@@ -200,12 +199,12 @@ for trials = [true false]
 end
 
 %% E. Analyze Spectrograms/Coherograms Components
+% This script in this section are temporary and will be replaced by a
+% better-designed, more well-commented function.
 
 disp('Grouping desired frequencies and averaging per day...');
 
 % Place desired bandwidth here
-% i = 1;
-% for l = 4:11
 paramSet.lower_freq = 6;
 paramSet.upper_freq = 12;
 paramSet.estimate_best_freq = true;
@@ -215,6 +214,9 @@ paramSet.estimate_best_freq = true;
 
 
 %% F. Plot Analyzed Components
+% This script in this section are temporary and will be replaced by a
+% better-designed, more well-commented function.
+
 hold on;
 PlotSummaryBars;
 

@@ -1,4 +1,4 @@
-function [grams] = generate_xGrams(acquisition, sets, processOpt, ...
+function [grams] = generate_xGrams(acquisition, paramSets...
     acquisition2)
 % Function that will accept 'acquisition' structure from gather windows of
 % data and from it compute either a spectrogram per set of data in
@@ -12,12 +12,24 @@ function [grams] = generate_xGrams(acquisition, sets, processOpt, ...
 % Two, acquisition can be a folder, containing the saved files from
 % gatherWindowsOfData. Either will do.
 %
-% dataToProcess contains options about which data to process. Fields
-% contain sets of days, epochs, tetrodes to create spectrograms for. If
-% coherence, then add a tetrodes2 field containing the set of tetrodes to
-% generate coherences against in the second operand.
+% paramSets contains options about which data to process, as well as
+% options for how to process them. Fields contain sets of days, epochs,
+% tetrodes to create spectrograms for. If coherence, then add a tetrodes2
+% field containing the set of tetrodes to generate coherences against in
+% the second operand.
 %
-% Calculates specgram unless user passes in a second acquisition structure.
+% Calculates specgram unless user passes in a second acquisition structure,
+% which then defaults to coherograms.
+% --------
+% OUTPUT
+% --------
+% grams.output{d,e,t,...} which contains spectrogram or coherogram
+% information in a struct for every single day epoch tetrode trial or day
+% epoch tetrodeX tetrodeY trial.
+%
+% e.g. grams.output{1,4,1,17,1} contains coherogram, frequency/time axes,
+% and std-error for day 1, epoch 4, tetrodeX 1, tetrodeY 17, trial 1
+%
 
 % Store figure window style
 % if ismac || ispc
@@ -66,23 +78,23 @@ end
  %params.pad = 1;			% smooths frequency representation
 
 %% Default parameters if not inputted
-if ~ismember('output', fields(sets))
+if isfield(paramSets, 'processOpt')
+	processOpt = paramSets.processOpt;
+end
+if ~ismember('output', fields(paramSets))
 	processOpt.output = true;
 end
-if ~ismember('save', fields(sets))
+if ~ismember('save', fields(paramSets))
 	processOpt.save = false;
 end
-if ~ismember('plot', fields(sets))
+if ~ismember('plot', fields(paramSets))
 	processOpt.plot = false;
 end
 
-%%
-% Simplify variables
-animals = fields(sets.animals);
+%% Simplify variables before loop
+animals = fields(paramSets.animals);
 animalcount = numel(animals);
-sets = sets.animals;
-
-
+paramSets = paramSets.animals;
 
 try
 	
@@ -96,9 +108,9 @@ for a = 1:animalcount
 	grams(a).animal = animals{a};
 	if ~file_read; assert(isequal(animals{a},acquisition(a).animal)); end
     
-    for d = sets.(animals{a}).days
-        for e = sets.(animals{a}).epochs
-            for t = sets.(animals{a}).tetrodes
+    for d = paramSets.(animals{a}).days
+        for e = paramSets.(animals{a}).epochs
+            for t = paramSets.(animals{a}).tetrodes
 				
 				% If there's an exception in handling, enforce it. It's a
 				% temporary solution, hopefully, until a more elegant one
@@ -226,10 +238,10 @@ for a = 1:animalcount
     grams(a).animal = animals{a};
 	if ~file_read; assert(isequal(animals{a},acquisition(a).animal)); end
     
-    for d = sets.(animals{a}).days
-        for e = sets.(animals{a}).epochs
-            for t = sets.(animals{a}).tetrodes
-            for t2 = sets.(animals{a}).tetrodes2
+    for d = paramSets.(animals{a}).days
+        for e = paramSets.(animals{a}).epochs
+            for t = paramSets.(animals{a}).tetrodes
+            for t2 = paramSets.(animals{a}).tetrodes2
 				
 				% If there's an exception in handling, enforce it. It's a
 				% temporary solution, hopefully, until a more elegant one

@@ -1,5 +1,5 @@
 function [acquisition] = ...
-	gatherWindowsOfData(dataFolder,dataToGet, processOpt)
+	gatherWindowsOfData(dataFolder,dataToGet)
 % function gatherWindowsOfData
 % for gathering all data for an (animal/prefix epoch day tet) tuple or set of
 % tuples. This function will be used to gather up all of the eeg data
@@ -91,22 +91,22 @@ function [acquisition] = ...
 %		window of time when the animal enters or exits the boundary region.
 %
 %
-%	'.processOpt' .. struct containing options for the process of
-%	sample triggered data windowing.
+%	'processOpt' .. struct containing options for the process
+%	of sample triggered data windowing.
 %
-%		'.processOpt.windowPadding' .. If not provided, automatically
-%		set to 0, in which case time points outside sample are set to 0's,
-%		and length of complete trace of data is preserved. If padding is
-%		set to [], it deletes non-sample data, removing padding. This has
-%		the effect of only storing the actual values associated with a
-%		window of data. If set to NaN, you can retain the length of the
-%		vector, but be able to detect what's not sample. Padding of any
-%		type takes up extra memory. Setting [] yields the most
-%		memory-efficient acquisitions.
+%		'.samplePArams.processOpt.windowPadding' .. If not provided,
+%		automatically set to 0, in which case time points outside sample
+%		are set to 0's, and length of complete trace of data is preserved.
+%		If padding is set to [], it deletes non-sample data, removing
+%		padding. This has the effect of only storing the actual values
+%		associated with a window of data. If set to NaN, you can retain the
+%		length of the vector, but be able to detect what's not sample.
+%		Padding of any type takes up extra memory. Setting [] yields the
+%		most memory-efficient acquisitions.
 %
 %
-%       '.processOpt.singleTrace' .. If provided, grabs a single trace
-%       containing all windows of data.
+%       'sampleParams.processOpt.singleTrace' .. If provided, grabs a
+%       single trace containing all windows of data.
 %
 %
 %   -----------------------------
@@ -119,7 +119,9 @@ function [acquisition] = ...
 % acquisition(i).data{day,epoch,tetrode} = [] matrix such that each rows
 % contains a copy of the data with only relevant values for a detected
 % trigger time. There are as many rows as there were triggered events.
-% 
+%
+% Other outputs including timing information follow the form of .data
+% field.
 
 %% Handling of optional inputs
 
@@ -144,6 +146,9 @@ end
 % if did not pass save option, set
 if ~ismember('save', fields(processOpt) )
 	processOpt.save = false;
+end
+if isfield('processOptions', sampleParams)
+	processOpt = sampleParams.processOpt;
 end
 
 if nargin < 3
