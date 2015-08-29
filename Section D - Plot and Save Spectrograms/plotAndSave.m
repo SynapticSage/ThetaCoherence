@@ -52,175 +52,157 @@ toProcess = sets.animals;
 
 %% Spectrograms
 if spectrograms
-for a = 1:numel(animals)
-    for d = toProcess.(animals{a}).days;
-        for e = toProcess.(animals{a}).epochs;
-            for t= toProcess.(animals{a}).tetrodes;
-				
-				for t2 = toProcess.(animals{a}).tetrodes2;
-				
-				for tr = 1:sum(~cellfun(@isempty,{gram(a).output{d, e, t,:}}))
+subscripts = getAllSubs(grams);
+for s = 1:size(subscripts,1);
+	
+	a	= subscripts(s,1);	% animals
+	d	= subscripts(s,2);	% day
+	e	= subscripts(s,3);	% epoch
+	t	= subscripts(s,4);	% tetrodeX
+	t2	= subscripts(s,5);	% tetrodeY
+	tr	= subscripts(s,6);	% trial
                 
-				% If there's an exception in handling, enforce it. It's a
-				% temporary solution, hopefully, until a more elegant one
-				% presents.
-                exception=[];
-				EnforceException;
-                
-                %% Adjust data
-                temp= gram(a).output{d, e, t, tr};
-                adjust=(max(temp.Stime)-min(temp.Stime))/2;
-                
-                temp.Stime=temp.Stime-min(temp.Stime)-adjust;
-                
-                %% Plot
-                q= figure; hold on;
-                set(gcf,'Position',[55 660 560 420]);
-                imagesc(temp.Stime,temp.Sfreq,temp.S'); colorbar;
-				if ~sets.trials
-					title([gram(a).animal '- Day:' num2str(d)...
-						' Epoch:' num2str(e)...
-						' Tet:' num2str(t)...
-						],'FontSize',18,'Fontweight','normal');
-				else
-					title([gram(a).animal '- Day:' num2str(d)...
-						' Epoch:' num2str(e)...
-						' Tet:' num2str(t)...
-						' Trial: ' num2str(tr) ...
-						],'FontSize',18,'Fontweight','normal');
-				end
-                ylabel('Freq','FontSize',20,'Fontweight','normal');
-                xlabel('Time(s)','FontSize',20,'Fontweight','normal');
-                set(gca,'XLim',[min(temp.Stime) max(temp.Stime)]);
-                set(gca,'YLim',[min(temp.Sfreq) max(temp.Sfreq)]);
-                
-                %% Save
-				if ispc
-					savepath= '/home/mcz/Desktop/GitProj/Images/';
-                    savepath = ['.' filesep];
-				elseif ismac
-					savepath= '~/Documents/MATLAB/LabProjects/Data/LongerLowerPassSpecsHpa5/';
-                end
-                
-				if ~sets.trials
-                    specific_folder = [gram(a).animal num2str(d) '_' ...
-                        num2str(e)];
-                    
-                    mkdir(savepath, specific_folder);
-                    savepath = [savepath specific_folder filesep];
-                    
-					saveas(gcf, [savepath gram(a).animal '_' ...
-					num2str(d) '_' num2str(e) '_' num2str(t) '.png']);
-                else
-                    
-                    specific_folder = [gram(a).animal num2str(d) '_' ...
-                        num2str(e) '_' num2str(t)];
-                    
-                    mkdir(savepath, specific_folder);
-                    savepath = [savepath specific_folder filesep];
-                    
-					saveas(gcf, [savepath gram(a).animal '_' ...
-					num2str(d) '_' num2str(e) '_' num2str(t) ...
-					'_' num2str(tr) '.png']);
-				end
-                
-                close
-				end
-            end
-        end
-    end
-end
-end
+	%% Adjust data
+	temp= gram(a).output{d, e, t, tr};
+	adjust=(max(temp.Stime)-min(temp.Stime))/2;
+
+	temp.Stime=temp.Stime-min(temp.Stime)-adjust;
+
+	%% Plot
+	q= figure; hold on;
+	set(gcf,'Position',[55 660 560 420]);
+	imagesc(temp.Stime,temp.Sfreq,temp.S'); colorbar;
+	if ~sets.trials
+		title([gram(a).animal '- Day:' num2str(d)...
+			' Epoch:' num2str(e)...
+			' Tet:' num2str(t)...
+			],'FontSize',18,'Fontweight','normal');
+	else
+		title([gram(a).animal '- Day:' num2str(d)...
+			' Epoch:' num2str(e)...
+			' Tet:' num2str(t)...
+			' Trial: ' num2str(tr) ...
+			],'FontSize',18,'Fontweight','normal');
+	end
+	ylabel('Freq','FontSize',20,'Fontweight','normal');
+	xlabel('Time(s)','FontSize',20,'Fontweight','normal');
+	set(gca,'XLim',[min(temp.Stime) max(temp.Stime)]);
+	set(gca,'YLim',[min(temp.Sfreq) max(temp.Sfreq)]);
+
+	%% Save
+	if ispc
+		savepath= '/home/mcz/Desktop/GitProj/Images/';
+		savepath = ['.' filesep];
+	elseif ismac
+		savepath= '~/Documents/MATLAB/LabProjects/Data/LongerLowerPassSpecsHpa5/';
+	end
+
+	if ~sets.trials
+		specific_folder = [gram(a).animal num2str(d) '_' ...
+			num2str(e)];
+
+		mkdir(savepath, specific_folder);
+		savepath = [savepath specific_folder filesep];
+
+		saveas(gcf, [savepath gram(a).animal '_' ...
+		num2str(d) '_' num2str(e) '_' num2str(t) '.png']);
+	else
+
+		specific_folder = [gram(a).animal num2str(d) '_' ...
+			num2str(e) '_' num2str(t)];
+
+		mkdir(savepath, specific_folder);
+		savepath = [savepath specific_folder filesep];
+
+		saveas(gcf, [savepath gram(a).animal '_' ...
+		num2str(d) '_' num2str(e) '_' num2str(t) ...
+		'_' num2str(tr) '.png']);
+	end
+
+	close
+	end
 end
 
 %% Coherograms
 if coherograms
-for a = 1:numel(animals)
-    for d = toProcess.(animals{a}).days
-        for e = toProcess.(animals{a}).epochs
-            for t= toProcess.(animals{a}).tetrodes
-			for t2 = toProcess.(animals{a}).tetrodes2
-				
-				% If there's an exception in handling, enforce it. It's a
-				% temporary solution, hopefully, until a more elegant one
-				% presents.
-                exception=[];
-				EnforceException;
+	
+subscripts = getAllSubs(grams);
+for s = 1:size(subscripts,1);
+	
+	a	= subscripts(s,1);	% animals
+	d	= subscripts(s,2);	% day
+	e	= subscripts(s,3);	% epoch
+	t	= subscripts(s,4);	% tetrodeX
+	t2	= subscripts(s,5);	% tetrodeY
+	tr	= subscripts(s,6);	% trial
                 
-				for tr = 1:sum(~cellfun(@isempty,{gram(a).output{d, e, t,t2,:}}))
-                
-				%% Adjust data axes
-                temp= gram(a).output{d, e, t,t2, tr};
-                adjust=(max(temp.Stime)-min(temp.Stime))/2;
-                
-                temp.Stime=temp.Stime-min(temp.Stime)-adjust;
-                
-                %% Plot
-                q= figure; hold on;
-                set(gcf,'Position',[55 660 560 420]);
-                imagesc(temp.Stime,temp.Sfreq,temp.C'); colorbar;
-				if ~sets.trials
-					title([sprintf('Coherence, \n') ...
-						gram(a).animal '- Day:' num2str(d)...
-						' Epoch:' num2str(e) sprintf('\n')...
-						' Tet_X:' num2str(t)...
-						'Tet_Y:' num2str(t2) ...
-						],'FontSize',16,'Fontweight','light');
-				else
-					title([ sprintf('Coherence, ') ...
-						gram(a).animal '- Day:' num2str(d)...
-						' Epoch:' num2str(e) ...
-						' Trial: ' num2str(tr) ...
-						 sprintf('\n')...
-						' Tet_X =' num2str(t)...
-						' Tet_Y =' num2str(t2) ...
-						],'FontSize',16,'Fontweight','light');
-				end
-                ylabel('Freq','FontSize',15,'Fontweight','normal');
-                xlabel('Time(s)','FontSize',15,'Fontweight','normal');
-                set(gca,'XLim',[min(temp.Stime) max(temp.Stime)]);
-                set(gca,'YLim',[min(temp.Sfreq) max(temp.Sfreq)]);
-                
-                %% Save
-				if ispc
-					savepath= '/home/mcz/Desktop/GitProj/Images/';
-                    savepath = ['.' filesep];
-				elseif ismac
-					savepath= '~/Documents/MATLAB/LabProjects/Data/LongerLowerPassSpecsHpa5/';
-				end
-                
-				if ~sets.trials
-                     specific_folder = [gram(a).animal num2str(d) '_' ...
-                        num2str(e)];
-                    
-                    mkdir(savepath, specific_folder);
-                    savepath = [savepath specific_folder filesep];
-                    
-					saveas(gcf, [savepath gram(a).animal '_' ...
-					num2str(d) '_' num2str(e) '_' ...
-					'TetX=' num2str(t) ', TetY=' num2str(t2) ...
-					'.png']);
-                else
-                    specific_folder = [gram(a).animal num2str(d) '_' ...
-                        num2str(e) '_TetX=' num2str(t) ...
-                        '_TetY=' num2str(t2)];
-                    
-                    mkdir(savepath, specific_folder);
-                    savepath = [savepath specific_folder filesep];
-                    
-					saveas(gcf, [savepath gram(a).animal '_' ...
-					num2str(d) '_' num2str(e) '_' ...
-					'TetX=' num2str(t) ', TetY=' num2str(t2) ...
-					'_' 'Trial' num2str(tr) '.png']);
-				end
-                
-                close
-				end
-			end
-			end
-        end
-    end
-end
+	%% Adjust data axes
+	temp= gram(a).output{d, e, t,t2, tr};
+	adjust=(max(temp.Stime)-min(temp.Stime))/2;
+
+	temp.Stime=temp.Stime-min(temp.Stime)-adjust;
+
+	%% Plot
+	q= figure; hold on;
+	set(gcf,'Position',[55 660 560 420]);
+	imagesc(temp.Stime,temp.Sfreq,temp.C'); colorbar;
+	if ~sets.trials
+		title([sprintf('Coherence, \n') ...
+			gram(a).animal '- Day:' num2str(d)...
+			' Epoch:' num2str(e) sprintf('\n')...
+			' Tet_X:' num2str(t)...
+			'Tet_Y:' num2str(t2) ...
+			],'FontSize',16,'Fontweight','light');
+	else
+		title([ sprintf('Coherence, ') ...
+			gram(a).animal '- Day:' num2str(d)...
+			' Epoch:' num2str(e) ...
+			' Trial: ' num2str(tr) ...
+			 sprintf('\n')...
+			' Tet_X =' num2str(t)...
+			' Tet_Y =' num2str(t2) ...
+			],'FontSize',16,'Fontweight','light');
+	end
+	ylabel('Freq','FontSize',15,'Fontweight','normal');
+	xlabel('Time(s)','FontSize',15,'Fontweight','normal');
+	set(gca,'XLim',[min(temp.Stime) max(temp.Stime)]);
+	set(gca,'YLim',[min(temp.Sfreq) max(temp.Sfreq)]);
+
+	%% Save
+	if ispc
+		savepath= '/home/mcz/Desktop/GitProj/Images/';
+		savepath = ['.' filesep];
+	elseif ismac
+		savepath= '~/Documents/MATLAB/LabProjects/Data/LongerLowerPassSpecsHpa5/';
+	end
+
+	if ~sets.trials
+		 specific_folder = [gram(a).animal num2str(d) '_' ...
+			num2str(e)];
+
+		mkdir(savepath, specific_folder);
+		savepath = [savepath specific_folder filesep];
+
+		saveas(gcf, [savepath gram(a).animal '_' ...
+		num2str(d) '_' num2str(e) '_' ...
+		'TetX=' num2str(t) ', TetY=' num2str(t2) ...
+		'.png']);
+	else
+		specific_folder = [gram(a).animal num2str(d) '_' ...
+			num2str(e) '_TetX=' num2str(t) ...
+			'_TetY=' num2str(t2)];
+
+		mkdir(savepath, specific_folder);
+		savepath = [savepath specific_folder filesep];
+
+		saveas(gcf, [savepath gram(a).animal '_' ...
+		num2str(d) '_' num2str(e) '_' ...
+		'TetX=' num2str(t) ', TetY=' num2str(t2) ...
+		'_' 'Trial' num2str(tr) '.png']);
+	end
+
+	close
+	end
 end
 
 %% Frequency Means
@@ -229,11 +211,15 @@ if meanFreqPlot
     S_results = [];
     C_results = [];
     
-    for a   = 1
-    for d   = mean_days
-    for e   = mean_epochs
-    for t   = mean_tets
-    for t2  = mean_tets2
+    subscripts = getAllSubs(grams);
+	for s = 1:size(subscripts,1);
+	
+	a	= subscripts(s,1);	% animals
+	d	= subscripts(s,2);	% day
+	e	= subscripts(s,3);	% epoch
+	t	= subscripts(s,4);	% tetrodeX
+	t2	= subscripts(s,5);	% tetrodeY
+	tr	= subscripts(s,6);	% trial
 
         %% Store result
         
@@ -248,173 +234,162 @@ if meanFreqPlot
             C_results = [C_results gram(a).output{d,e,t,t2}.freqCmean];
         end
         
-    end
-    end
 	end
-    end
     
-        %% Plot
-        q= figure;
-        
-        if ~isempty(S_results)
-            bar(mean_days,S_results);
-        end
-        
-        if ~isempty(C_results)
-            bar(mean_days,C_results);
-        end
-        
-        %% Labeling Figure
-        set(gcf,'Position',[55 660 560 420]);
-        
-        graphTitle = input('Graph title: ');
-        title( [graphTitle ...
-            ],'FontSize',16,'Fontweight','light');
-        
-        ylabel('Coherence','FontSize',15,'Fontweight','normal');
-        xlabel('Days','FontSize',15,'Fontweight','normal');
-        set(gca,'XLim',[min(temp.Stime) max(temp.Stime)]);
-        set(gca,'YLim',[min(temp.Sfreq) max(temp.Sfreq)]);
+	%% Plot
+	q= figure;
 
-        %% Save
-        if ispc
-            savepath= '/home/mcz/Desktop/GitProj/Images/';
-            savepath = ['.' filesep];
-        elseif ismac
-            savepath= '~/Documents/MATLAB/LabProjects/Data/LongerLowerPassSpecsHpa5/';
-        end
+	if ~isempty(S_results)
+		bar(mean_days,S_results);
+	end
 
-        if ~sets.trials
-             specific_folder = [gram(a).animal num2str(d) '_' ...
-                num2str(e)];
+	if ~isempty(C_results)
+		bar(mean_days,C_results);
+	end
 
-            mkdir(savepath, specific_folder);
-            savepath = [savepath specific_folder filesep];
+	%% Labeling Figure
+	set(gcf,'Position',[55 660 560 420]);
 
-            saveas(gcf, [savepath gram(a).animal '_' ...
-            num2str(d) '_' num2str(e) '_' ...
-            'TetX=' num2str(t) ', TetY=' num2str(t2) ...
-            '.png']);
-        else
-            specific_folder = [gram(a).animal num2str(d) '_' ...
-                num2str(e) '_TetX=' num2str(t) ...
-                '_TetY=' num2str(t2)];
+	graphTitle = input('Graph title: ');
+	title( [graphTitle ...
+		],'FontSize',16,'Fontweight','light');
 
-            mkdir(savepath, specific_folder);
-            savepath = [savepath specific_folder filesep];
+	ylabel('Coherence','FontSize',15,'Fontweight','normal');
+	xlabel('Days','FontSize',15,'Fontweight','normal');
+	set(gca,'XLim',[min(temp.Stime) max(temp.Stime)]);
+	set(gca,'YLim',[min(temp.Sfreq) max(temp.Sfreq)]);
 
-            saveas(gcf, [savepath gram(a).animal '_' ...
-            num2str(d) '_' num2str(e) '_' ...
-            'TetX=' num2str(t) ', TetY=' num2str(t2) ...
-            '_' 'Trial' num2str(tr) '.png']);
-        end
+	%% Save
+	if ispc
+		savepath= '/home/mcz/Desktop/GitProj/Images/';
+		savepath = ['.' filesep];
+	elseif ismac
+		savepath= '~/Documents/MATLAB/LabProjects/Data/LongerLowerPassSpecsHpa5/';
+	end
 
-        close
+	if ~sets.trials
+		 specific_folder = [gram(a).animal num2str(d) '_' ...
+			num2str(e)];
+
+		mkdir(savepath, specific_folder);
+		savepath = [savepath specific_folder filesep];
+
+		saveas(gcf, [savepath gram(a).animal '_' ...
+		num2str(d) '_' num2str(e) '_' ...
+		'TetX=' num2str(t) ', TetY=' num2str(t2) ...
+		'.png']);
+	else
+		specific_folder = [gram(a).animal num2str(d) '_' ...
+			num2str(e) '_TetX=' num2str(t) ...
+			'_TetY=' num2str(t2)];
+
+		mkdir(savepath, specific_folder);
+		savepath = [savepath specific_folder filesep];
+
+		saveas(gcf, [savepath gram(a).animal '_' ...
+		num2str(d) '_' num2str(e) '_' ...
+		'TetX=' num2str(t) ', TetY=' num2str(t2) ...
+		'_' 'Trial' num2str(tr) '.png']);
+	end
+
+	close
     
     end
 end
 
 
 if avgVelocity
-for a = 1:numel(animals)
-    for d = toProcess.(animals{a}).days
-        for e = toProcess.(animals{a}).epochs
-            for t= toProcess.(animals{a}).tetrodes
-			for t2 = toProcess.(animals{a}).tetrodes2
+	
+subscripts = getAllSubs(grams);
+for s = 1:size(subscripts,1);
+	
+	a	= subscripts(s,1);	% animals
+	d	= subscripts(s,2);	% day
+	e	= subscripts(s,3);	% epoch
+	t	= subscripts(s,4);	% tetrodeX
+	t2	= subscripts(s,5);	% tetrodeY
+	tr	= subscripts(s,6);	% trial
 				
-				% If there's an exception in handling, enforce it. It's a
-				% temporary solution, hopefully, until a more elegant one
-				% presents.
-				EnforceException;
                 
-				for tr = 1:sum(~cellfun(@isempty,{gram(a).output{d, e, t,t2,:}}))
-                
-				%% Adjust data axes
-                temp= gram(a).output{d, e, t,t2, tr};
-                adjust=(max(temp.Stime)-min(temp.Stime))/2;
-                
-                temp.Stime=temp.Stime-min(temp.Stime)-adjust;
-                
-                %% Plot
-                q= figure; hold on;
-                set(gcf,'Position',[55 660 560 420]);
-                subplot(2,1,1);
-                imagesc(temp.Stime,temp.Sfreq,temp.C'); %colorbar;
-                line([0 0],[min(temp.Sfreq) max(temp.Sfreq)],'color','k','linewidth',2,'linestyle','--')
-                
-				if ~sets.trials
-					title([sprintf('Coherence, \n') ...
-						gram(a).animal '- Day:' num2str(d)...
-						' Epoch:' num2str(e) sprintf('\n')...
-						' Tet_X:' num2str(t)...
-						'Tet_Y:' num2str(t2) ...
-						],'FontSize',16,'Fontweight','light');
-				else
-					title([ sprintf('Coherence, ') ...
-						gram(a).animal '- Day:' num2str(d)...
-						' Epoch:' num2str(e) ...
-						' Trial: ' num2str(tr) ...
-						 sprintf('\n')...
-						' Tet_X =' num2str(t)...
-						' Tet_Y =' num2str(t2) ...
-						],'FontSize',16,'Fontweight','light');
-				end
-                ylabel('Freq','FontSize',15,'Fontweight','normal');
-                xlabel('Time(s)','FontSize',15,'Fontweight','normal');
-                set(gca,'XLim',[min(temp.Stime) max(temp.Stime)]);
-                set(gca,'YLim',[min(temp.Sfreq) max(temp.Sfreq)]);
-                
-                subplot(2,1,2);
-                boundedline([0:length(speed)-1]-length(speed)/2,speed,sem,'alpha');
-                line([0 0],[min(sem)-min(speed) max(sem)+max(speed)],'color','k','linewidth',2,'linestyle','--')
-                ylabel('avg. velocity (cm/s)','FontSize',15,'Fontweight','normal');
-                xlabel('time (s)','FontSize',15,'Fontweight','normal');
-                set(gca,'XLim',[min() max()]);
-                set(gca,'YLim',[min() max()]);
+	%% Adjust data axes
+	temp= gram(a).output{d, e, t,t2, tr};
+	adjust=(max(temp.Stime)-min(temp.Stime))/2;
 
-                
-                %% Save
-				if ispc
-					savepath= '/home/mcz/Desktop/GitProj/Images/';
-                    savepath = ['.' filesep];
-				elseif ismac
-					savepath= '~/Documents/MATLAB/LabProjects/Data/LongerLowerPassSpecsHpa5/';
-				end
-                
-				if ~sets.trials
-                     specific_folder = [gram(a).animal num2str(d) '_' ...
-                        num2str(e)];
-                    
-                    mkdir(savepath, specific_folder);
-                    savepath = [savepath specific_folder filesep];
-                    
-					saveas(gcf, [savepath gram(a).animal '_' ...
-					num2str(d) '_' num2str(e) '_' ...
-					'TetX=' num2str(t) ', TetY=' num2str(t2) ...
-					'.png']);
-                else
-                    specific_folder = [gram(a).animal num2str(d) '_' ...
-                        num2str(e) '_TetX=' num2str(t) ...
-                        '_TetY=' num2str(t2)];
-                    
-                    mkdir(savepath, specific_folder);
-                    savepath = [savepath specific_folder filesep];
-                    
-					saveas(gcf, [savepath gram(a).animal '_' ...
-					num2str(d) '_' num2str(e) '_' ...
-					'TetX=' num2str(t) ', TetY=' num2str(t2) ...
-					'_' 'Trial' num2str(tr) '.png']);
-				end
-                
-                close
-				end
-			end
-			end
-        end
-    end
-end
-    
-    
-    
-end
+	temp.Stime=temp.Stime-min(temp.Stime)-adjust;
 
+	%% Plot
+	q= figure; hold on;
+	set(gcf,'Position',[55 660 560 420]);
+	subplot(2,1,1);
+	imagesc(temp.Stime,temp.Sfreq,temp.C'); %colorbar;
+	line([0 0],[min(temp.Sfreq) max(temp.Sfreq)],'color','k','linewidth',2,'linestyle','--')
+
+	if ~sets.trials
+		title([sprintf('Coherence, \n') ...
+			gram(a).animal '- Day:' num2str(d)...
+			' Epoch:' num2str(e) sprintf('\n')...
+			' Tet_X:' num2str(t)...
+			'Tet_Y:' num2str(t2) ...
+			],'FontSize',16,'Fontweight','light');
+	else
+		title([ sprintf('Coherence, ') ...
+			gram(a).animal '- Day:' num2str(d)...
+			' Epoch:' num2str(e) ...
+			' Trial: ' num2str(tr) ...
+			 sprintf('\n')...
+			' Tet_X =' num2str(t)...
+			' Tet_Y =' num2str(t2) ...
+			],'FontSize',16,'Fontweight','light');
+	end
+	ylabel('Freq','FontSize',15,'Fontweight','normal');
+	xlabel('Time(s)','FontSize',15,'Fontweight','normal');
+	set(gca,'XLim',[min(temp.Stime) max(temp.Stime)]);
+	set(gca,'YLim',[min(temp.Sfreq) max(temp.Sfreq)]);
+
+	subplot(2,1,2);
+	boundedline([0:length(speed)-1]-length(speed)/2,speed,sem,'alpha');
+	line([0 0],[min(sem)-min(speed) max(sem)+max(speed)],'color','k','linewidth',2,'linestyle','--')
+	ylabel('avg. velocity (cm/s)','FontSize',15,'Fontweight','normal');
+	xlabel('time (s)','FontSize',15,'Fontweight','normal');
+	set(gca,'XLim',[min() max()]);
+	set(gca,'YLim',[min() max()]);
+
+
+	%% Save
+	if ispc
+		savepath= '/home/mcz/Desktop/GitProj/Images/';
+		savepath = ['.' filesep];
+	elseif ismac
+		savepath= '~/Documents/MATLAB/LabProjects/Data/LongerLowerPassSpecsHpa5/';
+	end
+
+	if ~sets.trials
+		 specific_folder = [gram(a).animal num2str(d) '_' ...
+			num2str(e)];
+
+		mkdir(savepath, specific_folder);
+		savepath = [savepath specific_folder filesep];
+
+		saveas(gcf, [savepath gram(a).animal '_' ...
+		num2str(d) '_' num2str(e) '_' ...
+		'TetX=' num2str(t) ', TetY=' num2str(t2) ...
+		'.png']);
+	else
+		specific_folder = [gram(a).animal num2str(d) '_' ...
+			num2str(e) '_TetX=' num2str(t) ...
+			'_TetY=' num2str(t2)];
+
+		mkdir(savepath, specific_folder);
+		savepath = [savepath specific_folder filesep];
+
+		saveas(gcf, [savepath gram(a).animal '_' ...
+		num2str(d) '_' num2str(e) '_' ...
+		'TetX=' num2str(t) ', TetY=' num2str(t2) ...
+		'_' 'Trial' num2str(tr) '.png']);
+	end
+
+	close
+	end
+end % of avgVelocity
+
+end % END FUNCTION
