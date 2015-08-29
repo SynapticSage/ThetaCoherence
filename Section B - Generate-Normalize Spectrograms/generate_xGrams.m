@@ -106,8 +106,7 @@ for s = 1:size(subscripts,1);
 	t	= subscripts(s,4);	% tetrodeX
 	trial	= subscripts(s,6);	% trial
 				
-		% If file, read in, else access address in acquisition
-		% struct
+		%% Read from file or inputted acquisition struct
 		if file_read && trial == 1
 			% select file and load
 			file_string = [read_loc animals{a} ...
@@ -227,8 +226,7 @@ for s = 1:size(subscripts,1);
 	t	= subscripts(s,4);	% tetrodeX
 	t2	= subscripts2(s,4);	% tetrodeY
 				
-	% If file, read in, else access address in acquisition
-	% struct
+	%% Read from file or inputted acquisition struct
 	if file_read
 		% select file and load
 		file_string = [animals{a} ...

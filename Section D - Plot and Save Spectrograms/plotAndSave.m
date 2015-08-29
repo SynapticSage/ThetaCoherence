@@ -41,7 +41,7 @@ toProcess = sets.animals;
 
 %% Spectrograms
 if spectrograms
-subscripts = getAllSubs(grams);
+subscripts = getAllSubs(gram);
 for s = 1:size(subscripts,1);
 	
 	a	= subscripts(s,1);	% animals
@@ -49,17 +49,21 @@ for s = 1:size(subscripts,1);
 	e	= subscripts(s,3);	% epoch
 	t	= subscripts(s,4);	% tetrodeX
 	tr	= subscripts(s,end);	% trial
+	
+	if ~isfield(data,'S')
+		continue;
+	end
                 
 	%% Adjust data
-	temp= gram(a).output{d, e, t, tr};
-	adjust=(max(temp.Stime)-min(temp.Stime))/2;
+	data= gram(a).output{d, e, t, tr};
+	adjust=(max(data.Stime)-min(data.Stime))/2;
 
-	temp.Stime=temp.Stime-min(temp.Stime)-adjust;
+	data.Stime=data.Stime-min(data.Stime)-adjust;
 
 	%% Plot
 	q= figure; hold on;
 	set(gcf,'Position',[55 660 560 420]);
-	imagesc(temp.Stime,temp.Sfreq,temp.S'); colorbar;
+	imagesc(data.Stime,data.Sfreq,data.S'); colorbar;
 	if ~sets.trials
 		title([gram(a).animal '- Day:' num2str(d)...
 			' Epoch:' num2str(e)...
@@ -74,8 +78,8 @@ for s = 1:size(subscripts,1);
 	end
 	ylabel('Freq','FontSize',20,'Fontweight','normal');
 	xlabel('Time(s)','FontSize',20,'Fontweight','normal');
-	set(gca,'XLim',[min(temp.Stime) max(temp.Stime)]);
-	set(gca,'YLim',[min(temp.Sfreq) max(temp.Sfreq)]);
+	set(gca,'XLim',[min(data.Stime) max(data.Stime)]);
+	set(gca,'YLim',[min(data.Sfreq) max(data.Sfreq)]);
 
 	%% Save
 	if ispc
@@ -114,7 +118,7 @@ end
 %% Coherograms
 if coherograms
 	
-subscripts = getAllSubs(grams);
+subscripts = getAllSubs(gram);
 for s = 1:size(subscripts,1);
 	
 	a	= subscripts(s,1);	% animals
@@ -123,17 +127,22 @@ for s = 1:size(subscripts,1);
 	t	= subscripts(s,4);	% tetrodeX
 	t2	= subscripts(s,5);	% tetrodeY
 	tr	= subscripts(s,6);	% trial
+	
+	if ~isfield(data,'C')
+		continue;
+	end
                 
 	%% Adjust data axes
-	temp= gram(a).output{d, e, t,t2, tr};
-	adjust=(max(temp.Stime)-min(temp.Stime))/2;
+	data= gram(a).output{d, e, t,t2, tr};
+	
+	adjust=(max(data.Stime)-min(data.Stime))/2;
 
-	temp.Stime=temp.Stime-min(temp.Stime)-adjust;
+	data.Stime=data.Stime-min(data.Stime)-adjust;
 
 	%% Plot
 	q= figure; hold on;
 	set(gcf,'Position',[55 660 560 420]);
-	imagesc(temp.Stime,temp.Sfreq,temp.C'); colorbar;
+	imagesc(data.Stime,data.Sfreq,data.C'); colorbar;
 	if ~sets.trials
 		title([sprintf('Coherence, \n') ...
 			gram(a).animal '- Day:' num2str(d)...
@@ -153,8 +162,8 @@ for s = 1:size(subscripts,1);
 	end
 	ylabel('Freq','FontSize',15,'Fontweight','normal');
 	xlabel('Time(s)','FontSize',15,'Fontweight','normal');
-	set(gca,'XLim',[min(temp.Stime) max(temp.Stime)]);
-	set(gca,'YLim',[min(temp.Sfreq) max(temp.Sfreq)]);
+	set(gca,'XLim',[min(data.Stime) max(data.Stime)]);
+	set(gca,'YLim',[min(data.Sfreq) max(data.Sfreq)]);
 
 	%% Save
 	if ispc
@@ -199,7 +208,7 @@ if meanFreqPlot
     S_results = [];
     C_results = [];
     
-    subscripts = getAllSubs(grams);
+    subscripts = getAllSubs(gram);
 	for s = 1:size(subscripts,1);
 	
 	a	= subscripts(s,1);	% animals
@@ -244,8 +253,8 @@ if meanFreqPlot
 
 	ylabel('Coherence','FontSize',15,'Fontweight','normal');
 	xlabel('Days','FontSize',15,'Fontweight','normal');
-	set(gca,'XLim',[min(temp.Stime) max(temp.Stime)]);
-	set(gca,'YLim',[min(temp.Sfreq) max(temp.Sfreq)]);
+	set(gca,'XLim',[min(data.Stime) max(data.Stime)]);
+	set(gca,'YLim',[min(data.Sfreq) max(data.Sfreq)]);
 
 	%% Save
 	if ispc
@@ -286,7 +295,7 @@ end
 
 if avgVelocity
 	
-subscripts = getAllSubs(grams);
+subscripts = getAllSubs(gram);
 for s = 1:size(subscripts,1);
 	
 	a	= subscripts(s,1);	% animals
@@ -295,20 +304,23 @@ for s = 1:size(subscripts,1);
 	t	= subscripts(s,4);	% tetrodeX
 	t2	= subscripts(s,5);	% tetrodeY
 	tr	= subscripts(s,6);	% trial
-				
+	
+	if ~isfield(data,'C')
+		continue;
+	end		
                 
 	%% Adjust data axes
-	temp= gram(a).output{d, e, t,t2, tr};
-	adjust=(max(temp.Stime)-min(temp.Stime))/2;
+	data= gram(a).output{d, e, t,t2, tr};
+	adjust=(max(data.Stime)-min(data.Stime))/2;
 
-	temp.Stime=temp.Stime-min(temp.Stime)-adjust;
+	data.Stime=data.Stime-min(data.Stime)-adjust;
 
 	%% Plot
 	q= figure; hold on;
 	set(gcf,'Position',[55 660 560 420]);
 	subplot(2,1,1);
-	imagesc(temp.Stime,temp.Sfreq,temp.C'); %colorbar;
-	line([0 0],[min(temp.Sfreq) max(temp.Sfreq)],'color','k','linewidth',2,'linestyle','--')
+	imagesc(data.Stime,data.Sfreq,data.C'); %colorbar;
+	line([0 0],[min(data.Sfreq) max(data.Sfreq)],'color','k','linewidth',2,'linestyle','--')
 
 	if ~sets.trials
 		title([sprintf('Coherence, \n') ...
@@ -329,8 +341,8 @@ for s = 1:size(subscripts,1);
 	end
 	ylabel('Freq','FontSize',15,'Fontweight','normal');
 	xlabel('Time(s)','FontSize',15,'Fontweight','normal');
-	set(gca,'XLim',[min(temp.Stime) max(temp.Stime)]);
-	set(gca,'YLim',[min(temp.Sfreq) max(temp.Sfreq)]);
+	set(gca,'XLim',[min(data.Stime) max(data.Stime)]);
+	set(gca,'YLim',[min(data.Sfreq) max(data.Sfreq)]);
 
 	subplot(2,1,2);
 	boundedline([0:length(speed)-1]-length(speed)/2,speed,sem,'alpha');
