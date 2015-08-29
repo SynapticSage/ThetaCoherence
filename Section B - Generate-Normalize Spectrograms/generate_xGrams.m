@@ -91,295 +91,262 @@ if ~ismember('plot', fields(paramSets))
 	processOpt.plot = false;
 end
 
-%% Simplify variables before loop
-animals = fields(paramSets.animals);
-animalcount = numel(animals);
-paramSets = paramSets.animals;
-
 try
 	
 	
 %% Spectrograms! For-loooping over acquisitions
 if nargin < 3
 
+subscripts = getAllSubs(acquisition);
+for s = 1:size(subscripts,1);
+	subscripts(s,:)
+	a	= subscripts(s,1);	% animals
+	d	= subscripts(s,2);	% day
+	e	= subscripts(s,3);	% epoch
+	t	= subscripts(s,4);	% tetrodeX
+	trial	= subscripts(s,6);	% trial
+				
+		% If file, read in, else access address in acquisition
+		% struct
+		if file_read && trial == 1
+			% select file and load
+			file_string = [read_loc animals{a} ...
+				'acquisition' num2str(d) '-' num2str(e) '-' ...
+				num2str(t) '.mat'];
+			temp = load(file_string);
+			data =temp.data;
+		else
+			data = acquisition(a).data{d,e,t};	
+		end
+					
+		%% Acquire spectrograms for trial
 
-for a = 1:animalcount
-    
-	grams(a).animal = animals{a};
-	if ~file_read; assert(isequal(animals{a},acquisition(a).animal)); end
-    
-    for d = paramSets.(animals{a}).days
-        for e = paramSets.(animals{a}).epochs
-            for t = paramSets.(animals{a}).tetrodes
-				
-				% If there's an exception in handling, enforce it. It's a
-				% temporary solution, hopefully, until a more elegant one
-				% presents.
-                exception=[];
-				EnforceException;
-				
-				% If file, read in, else access address in acquisition
-				% struct
-				if file_read
-					% select file and load
-					file_string = [read_loc animals{a} ...
-						'acquisition' num2str(d) '-' num2str(e) '-' ...
-						num2str(t) '.mat'];
-					temp = load(file_string);
-					data =temp.data;
-				else
-					data = acquisition(a).data{d,e,t};	
-				end
-				
-                for trial = 1:size(data,1)
-					
-					%% Acquire spectrograms for trial
-					
-					% set specgram data
-					specgram_data = data(trial,:);
+		% set specgram data
+		specgram_data = data(trial,:);
 %                     specgram_data = cast(specgram_data,'double');
-						
-					% Subset out relevant indices and plot
-                    if any(isnan(specgram_data))
-						
-                        subset = ~isnan(specgram_data);
-						
-                        [S, Stime, Sfreq, Serror] = ...
-                            mtspecgramc(specgram_data(subset)' , movingwin, params);
-					else
-						
-                        subset = find(acquisition(a).data{d,e,t}(trial,:) ~= 0);
-						
-                        [S, Stime, Sfreq, Serror] = ...
-                            mtspecgramc(specgram_data(subset(1):subset(end))', movingwin,params);
-					end
-		  
-				  %% Z-score
-				  % Unable to test atm, draft code
-				  %Stime = Stime - length(Stime)/(params.Fs * 2); % This will make time start -win(1) instead of 0
 
-				  % Unable to test atm, draft code
-		 		  % to figure out- importing relevant mean data, or meangrnd data. Differentiate between S and Sgrnd?
-				  if zscore == 1
-                      
-                     if d< 10; dstr= ['0' num2str(d)]; else dstr= num2str(d); end;
-                     if t< 10; tstr= ['0' num2str(t)]; else tstr= num2str(t); end;
+		% Subset out relevant indices and plot
+		if any(isnan(specgram_data))
 
-                    zscoredir= ['/home/mcz/DataShare/DATA/sjadhav/HPExpt/' animals{1} '_direct/EEGSpec/'];
-                    datadir= [animals{1} 'eeggndspec' savetag dstr '-Tet' tstr '.mat' ];
-                    
-                    load([ zscoredir datadir]);
-                    
-					meanspecgnd = eeggndspec{d}{e}{t}.meanspec;
-		       		stdspecgnd =  eeggndspec{d}{e}{t}.stdspec;
-		       		
-					% Z-score
-					S = bsxfun(@minus,S,meanspecgnd(1:size(S,2))); 
-		       		S = bsxfun(@rdivide,S,stdspecgnd(1:size(S,2)));
-				  end
+			subset = ~isnan(specgram_data);
 
-                    %% If plot option is on, plot each one
-                    if processOpt.plot
-                        input('Press return to continue');
-                        clf
-                        i = imagesc(Stime,Sfreq,S');
-                        i.Parent.YDir = 'normal';       % images invert by 
-                        figure(1);                       % place figure at top of stack
+			[S, Stime, Sfreq, Serror] = ...
+				mtspecgramc(specgram_data(subset)' , movingwin, params);
+		else
+
+			subset = find(acquisition(a).data{d,e,t}(trial,:) ~= 0);
+
+			[S, Stime, Sfreq, Serror] = ...
+				mtspecgramc(specgram_data(subset(1):subset(end))', ...
+				movingwin,params);
+		end
+
+	  %% Z-score
+	  % Unable to test atm, draft code
+	  %Stime = Stime - length(Stime)/(params.Fs * 2); % This will make time start -win(1) instead of 0
+
+	  % Unable to test atm, draft code
+	  % to figure out- importing relevant mean data, or meangrnd data. Differentiate between S and Sgrnd?
+	  if zscore == 1
+
+		 if d< 10; dstr= ['0' num2str(d)]; else dstr= num2str(d); end;
+		 if t< 10; tstr= ['0' num2str(t)]; else tstr= num2str(t); end;
+		
+		zscoredir= ['/home/mcz/DataShare/DATA/sjadhav/HPExpt/'...
+			animals{1} '_direct/EEGSpec/'];
+		datadir= [animals{1} 'eeggndspec' savetag dstr '-Tet' tstr '.mat'];
+
+		load([ zscoredir datadir]);
+
+		meanspecgnd = eeggndspec{d}{e}{t}.meanspec;
+		stdspecgnd =  eeggndspec{d}{e}{t}.stdspec;
+
+		% Z-score
+		S = bsxfun(@minus,S,meanspecgnd(1:size(S,2))); 
+		S = bsxfun(@rdivide,S,stdspecgnd(1:size(S,2)));
+	  end
+
+		%% If plot option is on, plot each one
+		if processOpt.plot
+			input('Press return to continue');
+			clf
+			i = imagesc(Stime,Sfreq,S');
+			i.Parent.YDir = 'normal';       % images invert by 
+			figure(1);                       % place figure at top of stack
 
 
-                        title(['Trial ' num2str(trial)]);
-                        xlabel('Time (s)');
-                        ylabel('Frequency (hZ)');
-                        grid on;
-                    end
+			title(['Trial ' num2str(trial)]);
+			xlabel('Time (s)');
+			ylabel('Frequency (hZ)');
+			grid on;
+		end
 
-                    %% If user asks for output to RAM or harddrive
-					if processOpt.output || processOpt.save
-						Output.S = S;
-						Output.Stime = Stime;
-						Output.Sfreq = Sfreq;
-						Output.Serror = Serror;
-                        Output.acquis.sst=acquisition(a).sst{d,e,t};
-                        Output.acquis.ssi=acquisition(a).ssi{d,e,t};
+		%% If user asks for output to RAM or harddrive
+		if processOpt.output || processOpt.save
+			Output.S = S;
+			Output.Stime = Stime;
+			Output.Sfreq = Sfreq;
+			Output.Serror = Serror;
+			Output.acquis.sst=acquisition(a).sst{d,e,t};
+			Output.acquis.ssi=acquisition(a).ssi{d,e,t};
 
-					end
-					
-					%% If user asks to output to RAM
-					if processOpt.output
-						grams(a).output{d,e,t,trial} = Output;
-					end
-					
-					%% If user asks to save to harddrive, then do
-					if processOpt.save
-						
-						SaveFileCharacteristics.animal = ...
-							acquisition(a).animal;
-						SaveFileCharacteristics.data_name = ...
-							'spec';
-						SaveFileCharacteristics.numerical_address = ...
-							[d e t trial];
-						
-						saveOutput(SaveFileCharacteristics, Output);
-					end
+		end
 
-                end
-            end
-        end
-    end
-end
+		%% If user asks to output to RAM
+		if processOpt.output
+			grams(a).output{d,e,t,trial} = Output;
+		end
+
+		%% If user asks to save to harddrive, then do
+		if processOpt.save
+
+			SaveFileCharacteristics.animal = ...
+				acquisition(a).animal;
+			SaveFileCharacteristics.data_name = ...
+				'spec';
+			SaveFileCharacteristics.numerical_address = ...
+				[d e t trial];
+
+			saveOutput(SaveFileCharacteristics, Output);
+		end
+
+	end
 end
 
 %% Coherograms! (and spectrograms)
 %
 if nargin == 3
-
-for a = 1:animalcount
     
-    grams(a).animal = animals{a};
-	if ~file_read; assert(isequal(animals{a},acquisition(a).animal)); end
-    
-    for d = paramSets.(animals{a}).days
-        for e = paramSets.(animals{a}).epochs
-            for t = paramSets.(animals{a}).tetrodes
-            for t2 = paramSets.(animals{a}).tetrodes2
+    subscripts	= getAllSubs(acquisition);
+	subscripts2 = getAllSubs(acquisition2);
+for s = 1:size(subscripts,1);
+	a	= subscripts(s,1);	% animals
+	d	= subscripts(s,2);	% day
+	e	= subscripts(s,3);	% epoch
+	t	= subscripts(s,4);	% tetrodeX
+	t2	= subscripts2(s,4);	% tetrodeY
 				
-				% If there's an exception in handling, enforce it. It's a
-				% temporary solution, hopefully, until a more elegant one
-				% presents.
-                exception=[];
-				EnforceException;
-				
-				% If file, read in, else access address in acquisition
-					% struct
-					if file_read
-						% select file and load
-						file_string = [animals{a} ...
-							'acquisition' num2str(d) '-' num2str(e) '-' ...
-							num2str(t) '.mat'];
-						temp = load(file_string);
-						data =temp.data;
-					else
-						data = acquisition(a).data{d,e,t};	
-						data2= acquisition2(a).data{d,e,t2};
-					end
-				
-                for trial = 1:size(data,1)
+	% If file, read in, else access address in acquisition
+	% struct
+	if file_read
+		% select file and load
+		file_string = [animals{a} ...
+			'acquisition' num2str(d) '-' num2str(e) '-' ...
+			num2str(t) '.mat'];
+		temp = load(file_string);
+		data =temp.data;
+	else
+		data = acquisition(a).data{d,e,t};	
+		data2= acquisition2(a).data{d,e,t2};
+	end
+	
+	trials = 1:size(data,1);
+	for trial = trials
+		%% Acquire coherence and spectrograms for trial
 
-					% If there's an exception in handling, enforce it. It's a
-					% temporary solution, hopefully, until a more elegant one
-					% presents.
-					EnforceException;
-					
-					
-					%% Acquire coherence and spectrograms for trial
-					
-					specgram_data=data(trial,:);
-					specgram_data2=data2(trial,:);
+		specgram_data=data(trial,:);
+		specgram_data2=data2(trial,:);
 
-                    if any(isnan(specgram_data))
-                        
-                       logicalvec1 = ~isnan(specgram_data);
-%                      logicalvec2 = ~isnan(specgram_data2);
-                        
-                        [C,phi,S12,S1,S2,Stime,Sfreq,confC,phistd,Cerr] = ...
-                            cohgramc(specgram_data(logicalvec1)',...
-                            specgram_data2(logicalvec1)', movingwin,params);
-                    else
-                        
-                        indices = find(acquisition.data{d,e,t}(trial,:) ~= 0);
-                        indices2 = find(acquisition.data{d,e,t2}(trial,:) ~= 0);
-                        
-                        [C,phi,S12,S1,S2,Stime,Sfreq,confC,phistd,Cerr] = ...
-                            mtspecgramc(specgram_data(indices(1):indices(end))',...
-                            specgram_data2(indices2(1):indices2(end))',movingwin,params);
-                    end
+		if any(isnan(specgram_data))
 
-                    %% If plot option is on, plot each one
-                    if processOpt.plot
-                        input('Press return to continue');
-                        i = imagesc(Stime,Sfreq,C');
-                        i.Parent.YDir = 'normal';       % images invert by 
-                        figure(1);                       % place figure at top of stack
+		   logicalvec1 = ~isnan(specgram_data);
+%          logicalvec2 = ~isnan(specgram_data2);
+
+			[C,phi,S12,S1,S2,Stime,Sfreq,confC,phistd,Cerr] = ...
+				cohgramc(specgram_data(logicalvec1)',...
+				specgram_data2(logicalvec1)', movingwin,params);
+		else
+
+			indices = find(acquisition.data{d,e,t}(trial,:) ~= 0);
+			indices2 = find(acquisition.data{d,e,t2}(trial,:) ~= 0);
+
+			[C,phi,S12,S1,S2,Stime,Sfreq,confC,phistd,Cerr] = ...
+				mtspecgramc(specgram_data(indices(1):indices(end))',...
+				specgram_data2(indices2(1):indices2(end))', ...
+				movingwin,params);
+		end
+
+		%% If plot option is on, plot each one
+		if processOpt.plot
+			input('Press return to continue');
+			i = imagesc(Stime,Sfreq,C');
+			i.Parent.YDir = 'normal';       % images invert by 
+			figure(1);                       % place figure at top of stack
 
 
-                        title(['Trial ' num2str(trial)]);
-                        xlabel('Time (s)');
-                        ylabel('Frequency (hZ)');
-                        grid on;
-					end
+			title(['Trial ' num2str(trial)]);
+			xlabel('Time (s)');
+			ylabel('Frequency (hZ)');
+			grid on;
+		end
 
-					%% If user asks for output, then add to proper cell locs
-					if processOpt.output || processOpt.save
-						% Cross-tetrode informations
-						Output12.C = C;
-						Output12.cerror = Cerr;
-						Output12.confC = confC;
-						Output12.phi = phi;
-						Output12.phistd = phistd;
-						Output12.S12 = S12;
-						Output12.Stime = Stime;
-						Output12.Sfreq = Sfreq;
-                        Output12.acquis.sst=acquisition(a).sst{d,e,t};
-                        Output12.acquis.ssi=acquisition(a).ssi{d,e,t};
+		%% If user asks for output, then add to proper cell locs
+		if processOpt.output || processOpt.save
+			% Cross-tetrode informations
+			Output12.C = C;
+			Output12.cerror = Cerr;
+			Output12.confC = confC;
+			Output12.phi = phi;
+			Output12.phistd = phistd;
+			Output12.S12 = S12;
+			Output12.Stime = Stime;
+			Output12.Sfreq = Sfreq;
+			Output12.acquis.sst=acquisition(a).sst{d,e,t};
+			Output12.acquis.ssi=acquisition(a).ssi{d,e,t};
 
-						% Single tetrode t information
-						Output1.S = S1;
-						Output1.Stime = Stime;
-						Output1.Sfreq = Stime;
-                        Output1.acquis.sst=acquisition(a).sst{d,e,t};
-                        Output1.acquis.ssi=acquisition(a).ssi{d,e,t};
+			% Single tetrode t information
+			Output1.S = S1;
+			Output1.Stime = Stime;
+			Output1.Sfreq = Stime;
+			Output1.acquis.sst=acquisition(a).sst{d,e,t};
+			Output1.acquis.ssi=acquisition(a).ssi{d,e,t};
 
 
-						% Single tetrode t2 information
-						Output2.S = S2;
-						Output2.Stime = Stime;
-						Output2.Sfreq = Stime;
-                        Output12.acquis.sst=acquisition2(a).sst{d,e,t};
-                        Output12.acquis.ssi=acquisition2(a).ssi{d,e,t};
+			% Single tetrode t2 information
+			Output2.S = S2;
+			Output2.Stime = Stime;
+			Output2.Sfreq = Stime;
+			Output12.acquis.sst=acquisition2(a).sst{d,e,t};
+			Output12.acquis.ssi=acquisition2(a).ssi{d,e,t};
 
-					end
-					
-					%% If user asks to output from function/RAM
-					if processOpt.output
-						grams(a).output{d,e,t,t2,trial} = Output12;
-						grams(a).output{d,e,t,t,trial} = Output1;
-						grams(a).output{d,e,t2,t2,trial} = Output2;
-					end
-					
-					%% If user asks to save data to harddrive, then do
-					if processOpt.save
-						
-						% Save coherence for t & t2
-						SaveFileCharacteristics.animal = ...
-							acquisition(a).animal;
-						SaveFileCharacteristics.data_name = ...
-							'coher';
-						SaveFileCharacteristics.numerical_address = ...
-							[d e t t2 trial];
-						saveOutput(SaveFileCharacteristics, Output12);
-						
-						% Save spectrogram t
-						SaveFileCharacteristics.data_name = ...
-							'spec';
-						SaveFileCharacteristics.numerical_address = ...
-							[d e t trial];
-						saveOutput(SaveFileCharacteristics,Output1);
-						
-						% Save spectrogram t2
-						SaveFileCharacteristics.numerical_address = ...
-							[d e t2 trial];
-						
-						saveOutput(SaveFileCharacteristics,Output2);
-						
-					end
-					
+		end
 
-                end
-            end
-            end
-        end
-    end
-end 
+		%% If user asks to output from function/RAM
+		if processOpt.output
+			grams(a).animal = acquisition(a).animal;
+			grams(a).output{d,e,t,t2,trial} = Output12;
+			grams(a).output{d,e,t,t,trial} = Output1;
+			grams(a).output{d,e,t2,t2,trial} = Output2;
+		end
+
+		%% If user asks to save data to harddrive, then do
+		if processOpt.save
+
+			% Save coherence for t & t2
+			SaveFileCharacteristics.animal = ...
+				acquisition(a).animal;
+			SaveFileCharacteristics.data_name = ...
+				'coher';
+			SaveFileCharacteristics.numerical_address = ...
+				[d e t t2 trial];
+			saveOutput(SaveFileCharacteristics, Output12);
+
+			% Save spectrogram t
+			SaveFileCharacteristics.data_name = ...
+				'spec';
+			SaveFileCharacteristics.numerical_address = ...
+				[d e t trial];
+			saveOutput(SaveFileCharacteristics,Output1);
+
+			% Save spectrogram t2
+			SaveFileCharacteristics.numerical_address = ...
+				[d e t2 trial];
+
+			saveOutput(SaveFileCharacteristics,Output2);
+
+		end
+	end
+	end
 end
 
 

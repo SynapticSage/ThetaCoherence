@@ -107,9 +107,9 @@ sampleParams.trajbound_type = 0 ;            % 0 denotes outbound
  % ------------------------------------------------------------------------
     
 
-animal_set = {'HPb'};       
-day_set = 1:8;			% set of days to analyze for all animals ...
-epoch_set = [2 4];
+animal_set = {'HPa'};       
+day_set = 2:5;			% set of days to analyze for all animals ...
+epoch_set = [2];
 tetrode_set = [1];
 tetrode_set2 = [17];
 
