@@ -1,38 +1,27 @@
-function plotAndSave( gram, plot, acquisition, acquisition2)
+function plotAndSave( gram, sets, acquisition, acquisition2)
 %PLOTANDSAVE Literally does what it says!
 %   pass in spectrograms or coherograms in gram 
 %	pass in sets struct containing information about what days, epochs and
 %	tetrodes to average over in sets
 
 %% Setting default options
-if ~ismember('trials',fields(sets))
+if ~isfield(sets,'trials')
 	sets.trials = false;
 end
-
-if ~ismember('coherograms',fields(sets))
+if ~isfield(sets,'coherograms')
 	coherograms = false;
 else
     coherograms = sets.coherograms;
 end
-if ~ismember('spectrograms',fields(sets))
+if ~isfield(sets,'spectrograms')
 	spectrograms = false;
 else
     spectrograms = sets.spectrograms;
 end
-
-if ismember('meanFreqPlot', fields(sets))
-    mean_days = sets.meanFreqPlot.days;
-    mean_epochs = sets.meanFreqPlot.epochs;
-    mean_tets = sets.meanFreqPlot.tetrodes;
-    if ismember('tetrodes2',fields(sets.meanFreqPlot))
-        mean_tets2 = sets.meanFreqPlot.tetrodes2;
-    else
-        mean_tets2 = 1;
-    end
-    
-    meanFreqPlot = true;
-else
+if ~isfield(sets,'meanFreqPlot')  
     meanFreqPlot = false;
+else
+    meanFreqPlot = sets.meanFreqPlot;
 end
 
 % if ismember('plotAvgVelocity', fields(sets))

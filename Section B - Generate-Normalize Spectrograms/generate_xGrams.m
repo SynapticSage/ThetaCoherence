@@ -219,6 +219,7 @@ if nargin == 3
     
     subscripts	= getAllSubs(acquisition);
 	subscripts2 = getAllSubs(acquisition2);
+	
 for s = 1:size(subscripts,1);
 	a	= subscripts(s,1);	% animals
 	d	= subscripts(s,2);	% day

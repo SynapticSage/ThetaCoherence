@@ -126,38 +126,32 @@ function [avg_grams] = averageAcross2(grams,paramSet)
 	sieve = [inf inf inf inf inf];
 	sieve(dim2avg) = 1;
 	
-	animals = fields(paramSet.animals);
-	dataToProcess= paramSet.animals;
-	for a = 1:numel(animals)
-		anim = animals{a};
-		for d	= dataToProcess.(anim).days
-		for e	= dataToProcess.(anim).epochs
-		for t	= dataToProcess.(anim).tetrodes
-			% Count trials
-			tr_logical = ~cellfun(@isempty,{grams(a).output{d, e, t,:}});
-			numTrials = sum(tr_logical);
-		for tr	= 1:numTrials
+	subscripts = getAllSubs(grams);
+	for s = 1:size(subscripts,1);
+	
+		a	= subscripts(s,1);	% animals
+		d	= subscripts(s,2);	% day
+		e	= subscripts(s,3);	% epoch
+		t	= subscripts(s,4);	% tetrodeX
+		t2	= subscripts(s,5);	% tetrodeY
+		tr	= subscripts(s,6);	% trial
 				
-				% For each field, place averaged result
-				for field = averaging_fields
-					
-					d=min(	d,	sieve(1));
-					e=min(	e,	sieve(2));
-					t=min(	t,	sieve(3));
-					tr=min(	tr,	sieve(4));
-					
-					
-					temp  = data.(field{1})(d,e,t,tr,1,:,:);
-					dims = size(temp);
-					temp = reshape(temp,dims(end-1),dims(end));
-					avg_grams(a).output{d,e,t,tr}.(field{1}) = ...
-						temp;
-				end
+			% For each field, place averaged result
+			for field = averaging_fields
 
-		end
-		end
-		end
-		end
+				d=min(	d,	sieve(1));
+				e=min(	e,	sieve(2));
+				t=min(	t,	sieve(3));
+				tr=min(	tr,	sieve(4));
+
+
+				temp  = data.(field{1})(d,e,t,tr,1,:,:);
+				dims = size(temp);
+				temp = reshape(temp,dims(end-1),dims(end));
+				avg_grams(a).output{d,e,t,tr}.(field{1}) = ...
+					temp;
+			end
+
 	end
 	
 
