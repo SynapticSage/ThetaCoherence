@@ -383,7 +383,7 @@ end
 end
 
 
-catch ME				% if screws up in for-loop, reset figure style.
+catch ME				% If screws up processing, display error and reset figure
 	%% Error post-processing
     % Display error data
 	disp(ME.message);
