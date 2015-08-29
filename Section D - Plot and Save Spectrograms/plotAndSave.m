@@ -1,4 +1,4 @@
-function plotAndSave( gram, sets, acquisition, acquisition2)
+function plotAndSave( gram, plot, acquisition, acquisition2)
 %PLOTANDSAVE Literally does what it says!
 %   pass in spectrograms or coherograms in gram 
 %	pass in sets struct containing information about what days, epochs and
@@ -59,8 +59,7 @@ for s = 1:size(subscripts,1);
 	d	= subscripts(s,2);	% day
 	e	= subscripts(s,3);	% epoch
 	t	= subscripts(s,4);	% tetrodeX
-	t2	= subscripts(s,5);	% tetrodeY
-	tr	= subscripts(s,6);	% trial
+	tr	= subscripts(s,end);	% trial
                 
 	%% Adjust data
 	temp= gram(a).output{d, e, t, tr};
@@ -294,9 +293,7 @@ if meanFreqPlot
 
 	close
     
-    end
 end
-
 
 if avgVelocity
 	
