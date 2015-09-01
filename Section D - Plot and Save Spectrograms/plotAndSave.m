@@ -365,46 +365,45 @@ for a = 1:numel(animals)
                 set(gca,'YLim',[min(temp.Sfreq) max(temp.Sfreq)]);
                 
                 subplot(2,1,2);
-                boundedline([0:length(speed)-1]-length(speed)/2,speed,sem,'alpha');
+                errorbar(temp.Stime,speed,sem,'.','linewidth',2,'markersize',25);
                 line([0 0],[min(sem)-min(speed) max(sem)+max(speed)],'color','k','linewidth',2,'linestyle','--')
                 ylabel('avg. velocity (cm/s)','FontSize',15,'Fontweight','normal');
                 xlabel('time (s)','FontSize',15,'Fontweight','normal');
-                set(gca,'XLim',[min() max()]);
-                set(gca,'YLim',[min() max()]);
-
+                set(gca,'XLim',[min(temp.Stime) max(temp.Stime)]);
+                set(gca,'YLim',[min(temp.Sfreq) max(temp.Sfreq)]);
                 
                 %% Save
-				if ispc
-					savepath= '/home/mcz/Desktop/GitProj/Images/';
-                    savepath = ['.' filesep];
-				elseif ismac
-					savepath= '~/Documents/MATLAB/LabProjects/Data/LongerLowerPassSpecsHpa5/';
-				end
-                
-				if ~sets.trials
-                     specific_folder = [gram(a).animal num2str(d) '_' ...
-                        num2str(e)];
-                    
-                    mkdir(savepath, specific_folder);
-                    savepath = [savepath specific_folder filesep];
-                    
-					saveas(gcf, [savepath gram(a).animal '_' ...
-					num2str(d) '_' num2str(e) '_' ...
-					'TetX=' num2str(t) ', TetY=' num2str(t2) ...
-					'.png']);
-                else
-                    specific_folder = [gram(a).animal num2str(d) '_' ...
-                        num2str(e) '_TetX=' num2str(t) ...
-                        '_TetY=' num2str(t2)];
-                    
-                    mkdir(savepath, specific_folder);
-                    savepath = [savepath specific_folder filesep];
-                    
-					saveas(gcf, [savepath gram(a).animal '_' ...
-					num2str(d) '_' num2str(e) '_' ...
-					'TetX=' num2str(t) ', TetY=' num2str(t2) ...
-					'_' 'Trial' num2str(tr) '.png']);
-				end
+% 				if ispc
+% 					savepath= '/home/mcz/Desktop/GitProj/Images/';
+%                     savepath = ['.' filesep];
+% 				elseif ismac
+% 					savepath= '~/Documents/MATLAB/LabProjects/Data/LongerLowerPassSpecsHpa5/';
+% 				end
+%                 
+% 				if ~sets.trials
+%                      specific_folder = [gram(a).animal num2str(d) '_' ...
+%                         num2str(e)];
+%                     
+%                     mkdir(savepath, specific_folder);
+%                     savepath = [savepath specific_folder filesep];
+%                     
+% 					saveas(gcf, [savepath gram(a).animal '_' ...
+% 					num2str(d) '_' num2str(e) '_' ...
+% 					'TetX=' num2str(t) ', TetY=' num2str(t2) ...
+% 					'.png']);
+%                 else
+%                     specific_folder = [gram(a).animal num2str(d) '_' ...
+%                         num2str(e) '_TetX=' num2str(t) ...
+%                         '_TetY=' num2str(t2)];
+%                     
+%                     mkdir(savepath, specific_folder);
+%                     savepath = [savepath specific_folder filesep];
+%                     
+% 					saveas(gcf, [savepath gram(a).animal '_' ...
+% 					num2str(d) '_' num2str(e) '_' ...
+% 					'TetX=' num2str(t) ', TetY=' num2str(t2) ...
+% 					'_' 'Trial' num2str(tr) '.png']);
+% 				end
                 
                 close
 				end

@@ -1,4 +1,4 @@
-function [speed, sem] =getAvgVelocity(acquisition, a, d, e, t, t2, tr)
+function [speed, sem, binSpec] =getAvgVelocity(acquisition, a, d, e, t, t2, tr)
 %GETAVGVELOCITY Get average velocity across trials
 %   pass in spectrograms or coherograms in gram 
 %	pass in sets struct containing information about what days, epochs and
@@ -18,11 +18,37 @@ posData= pos{1,1}{1,e}.data;
 posIndices=acquisition.ssi{d,e};
 
 for i= 1:length(posIndices);
-temp= posIndices(i,:);
-velVector(i,:)= posData(temp(1):temp(2),5);
+tempidx= posIndices(i,:);
+velVector(i,:)= posData(tempidx(1):tempidx(2)-1,5);
 end
 
-speed= mean(velVector);
-sem= std(velVector) ./ sqrt(size(velVector,1));
+% have ==> [trials x pos bin #] :::: end goal==> [trials x spec bin #] 
+% (sloppy below. padding with NaNs for uneven spectrogram bins) 
+%
+% calculate relevant dimensions for reshaping and padding
+dimSpec= size(temp.Stime,2);
+dimTrial= size(velVector,1);
+dimPos= size(velVector,2);
+
+% How many NaN columns needed to make pos bin # divisible by spec bin #?
+pad= dimSpec- rem(dimPos, dimSpec);
+
+% add NaN columns to the velVector matrix
+velVectorPad= [velVector nan([dimTrial, pad])];
+
+% what size are the new pos bins that match up with the spec bin #?
+newBinWidth= size(velVectorPad,2)/dimSpec;
+
+% make a 3D matrix [trial x new binsize x spec bin #] 
+velVectorBins=reshape(velVectorPad, [dimTrial, newBinWidth, dimSpec]);
+
+% take average across new bin, now have [trial x spec bin #]
+newVelVector= squeeze(nanmean(velVectorBins,2));
+
+speed= mean(newVelVector);
+sem= std(newVelVector) ./ sqrt(size(newVelVector,1));
+
+binTime= diff(temp.Stime);
+binSpec= [newBinWidth, binTime(1)]; 
 
 end
