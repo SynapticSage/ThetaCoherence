@@ -172,9 +172,9 @@ end
 
 disp('Generating spec- or coherograms...');
 
-if exist('tetrode_set2','var')		% TETRODE PAIRS - Coherence
+if exist('tetrode_set2','var')		% TETRODE PAIRS
     grams = generate_xGrams(acquisition,paramSet,acquisition2);
-else								% TETRODE SET	- Spectrogram
+else								% SINGLE TETRODE SET	
     grams = generate_xGrams(acquisition,paramSet);
 end
 
