@@ -1,4 +1,4 @@
-function [speed, sem, binSpec] =getAvgVelocity(acquisition, a, d, e, t, t2, tr)
+function [speed, sem, binSpec] =getAvgVelocity(grams,beh_data, a, d, e, t, t2, tr)
 %GETAVGVELOCITY Get average velocity across trials
 %   pass in spectrograms or coherograms in gram 
 %	pass in sets struct containing information about what days, epochs and
@@ -7,17 +7,18 @@ function [speed, sem, binSpec] =getAvgVelocity(acquisition, a, d, e, t, t2, tr)
 
 if d< 10; dstr= ['0' num2str(d)]; else dstr= num2str(d); end;
 
-% fix this later
-if d == 1 && e==2; e=4; end;
-if d == 1 && e==4; e=6; end;
+% % fix this later
+% if d == 1 && e==2; e=4; end; 
+% if d == 1 && e==4; e=6; end; Commented out code doesn't work because it
+% changes 2 to 4 and then the very next line changes 4 to 6. This has the
+% effect of transforming 2 to 6. Reversing the lines doesn't work either.
+exception=[];
+EnforceException;
 
+posData = beh_data.pos{d,e}.data;
+posIndices= beh_data.ssi{d,e};
 
-posPath= [acquisition.animal 'pos' dstr '.mat'];
-load(posPath);
-posData= pos{1,1}{1,e}.data;
-posIndices=acquisition.ssi{d,e};
-
-for i= 1:length(posIndices);
+for i= 1:length(posIndices)
 tempidx= posIndices(i,:);
 velVector(i,:)= posData(tempidx(1):tempidx(2)-1,5);
 end
@@ -25,6 +26,8 @@ end
 % have ==> [trials x pos bin #] :::: end goal==> [trials x spec bin #] 
 % (sloppy below. padding with NaNs for uneven spectrogram bins) 
 %
+temp = grams.output{d,e,t,t2,tr};
+
 % calculate relevant dimensions for reshaping and padding
 dimSpec= size(temp.Stime,2);
 dimTrial= size(velVector,1);

@@ -1,4 +1,4 @@
-function plotAndSave( gram, sets, acquisition, acquisition2)
+function plotAndSave( gram, sets, beh_data, beh_data2)
 %PLOTANDSAVE Literally does what it says!
 %   pass in spectrograms or coherograms in gram 
 %	pass in sets struct containing information about what days, epochs and
@@ -412,8 +412,7 @@ for a = 1:numel(animals)
         end
     end
 end
-    
-    
-    
+end
+
 end
 
