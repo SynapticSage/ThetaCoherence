@@ -6,8 +6,10 @@ function [speed, sem, binSpec] =getAvgVelocity(grams, beh_data, d, e, t, t2,tr)
 
 if nargin == 7
     trialAvg = false;
+    temp = grams.output{d,e,t,t2,tr};
 else
     trialAvg = true;
+    temp = grams.output{d,e,t,t2};
 end
 
 
@@ -40,7 +42,6 @@ end
 % have ==> [trials x pos bin #] :::: end goal==> [trials x spec bin #] 
 % (sloppy below. padding with NaNs for uneven spectrogram bins) 
 %
-temp = grams.output{d,e,t,t2,tr};
 
 % calculate relevant dimensions for reshaping and padding
 dimSpec= size(temp.Stime,2);

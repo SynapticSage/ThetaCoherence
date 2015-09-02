@@ -93,7 +93,7 @@ sampleParams.trajbound_type = 0 ;            % 0 denotes outbound
 % entrance or exit. Its unit is frames.  For 30hz sample rate, [15 15]
 % grabs 15 frames in front and behind boundary crossing. entranceOrExit
 % subfield controls whether to sample entrance or exit.
- sampleParams.edgeMode.window = [150 150];
+ sampleParams.edgeMode.window = [60 60];
  sampleParams.edgeMode.entranceOrExit = 'entrance';
  
 
@@ -164,6 +164,9 @@ if exist('tetrode_set2','var')		% Acquire for TetrodeY Set, if user asked for it
 end
 
 %% B.1 Generate Spectrograms
+
+% -------------------------
+% Parameters for 
 
 disp('Generating spec- or coherograms...');
 

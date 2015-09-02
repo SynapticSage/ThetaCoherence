@@ -51,9 +51,10 @@ zscore =0;
 %% Define Chronux params
 % -------------------------------------------  
 params.Fs = 1500;
-params.fpass = [0 20];		% params.fpass = [0 400];
+params.fpass = [0 40];		% params.fpass = [0 400];
 params.tapers = [3 5];
 params.err = [2 0.05];
+
 if params.fpass(2) >= 400
     movingwin = [100 10]/1000; 
 end
@@ -72,7 +73,6 @@ end
 if params.fpass(2) == 10
     movingwin = [8000 800]/1000; 
     savetag = 'floor';
-
 end
 
  %params.pad = 1;			% smooths frequency representation

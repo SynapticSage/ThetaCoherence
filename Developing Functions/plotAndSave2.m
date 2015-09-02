@@ -211,7 +211,11 @@ end
         adjust=(max(temp.Stime)-min(temp.Stime))/2;
         temp.Stime=temp.Stime-min(temp.Stime)-adjust;
         
-        [speed, sem, binSpec] = getAvgVelocity(gram, beh_data, d,e,t,t2,tr);
+        if trials
+            [speed, sem, binSpec] = getAvgVelocity(gram, beh_data, d,e,t,t2,tr);
+        else
+            [speed, sem, binSpec] = getAvgVelocity(gram, beh_data, d,e,t,t2);
+        end
         
         errorbar(temp.Stime,speed,sem,'-.','linewidth',2,'markersize',25);
         line([0 0],[min(sem)-min(speed) max(sem)+max(speed)],'color','k','linewidth',2,'linestyle','--')
