@@ -194,6 +194,8 @@ avg_grams = averageAcross(grams,paramSet);
 
 disp('Plotting and saving data...');
 
+paramSet.plotAvgVelocity = true;
+paramSet.plotPositions = true;
     
 for trials = [true false]
 	paramSet.trials = trials;

@@ -211,14 +211,14 @@ end
         adjust=(max(temp.Stime)-min(temp.Stime))/2;
         temp.Stime=temp.Stime-min(temp.Stime)-adjust;
         
-        [speed, sem, binSpec] = getAvgVelocity(gram, beh_data, temp.Stime, d,e);
+        [speed, sem, binSpec] = getAvgVelocity(gram, beh_data, d,e,t,t2,tr);
         
-        errorbar(data.Stime,speed,sem,'.','linewidth',2,'markersize',25);
+        errorbar(temp.Stime,speed,sem,'-.','linewidth',2,'markersize',25);
         line([0 0],[min(sem)-min(speed) max(sem)+max(speed)],'color','k','linewidth',2,'linestyle','--')
         ylabel('avg. velocity (cm/s)','FontSize',xy_font_size,'Fontweight','normal');
         xlabel('time (s)','FontSize',xy_font_size,'Fontweight','normal');
-        set(gca,'XLim',[min(data.Stime) max(data.Stime)]);
-        set(gca,'YLim',[min(data.Sfreq) max(data.Sfreq)]);
+        set(gca,'XLim',[min(temp.Stime) max(temp.Stime)]);
+        set(gca,'YLim',[0 max(speed)]);
         
     end
     
