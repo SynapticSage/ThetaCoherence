@@ -1,4 +1,4 @@
-function [speed, sem, binSpec] =getAvgVelocity(grams,beh_data, a, d, e, t, t2, tr)
+function [speed, sem, binSpec] =getAvgVelocity(grams, beh_data, Stime, d, e)
 %GETAVGVELOCITY Get average velocity across trials
 %   pass in spectrograms or coherograms in gram 
 %	pass in sets struct containing information about what days, epochs and
@@ -29,7 +29,7 @@ end
 temp = grams.output{d,e,t,t2,tr};
 
 % calculate relevant dimensions for reshaping and padding
-dimSpec= size(temp.Stime,2);
+dimSpec= size(Stime,2);
 dimTrial= size(velVector,1);
 dimPos= size(velVector,2);
 
