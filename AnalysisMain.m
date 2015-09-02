@@ -52,7 +52,7 @@ if path_added || (~path_added && exist(files_dot_brandeis_edu, 'dir'))
     path_added = true;
 end
     
-clear sampleParams acquisition acquisition2 grams avg_grams
+clear sampleParams acquisition acquisition2 grams avg_grams paramSet
 
 %% Parameter Section
 
@@ -66,20 +66,15 @@ clear sampleParams acquisition acquisition2 grams avg_grams
 % How large of radius should we sample
 
 sampleParams.circleParams.radius = 20;       % 20 pixel radius
-% Where to sample
-% [1 1] denotes [segment_1 end_of_it]
-% % sampleParams.circleParams.segment = [1 1];
+% % Where to sample
+% % [1 1] denotes [segment_1 end_of_it]
+% % % sampleParams.circleParams.segment = [1 1];
 sampleParams.circleParams.segment = {1, 'final'}; % end of segment 1
-
-
-% Note: Second number encodes start and end of segment in 0 and 1.
-% Eventually we may extend function to request a point that is some
-% fraction, e.g. 0.75 from start (0) to end (1) of segment
 
 % ----------------------------------------------------------
 % Parameters for controlling which segment transitions to sample
 % ----------------------------------------------------------
-
+% 
 % sampleParams.segmentTransition = [1 4; 1 5];
 
 % ----------------------------------------------------------
@@ -160,15 +155,15 @@ disp('Acquiring windows of data at requested sample points...');
 
 % Acquire from first set of tetrodes
 
-processOpt.otherTetrodes = false;
-acquisition = gatherWindowsOfData(saveFolder, paramSet);
+paramSet.processOpt.otherTetrodes = false;
+[acquisition beh_data]= gatherWindowsOfData(saveFolder, paramSet);
 
 if exist('tetrode_set2','var')		% Acquire for TetrodeY Set, if user asked for it
     paramSet.processOpt.otherTetrodes = true;
-    acquisition2 = gatherWindowsOfData(saveFolder, paramSet);
+    [acquisition2 beh_data2] = gatherWindowsOfData(saveFolder, paramSet);
 end
 
-%% B. Generate Spectrograms
+%% B.1 Generate Spectrograms
 
 disp('Generating spec- or coherograms...');
 
@@ -177,6 +172,9 @@ if exist('tetrode_set2','var')		% TETRODE PAIRS - Coherence
 else								% TETRODE SET	- Spectrogram
     grams = generate_xGrams(acquisition,paramSet);
 end
+
+%% B.2 Clear RAM after Spectrogram Creation
+clear acquisition acquisition2;
 
 
 %% C. Average Spectrograms/Coherograms
@@ -199,8 +197,8 @@ disp('Plotting and saving data...');
     
 for trials = [true false]
 	paramSet.trials = trials;
-	if trials; g = grams; else; g = avg_grams; end
-	plotAndSave(g,paramSet, acquisition, acquisition2);
+	if trials; dataToPlot = grams; else; dataToPlot = avg_grams; end
+	plotAndSave2(dataToPlot,paramSet, beh_data);
 end
 
 %% E. Analyze Spectrograms/Coherograms Components
