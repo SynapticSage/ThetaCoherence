@@ -146,7 +146,7 @@ for a = 1:numel(animals)
 				% presents.
                 exception=[];
 				EnforceException;
-                
+                 
 				for tr = 1:sum(~cellfun(@isempty,{gram(a).output{d, e, t,t2,:}}))
                 
 				%% Adjust data axes
