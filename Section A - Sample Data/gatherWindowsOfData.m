@@ -1,4 +1,4 @@
-function [acquisition] = ...
+function [acquisition beh_data] = ...
 	gatherWindowsOfData(dataFolder,dataToGet)
 % function gatherWindowsOfData
 % for gathering all data for an (animal/prefix epoch day tet) tuple or set of
@@ -185,11 +185,14 @@ for a = 1:numel(animal_list)
 	anim = animal_list{a};
 	acquisition(a).animal = anim;
 	
-	% Preallocate cell
+	% Preallocate cells
 	acquisition(a).data = cell(...
 		numel(dataToGet.animals.(anim).days), ...
 		numel(dataToGet.animals.(anim).epochs), ...
 		numel(dataToGet.animals.(anim).tetrodes));
+    beh_data(a).data = cell(...
+        numel(dataToGet.animals.(anim).days), ...
+		numel(dataToGet.animals.(anim).epochs));
 	
     for d = dataToGet.animals.(anim).days
         
@@ -273,9 +276,13 @@ for a = 1:numel(animal_list)
 				if processOpt.output
 					
 					acquisition(a).data{d,e,t} = windowedData;
-					acquisition(a).time_vec{d,e,t} = windowedData;
-                    acquisition(a).sst{d,e,t} = start_stop_times;
-                    acquisition(a).ssi{d,e,t} = start_stop_indices;
+% 					acquisition(a).time_vec{d,e,t} = windowedData;
+                    
+                    beh_data(a).sst{d,e} = start_stop_times;
+                    beh_data(a).ssi{d,e} = start_stop_indices;
+                    beh_data(a).pos{d,e} = data.pos;
+                    beh_data(a).linpos{d,e} = data.linpos;
+                    beh_data(a).trajinfo{d,e} = data.trajinfo;
 					
 				end
 				
