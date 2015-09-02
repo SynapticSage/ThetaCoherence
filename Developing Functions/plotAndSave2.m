@@ -207,10 +207,12 @@ end
     
     function plotVelocity
         
-        [speed, sem, binSpec] = getAvgVelocity(gram, beh_data, a,d,e,t,t2,tr);
+        temp= gram(a).output{d, e, t,t2};
+        adjust=(max(temp.Stime)-min(temp.Stime))/2;
+        temp.Stime=temp.Stime-min(temp.Stime)-adjust;
         
-        data = gram.output{d,e,t,t2};
-    
+        [speed, sem, binSpec] = getAvgVelocity(gram, beh_data, temp.Stime, d,e);
+        
         errorbar(data.Stime,speed,sem,'.','linewidth',2,'markersize',25);
         line([0 0],[min(sem)-min(speed) max(sem)+max(speed)],'color','k','linewidth',2,'linestyle','--')
         ylabel('avg. velocity (cm/s)','FontSize',xy_font_size,'Fontweight','normal');
