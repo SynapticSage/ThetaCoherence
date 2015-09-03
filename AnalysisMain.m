@@ -92,6 +92,7 @@ sampleParams.trajbound_type = 0 ;            % 0 denotes outbound
 % grabs 15 frames in front and behind boundary crossing. entranceOrExit
 % subfield controls whether to sample entrance or exit.
  sampleParams.edgeMode.window = [90 90];
+ 
  sampleParams.edgeMode.entranceOrExit = 'entrance';
  
 
@@ -165,6 +166,9 @@ end
 
 %% B.1 Generate Spectrograms
 
+% -------------------------
+% Parameters for 
+
 disp('Generating spec- or coherograms...');
 
 if exist('tetrode_set2','var')		% TETRODE PAIRS - Coherence
@@ -199,10 +203,9 @@ disp('Plotting and saving data...');
 % ---------------
 
 paramSet.coherograms = true;
+paramSet.plotAvgVelocity = true;
 paramSet.plotPositions = true;
-
 % ---------------
-
     
 for trials = [true false]
 	paramSet.trials = trials;

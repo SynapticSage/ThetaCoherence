@@ -146,7 +146,7 @@ for a = 1:numel(animals)
 				% presents.
                 exception=[];
 				EnforceException;
-                
+                 
 				for tr = 1:sum(~cellfun(@isempty,{gram(a).output{d, e, t,t2,:}}))
                 
 				%% Adjust data axes
@@ -365,6 +365,10 @@ for a = 1:numel(animals)
                 set(gca,'YLim',[min(temp.Sfreq) max(temp.Sfreq)]);
                 
                 subplot(2,1,2);
+                
+                %[speed, sem, binSpec] = getAvgVelocity(gram, beh_data, temp.Stime, d,e);
+                %[speed, sem, binSpec] = getAvgVelocity(gram, acquisition, temp.Stime, d,e);
+
                 errorbar(temp.Stime,speed,sem,'.','linewidth',2,'markersize',25);
                 line([0 0],[min(sem)-min(speed) max(sem)+max(speed)],'color','k','linewidth',2,'linestyle','--')
                 ylabel('avg. velocity (cm/s)','FontSize',15,'Fontweight','normal');

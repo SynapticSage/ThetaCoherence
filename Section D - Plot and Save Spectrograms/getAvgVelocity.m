@@ -1,8 +1,16 @@
-function [speed, sem, binSpec] =getAvgVelocity(grams,beh_data, a, d, e, t, t2, tr)
+function [speed, sem, binSpec] =getAvgVelocity(grams, beh_data, d, e, t, t2,tr)
 %GETAVGVELOCITY Get average velocity across trials
 %   pass in spectrograms or coherograms in gram 
 %	pass in sets struct containing information about what days, epochs and
 %	tetrodes to average over in sets
+
+if nargin == 7
+    trialAvg = false;
+    temp = grams.output{d,e,t,t2,tr};
+else
+    trialAvg = true;
+    temp = grams.output{d,e,t,t2};
+end
 
 
 if d< 10; dstr= ['0' num2str(d)]; else dstr= num2str(d); end;
@@ -18,15 +26,22 @@ EnforceException;
 posData = beh_data.pos{d,e}.data;
 posIndices= beh_data.ssi{d,e};
 
-for i= 1:length(posIndices)
-tempidx= posIndices(i,:);
-velVector(i,:)= posData(tempidx(1):tempidx(2)-1,5);
+if trialAvg % Single Trial
+    
+    for i= 1:length(posIndices)
+    
+        tempidx= posIndices(i,:);
+        velVector(i,:)= posData(tempidx(1):tempidx(2)-1,5);
+    end
+    
+else % Trial Average
+    tempidx = posIndices(tr,:);
+    velVector = posData(tempidx(1):tempidx(2)-1,5)';
 end
 
 % have ==> [trials x pos bin #] :::: end goal==> [trials x spec bin #] 
 % (sloppy below. padding with NaNs for uneven spectrogram bins) 
 %
-temp = grams.output{d,e,t,t2,tr};
 
 % calculate relevant dimensions for reshaping and padding
 dimSpec= size(temp.Stime,2);
@@ -46,10 +61,16 @@ newBinWidth= size(velVectorPad,2)/dimSpec;
 velVectorBins=reshape(velVectorPad, [dimTrial, newBinWidth, dimSpec]);
 
 % take average across new bin, now have [trial x spec bin #]
-newVelVector= squeeze(nanmean(velVectorBins,2));
+newVelVector= squeeze(nanmean(   velVectorBins,2));
 
-speed= mean(newVelVector);
-sem= std(newVelVector) ./ sqrt(size(newVelVector,1));
+if trialAvg
+    speed   = mean(newVelVector);
+    sem     = std(newVelVector) ./ sqrt(size(newVelVector,1));
+else
+    speed   = newVelVector;
+    sem     = std(velVectorBins,0,2,'omitnan') ./ sqrt(size(velVectorBins,2));
+    sem     = squeeze(sem);
+end
 
 binTime= diff(temp.Stime);
 binSpec= [newBinWidth, binTime(1)]; 

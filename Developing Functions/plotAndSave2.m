@@ -6,8 +6,8 @@ function plotAndSave( gram, sets, beh_data, beh_data2)
 
 %% Constants
 
-xy_font_size = 12;
-title_font_size = 14;
+XY_FONT_SIZE = 12;
+TITLE_FONT_SIZE = 14;
 
 %% Pre-processing
 
@@ -17,6 +17,8 @@ num_of_plots = 0;
 curr_plot = 0;
 
 %% Setting default options
+
+save = false;
 
 if isfield(sets,'coherograms') && sets.coherograms == true
 	coherograms = true;
@@ -48,7 +50,7 @@ else
     plotAvgVelocity = false; 
 end
 
-if ismember('meanFreqPlot', fields(sets))
+if isfield(sets,'meanFreqPlot')
     mean_days = sets.meanFreqPlot.days;
     mean_epochs = sets.meanFreqPlot.epochs;
     mean_tets = sets.meanFreqPlot.tetrodes;
@@ -71,17 +73,6 @@ else
     trials = false;
 end
 
-% if ismember('plotAvgVelocity', fields(sets))
-%    
-%     coherograms = sets.coherograms;
-%     spectrograms = false;
-%     avgVelocity = true;
-%     
-% else
-%     avgVelocity= false;
-%     
-% end
-
 %% Startup the subplot
 % Calculate number of plots, and form the subplot panes for it.
 rows = ceil(sqrt(num_of_plots));
@@ -94,7 +85,6 @@ animals = fields(sets.animals);
 toProcess = sets.animals;
 
 %% Plot various objects
-if coherograms
 for a = 1:numel(animals)
     for d = toProcess.(animals{a}).days
         for e = toProcess.(animals{a}).epochs
@@ -135,16 +125,36 @@ for a = 1:numel(animals)
                 end 
                 
                  curr_plot = 0;
-				 
-				 %% Save Plot
-				 % Unwritten!
+                 
+                 %% SAVE Section
+                 if save
+					 
+					 % If save, then save everything to current directoy
+					 % TODO, automatically create folders for everything,
+					 % like plotAndSave version 1
+					 
+					 descriptor = '';
+					 figfile = [animals{a} descriptor num2str(d) ...
+						 '-' num2str(e) '-' num2str(t) '-' num2str(t2) ...
+						 '-' num2str(tr)];
+
+					 print('-dpdf', figfile); 
+					 print('-dpng', figfile, '-r300'); 
+					 saveas(gcf,figfile,'fig'); 
+					 print('-depsc2', figfile); 
+					 print('-djpeg', figfile);
+					 
+				 else
+					 
+					 % Pause for use to hit enter between every figure
+					 input('Pres enter to continue...','s');
+				 end
                 
 				end
 			end
 			end
         end
     end
-end
 end
 
 %% NESTED PLOT FUNCTIONS ...
@@ -168,7 +178,7 @@ end
 						' Epoch:' num2str(e) sprintf('\n')...
 						' Tet_X:' num2str(t)...
 						'Tet_Y:' num2str(t2) ...
-						],'FontSize',title_font_size,'Fontweight','light');
+						],'FontSize',TITLE_FONT_SIZE,'Fontweight','light');
 				else
 					title([ sprintf('Coherence, ') ...
 						gram(a).animal '- Day:' num2str(d)...
@@ -177,10 +187,10 @@ end
 						 sprintf('\n')...
 						' Tet_X =' num2str(t)...
 						' Tet_Y =' num2str(t2) ...
-						],'FontSize',title_font_size,'Fontweight','light');
+						],'FontSize',TITLE_FONT_SIZE,'Fontweight','light');
 				end
-                ylabel('Freq','FontSize',xy_font_size,'Fontweight','normal');
-                xlabel('Time(s)','FontSize',xy_font_size,'Fontweight','normal');
+                ylabel('Freq','FontSize',XY_FONT_SIZE,'Fontweight','normal');
+                xlabel('Time(s)','FontSize',XY_FONT_SIZE,'Fontweight','normal');
                 set(gca,'XLim',[min(temp.Stime) max(temp.Stime)]);
                 set(gca,'YLim',[min(temp.Sfreq) max(temp.Sfreq)]);
         
@@ -201,10 +211,10 @@ end
 						' Epoch:' num2str(e)...
 						' Tet:' num2str(t)...
 						' Trial: ' num2str(tr) ...
-						],'FontSize',title_font_size,'Fontweight','normal');
+						],'FontSize',TITLE_FONT_SIZE,'Fontweight','normal');
 				end
-                ylabel('Freq','FontSize',xy_font_size,'Fontweight','normal');
-                xlabel('Time(s)','FontSize',xy_font_size,'Fontweight','normal');
+                ylabel('Freq','FontSize',XY_FONT_SIZE,'Fontweight','normal');
+                xlabel('Time(s)','FontSize',XY_FONT_SIZE,'Fontweight','normal');
                 set(gca,'XLim',[min(temp.Stime) max(temp.Stime)]);
                 set(gca,'YLim',[min(temp.Sfreq) max(temp.Sfreq)]);
         
@@ -212,16 +222,22 @@ end
     
     function plotVelocity
         
-        [speed, sem, binSpec] = getAvgVelocity(gram, beh_data, a,d,e,t,t2,tr);
+        temp= gram(a).output{d, e, t,t2};
+        adjust=(max(temp.Stime)-min(temp.Stime))/2;
+        temp.Stime=temp.Stime-min(temp.Stime)-adjust;
         
-        data = gram.output{d,e,t,t2};
-    
-        errorbar(data.Stime,speed,sem,'.','linewidth',2,'markersize',25);
+        if trials
+            [speed, sem, binSpec] = getAvgVelocity(gram, beh_data, d,e,t,t2,tr);
+        else
+            [speed, sem, binSpec] = getAvgVelocity(gram, beh_data, d,e,t,t2);
+        end
+        
+        errorbar(temp.Stime,speed,sem,'-.','linewidth',2,'markersize',25);
         line([0 0],[min(sem)-min(speed) max(sem)+max(speed)],'color','k','linewidth',2,'linestyle','--')
-        ylabel('avg. velocity (cm/s)','FontSize',xy_font_size,'Fontweight','normal');
-        xlabel('time (s)','FontSize',xy_font_size,'Fontweight','normal');
-        set(gca,'XLim',[min(data.Stime) max(data.Stime)]);
-        set(gca,'YLim',[min(data.Sfreq) max(data.Sfreq)]);
+        ylabel('avg. velocity (cm/s)','FontSize',XY_FONT_SIZE,'Fontweight','normal');
+        xlabel('time (s)','FontSize',XY_FONT_SIZE,'Fontweight','normal');
+        set(gca,'XLim',[min(temp.Stime) max(temp.Stime)]);
+        set(gca,'YLim',[0 max(speed)]);
         
     end
     
