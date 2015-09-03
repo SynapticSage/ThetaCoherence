@@ -136,7 +136,7 @@ for a = 1:numel(animals)
                  %% SAVE Section
                  
                  descriptor = '';
-                 figfile = [animals{a} descriptor num2str(d) 
+                 figfile = [animals{a} descriptor num2str(d) ...
                      '-' num2str(e) '-' num2str(t) '-' num2str(t2) ...
                      '-' num2str(tr)];
                  
