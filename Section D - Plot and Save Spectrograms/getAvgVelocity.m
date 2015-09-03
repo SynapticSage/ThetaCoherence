@@ -20,8 +20,6 @@ if d< 10; dstr= ['0' num2str(d)]; else dstr= num2str(d); end;
 % if d == 1 && e==4; e=6; end; Commented out code doesn't work because it
 % changes 2 to 4 and then the very next line changes 4 to 6. This has the
 % effect of transforming 2 to 6. Reversing the lines doesn't work either.
-exception=[];
-EnforceException;
 
 posData = beh_data.pos{d,e}.data;
 posIndices= beh_data.ssi{d,e};

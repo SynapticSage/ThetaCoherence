@@ -92,6 +92,7 @@ animals = fields(sets.animals);
 toProcess = sets.animals;
 
 %% Plot various objects
+try
 for a = 1:numel(animals)
     for d = toProcess.(animals{a}).days
         for e = toProcess.(animals{a}).epochs
@@ -169,7 +170,7 @@ for a = 1:numel(animals)
                      
                      curr_folder = pwd; cd(savefolder);
                      
-                     descriptor = '';
+                     descriptor = '_Inbound_SideArm2_';
                      
                      figfile = [animals{a} descriptor num2str(d) ...
                              '-' num2str(e) '- TetX=' num2str(t) ...
@@ -197,6 +198,7 @@ for a = 1:numel(animals)
         end
     end
 end
+catch ME; save('PlotAndSave2_ErrorState'); throw(ME); end;
 
 %% NESTED PLOT FUNCTIONS ...
     % Each of these controls the behavior of a type of plot
@@ -240,7 +242,8 @@ end
     function plotSpectrogram
         
         %% Plot
-                set(gcf,'Position',[55 660 560 420]);
+                set(gcf,'Position',[55 660 560 420
+                    
                 imagesc(temp.Stime,temp.Sfreq,temp.S'); colorbar;
 				if ~trials
 					title([gram(a).animal '- Day:' num2str(d)...
