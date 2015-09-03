@@ -64,18 +64,16 @@ clear sampleParams acquisition acquisition2 grams avg_grams paramSet
 % Parameters for circumscribing sample around a point
 % --------------------------------------------------------
 % How large of radius should we sample
-
 sampleParams.circleParams.radius = 20;       % 20 pixel radius
 % % Where to sample
-% % [1 1] denotes [segment_1 end_of_it]
-% % % sampleParams.circleParams.segment = [1 1];
 sampleParams.circleParams.segment = {1, 'final'}; % end of segment 1
+
 
 % ----------------------------------------------------------
 % Parameters for controlling which segment transitions to sample
 % ----------------------------------------------------------
 % 
-% sampleParams.segmentTransition = [1 4; 1 5];
+% sampleParams.segmentTransition = [1 4; 1 2];
 
 % ----------------------------------------------------------
 % Parameters for selecting trajectory type to sample
@@ -93,7 +91,7 @@ sampleParams.trajbound_type = 0 ;            % 0 denotes outbound
 % entrance or exit. Its unit is frames.  For 30hz sample rate, [15 15]
 % grabs 15 frames in front and behind boundary crossing. entranceOrExit
 % subfield controls whether to sample entrance or exit.
- sampleParams.edgeMode.window = [150 150];
+ sampleParams.edgeMode.window = [90 90];
  sampleParams.edgeMode.entranceOrExit = 'entrance';
  
 
@@ -102,11 +100,11 @@ sampleParams.trajbound_type = 0 ;            % 0 denotes outbound
  % ------------------------------------------------------------------------
     
 
-animal_set = {'HPb'};       
-day_set = 1:8;			% set of days to analyze for all animals ...
+animal_set = {'HPa'};       
+day_set = 5;			% set of days to analyze for all animals ...
 epoch_set = [2 4];
 tetrode_set = [1];
-tetrode_set2 = [17];
+tetrode_set2 = [9];
 
 averaged_trials = 'both';
 
@@ -148,6 +146,8 @@ processOpt.output = true; processOpt.save = false;
 processOpt.plot = false;					% Controls plotting during spectrogram extraction -- Section D plots now, so this is an easter egg.
 paramSet.processOpt = processOpt;
 
+
+ 
 
 %% A. Gather Windows of Data
 
@@ -194,11 +194,20 @@ avg_grams = averageAcross(grams,paramSet);
 
 disp('Plotting and saving data...');
 
+% --------------
+% Select plot types ... comment out unwanted types
+% ---------------
+
+paramSet.coherograms = true;
+paramSet.plotPositions = true;
+
+% ---------------
+
     
 for trials = [true false]
 	paramSet.trials = trials;
 	if trials; dataToPlot = grams; else; dataToPlot = avg_grams; end
-	plotAndSave2(dataToPlot,paramSet, beh_data);
+	plotAndSave2(dataToPlot,paramSet,beh_data);
 end
 
 %% E. Analyze Spectrograms/Coherograms Components

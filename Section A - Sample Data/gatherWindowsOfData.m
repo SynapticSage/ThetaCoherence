@@ -259,6 +259,10 @@ for a = 1:numel(animal_list)
             
             for t = tetrodes
 				
+				% Display processing
+				disp(sprintf('Processing day %d, ep %d, tet %d', ...
+					d,e,t));
+				
 				% If there's an exception, where we for a single day
 				% process a different epoch, enforce it
 				EnforceException;
@@ -411,24 +415,41 @@ function [winData, time_vec] = windowData(dat, dat_sub, dat_ind,...
         winData = zeros( size(windowTimes,1), numel(time_vec) ); 
         
         if ~isempty(processOpt.windowPadding)
-            for ind = 1:size(windowTimes,1)
-
-                % Create logical vector for selecting the proper data to store
-                single_trial_of_interest = (time_vec > windowTimes(ind,1)) & ...
-                    (time_vec < windowTimes(ind,2));
-
-                % Multiply by logical to zero out irrelevant data, and store vector
-                % into a column of the matrix.
-                winData(ind,:) = cast(single_trial_of_interest', data_class).* ...
-                    temp.(dat_sub)(I{1},I{2});
-
-                % Add padding if it's specified
-                if processOpt.windowPadding ~= 0			
-                    winData(ind,~single_trial_of_interest) = ...
+%             for ind = 1:size(windowTimes,1)
+% 
+%                 % Create logical vector for selecting the proper data to store
+%                 single_trial_of_interest = (time_vec > windowTimes(ind,1)) & ...
+%                     (time_vec < windowTimes(ind,2));
+% 
+%                 % Multiply by logical to zero out irrelevant data, and store vector
+%                 % into a column of the matrix.
+%                 winData(ind,:) = cast(single_trial_of_interest', data_class).* ...
+%                     temp.(dat_sub)(I{1},I{2});
+% 
+%                 % Add padding if it's specified
+%                 if processOpt.windowPadding ~= 0			
+%                     winData(ind,~single_trial_of_interest) = ...
+%                         processOpt.windowPadding;
+%                 end
+% 
+%             end
+			%% REWRITTEN VECTORIZED WINDOWING -- much faster!
+			T = repmat(time_vec,[size(windowTimes(:,1)),1]);
+			W_start = repmat(windowTimes(:,1),[1,size(time_vec,2)]);
+			W_end = repmat(windowTimes(:,2),[1,size(time_vec,2)]);
+			D = repmat(temp.(dat_sub)(I{1},I{2})',[size(windowTimes(:,1)),1]);
+			
+			trials_of_interest = T > W_start & T < W_end;
+			
+			winData = cast(trials_of_interest, data_class).* ...
+                     D;
+				 
+			if processOpt.windowPadding ~= 0			
+                    winData(~trials_of_interest) = ...
                         processOpt.windowPadding;
-                end
-
             end
+
+
         else
             %TODO write situation for [] padding
         end

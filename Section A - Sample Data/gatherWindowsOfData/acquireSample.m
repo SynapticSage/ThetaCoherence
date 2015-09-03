@@ -167,24 +167,33 @@ end
 % window around exiting x and 'exit' will give you a window of times around
 % the first detection on y.
 
-if isfield(sampleParams,'segmentTransitions')
+if isfield(sampleParams,'segmentTransition')
 	
-	transitions = sampleParams.segmentTransitions;
-	traj = data.linpos.statematrix.traj;
+	transitions = sampleParams.segmentTransition;
+	segmentIndex = data.linpos.statematrix.segmentIndex;
 	
-	traj_diff = diff(traj);
+	% Mark out all data on non-interesting segments
+	interesting_segs = unique(transitions);
+	uninteresting_seg_loc = ones(size(segmentIndex));
+	for seg = interesting_segs'
+		uninteresting_seg_loc = uninteresting_seg_loc & ...
+			segmentIndex ~= seg;
+	end
+	segmentIndex(uninteresting_seg_loc) = NaN;
+	
+	seg_diff = diff(segmentIndex);
 	requested_diff = transitions(:,2) - transitions(:,1);
 	
 	logical_singtrans		= zeros(size(all_times));	% detects all segment transitions of certain type at all times per loop iteration
 	logical_alltrans	= zeros(size(all_times));	% updates to catalogue all points per iteration
 	for i = 1:numel(requested_diff)
 		
-		logical_singtrans = traj_diff == requested_diff(i);
+		logical_singtrans = [seg_diff == requested_diff(i); 0];
 		logical_alltrans = logical_singtrans | logical_alltrans;
 	end
 	
 	
-	clear traj transitions traj_diff requested_diff;
+	clear segmentIndex transitions seg_diff requested_diff;
 	clear logical_matchtrans;
 	
 	% Adjust the sample

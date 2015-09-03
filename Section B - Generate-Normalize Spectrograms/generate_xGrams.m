@@ -241,6 +241,10 @@ for a = 1:animalcount
             for t = paramSets.(animals{a}).tetrodes
             for t2 = paramSets.(animals{a}).tetrodes2
 				
+				% Display processing
+				disp(sprintf('Generate coherence day %d, ep %d, tet %d, tet2 %d', ...
+					d,e,t,t2));
+				
 				% If there's an exception in handling, enforce it. It's a
 				% temporary solution, hopefully, until a more elegant one
 				% presents.

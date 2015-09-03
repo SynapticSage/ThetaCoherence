@@ -86,6 +86,7 @@ end
 % Calculate number of plots, and form the subplot panes for it.
 rows = ceil(sqrt(num_of_plots));
 cols = ceil(sqrt(num_of_plots));
+if num_of_plots<=(rows*(cols-1)); cols=cols-1; end;
 subplot(rows,cols,1);
 
 %% Simplifying variable names detailing what to get
@@ -108,6 +109,7 @@ for a = 1:numel(animals)
                 
 				for tr = 1:sum(~cellfun(@isempty,{gram(a).output{d, e, t,t2,:}}))
                 
+				%% Run Plots Requested
 				if coherograms
                     curr_plot = curr_plot + 1;
                     subplot(rows,cols,curr_plot);
@@ -133,6 +135,9 @@ for a = 1:numel(animals)
                 end 
                 
                  curr_plot = 0;
+				 
+				 %% Save Plot
+				 % Unwritten!
                 
 				end
 			end
