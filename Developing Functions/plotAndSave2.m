@@ -18,7 +18,7 @@ curr_plot = 0;
 
 %% Setting default options
 
-save = false;
+save = true;
 
 if isfield(sets,'coherograms') && sets.coherograms == true
 	coherograms = true;
@@ -141,21 +141,48 @@ for a = 1:numel(animals)
                  
                  %% SAVE Section
                  if save
-					 
-					 % If save, then save everything to current directoy
-					 % TODO, automatically create folders for everything,
-					 % like plotAndSave version 1
-					 
-					 descriptor = '';
-					 figfile = [animals{a} descriptor num2str(d) ...
-						 '-' num2str(e) '-' num2str(t) '-' num2str(t2) ...
-						 '-' num2str(tr)];
+                     
+                     savefolder='./';
+                     
+                     if sets.trials
+                         
+                         specific_folder = [gram(a).animal num2str(d) '_' ...
+                            num2str(e) '_TetX=' num2str(t) ...
+                            '_TetY=' num2str(t2)];
+                        
+                         mkdir(savefolder, specific_folder);
+                         savefolder = [savefolder specific_folder filesep];
+
+                         typestr = [', Tr - ' num2str(tr)];
+
+                     else
+
+                            specific_folder = [gram(a).animal num2str(d) '_' ...
+                                num2str(e)];
+
+                            mkdir(savefolder, specific_folder);
+                            savefolder = [savefolder specific_folder filesep];
+
+                            typestr = '';
+                        
+                     end
+                     
+                     curr_folder = pwd; cd(savefolder);
+                     
+                     descriptor = '';
+                     
+                     figfile = [animals{a} descriptor num2str(d) ...
+                             '-' num2str(e) '- TetX=' num2str(t) ...
+                             '- TetY=' num2str(t2) ...
+                             typestr];
 
 					 print('-dpdf', figfile); 
 					 print('-dpng', figfile, '-r300'); 
 					 saveas(gcf,figfile,'fig'); 
 					 print('-depsc2', figfile); 
 					 print('-djpeg', figfile);
+                     
+                     cd(curr_folder);
 					 
 				 else
 					 
@@ -284,7 +311,7 @@ end
 
 	function plotStrongestBand
 		
-		temp = gram.output{d,e,t,t2,tr}
+		temp = gram.output{d,e,t,t2,tr};
 		if isfield(temp, 'CmaxPerTime')
 
 			adjust=(max(temp.Stime)-min(temp.Stime))/2;

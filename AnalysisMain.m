@@ -66,7 +66,7 @@ clear sampleParams acquisition acquisition2 grams avg_grams paramSet
 % How large of radius should we sample
 sampleParams.circleParams.radius = 20;       % 20 pixel radius
 % % Where to sample
-sampleParams.circleParams.segment = {1, 'final'}; % end of segment 1
+sampleParams.circleParams.segment = {2, 'initial'}; % end of segment 1
 
 
 % ----------------------------------------------------------
@@ -79,7 +79,7 @@ sampleParams.circleParams.segment = {1, 'final'}; % end of segment 1
 % Parameters for selecting trajectory type to sample
 % ---------------------------------------------------------
 % Which trajectory type to sample?
-sampleParams.trajbound_type = 0 ;            % 0 denotes outbound
+sampleParams.trajbound_type = 1 ;            % 0 denotes outbound
 
 
 % ---------------------------------------------------------------------
