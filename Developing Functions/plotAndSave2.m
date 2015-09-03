@@ -93,7 +93,6 @@ animals = fields(sets.animals);
 toProcess = sets.animals;
 
 %% Plot various objects
-if coherograms
 for a = 1:numel(animals)
     for d = toProcess.(animals{a}).days
         for e = toProcess.(animals{a}).epochs
@@ -133,13 +132,25 @@ for a = 1:numel(animals)
                 end 
                 
                  curr_plot = 0;
+                 
+                 %% SAVE Section
+                 
+                 descriptor = '';
+                 figfile = [animals{a} descriptor num2str(d) 
+                     '-' num2str(e) '-' num2str(t) '-' num2str(t2) ...
+                     '-' num2str(tr)];
+                 
+                 print('-dpdf', figfile); 
+                 print('-dpng', figfile, '-r300'); 
+                 saveas(gcf,figfile,'fig'); 
+                 print('-depsc2', figfile); 
+                 print('-djpeg', figfile);
                 
 				end
 			end
 			end
         end
     end
-end
 end
 
 %% NESTED PLOT FUNCTIONS ...
