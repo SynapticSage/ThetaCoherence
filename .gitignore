@@ -6,3 +6,8 @@
 *.bmp
 */States
 *.svg
+*.eps
+*.fig
+*.jpg
+*.pdf
+*.png
