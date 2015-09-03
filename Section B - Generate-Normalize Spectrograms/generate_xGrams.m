@@ -325,13 +325,12 @@ for a = 1:animalcount
 						% Single tetrode t information
 						Output1.S = S1;
 						Output1.Stime = Stime;
-						Output1.Sfreq = Stime;
-
+						Output1.Sfreq = Sfreq;
 
 						% Single tetrode t2 information
 						Output2.S = S2;
 						Output2.Stime = Stime;
-						Output2.Sfreq = Stime;
+						Output2.Sfreq = Sfreq;
 
 					end
 					

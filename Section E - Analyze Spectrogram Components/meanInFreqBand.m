@@ -1,4 +1,8 @@
 function [grams S_summary C_summary] = meanInFreqBand(grams,paramSet)
+% FUNCTION meanInFreqBand(grams,paramSet)
+%
+% paramSet must-haves -- upper_freq, lower_freq
+% paramSet optionals -- estimate_best_freq
 %
 % Function that cuts out a relevant region and/or collapses averages that
 % signal over its y-axis or its x-axis. In spectrogram land, this means,
@@ -58,7 +62,8 @@ spec_cell = grams(a).output;
 		
         % If it has something, then perform averaging
 		if isstruct(maybe_spec_data)
-			disp([i1 i2 i3 i4 i5]);
+			fprintf('Componifying day %d, ep %d, tetX %d, tetY %d, tr %d \n', ...
+				i1,i2,i3,i4,i5);
             
             %% Pull out indices between where sampling frequencies
             ind_start = maybe_spec_data.Sfreq >= lower_freq;
@@ -79,7 +84,7 @@ spec_cell = grams(a).output;
 			%% Process fields that exist
 			for f = 1:numel(field)
             
-			f = field{f}
+			f = field{f};
 			
             % pull out S
             g = maybe_spec_data.(f);

@@ -38,16 +38,23 @@ end
 % plots.
 if isfield(sets,'plotPositions') && sets.plotPositions == true
     num_of_plots = num_of_plots + 1;
-    plotPositions = true;
+    positions = true;
 else
-    plotPositions = false; 
+    positions = false; 
 end
 
 if isfield(sets,'plotAvgVelocity') && sets.plotAvgVelocity == true
     num_of_plots = num_of_plots + 1;
-    plotAvgVelocity = true;
+    avgVelocity = true;
 else
-    plotAvgVelocity = false; 
+    avgVelocity = false; 
+end
+
+if isfield(sets, 'plotStrongestBand') && sets.plotStrongestBand == true
+	num_of_plots = num_of_plots + 1;
+	strongestBand = true;
+else
+	strongestBand = false'
 end
 
 if isfield(sets,'meanFreqPlot')
@@ -112,17 +119,23 @@ for a = 1:numel(animals)
                     plotSpectrogram;
                 end
                 
-                if plotPositions
+                if positions
                     curr_plot = curr_plot + 1;
                     subplot(rows,cols,curr_plot);
                     plotPos;
                 end
                 
-                if plotAvgVelocity
+                if avgVelocity
                     curr_plot = curr_plot + 1;
                     subplot(rows,cols,curr_plot);
                     plotVelocity;
-                end 
+				end 
+				
+				if strongestBand
+					curr_plot = curr_plot + 1;
+					subplot(rows,cols,curr_plot);
+					plotStrongestBand;
+				end
                 
                  curr_plot = 0;
                  
@@ -147,6 +160,7 @@ for a = 1:numel(animals)
 				 else
 					 
 					 % Pause for use to hit enter between every figure
+					 figure(gcf);
 					 input('Pres enter to continue...','s');
 				 end
                 
@@ -170,7 +184,7 @@ end
                 
                 %% Plot
                 set(gcf,'Position',[55 660 560 420]);
-                i=imagesc(temp.Stime,temp.Sfreq,temp.C'); colorbar;
+                i=imagesc(temp.Stime,temp.Sfreq,temp.C'); %colorbar;
                 i.Parent.YDir='normal';
 				if ~trials
 					title([sprintf('Coherence, \n') ...
@@ -266,7 +280,26 @@ end
         
         plotSingleSample(beh_data(a).pos{d,e}, beh_data(a).ssi{d,e}, tr);
         
-    end
+	end
+
+	function plotStrongestBand
+		
+		temp = gram.output{d,e,t,t2,tr}
+		if isfield(temp, 'CmaxPerTime')
+
+			adjust=(max(temp.Stime)-min(temp.Stime))/2;
+			temp.Stime=temp.Stime-min(temp.Stime)-adjust;
+
+			plot(temp.Stime, smooth(temp.CmaxPerTime,3));
+			
+			xlabel('Time (s)');
+			ylabel(sprintf('Strongest Freq between %d - %d', ...
+				temp.freqCmean_lower, temp.freqCmean_upper));
+			
+			set(gca,'XLim',[min(temp.Stime) max(temp.Stime)]);
+			set(gca,'YLim',[temp.freqCmean_lower, temp.freqCmean_upper]);
+		end
+	end
     
     
 end

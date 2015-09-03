@@ -91,7 +91,7 @@ sampleParams.trajbound_type = 0 ;            % 0 denotes outbound
 % entrance or exit. Its unit is frames.  For 30hz sample rate, [15 15]
 % grabs 15 frames in front and behind boundary crossing. entranceOrExit
 % subfield controls whether to sample entrance or exit.
- sampleParams.edgeMode.window = [90 90];
+ sampleParams.edgeMode.window = [120 120];
  
  sampleParams.edgeMode.entranceOrExit = 'entrance';
  
@@ -193,26 +193,6 @@ paramSet.average = {'trial'};
 
 avg_grams = averageAcross(grams,paramSet);
 
-
-%% D. Plot and Save Spectrograms/Coherograms
-
-disp('Plotting and saving data...');
-
-% --------------
-% Select plot types ... comment out unwanted types
-% ---------------
-
-paramSet.coherograms = true;
-paramSet.plotAvgVelocity = true;
-paramSet.plotPositions = true;
-% ---------------
-    
-for trials = [true false]
-	paramSet.trials = trials;
-	if trials; dataToPlot = grams; else; dataToPlot = avg_grams; end
-	plotAndSave2(dataToPlot,paramSet,beh_data);
-end
-
 %% E. Analyze Spectrograms/Coherograms Components
 % This script in this section are temporary and will be replaced by a
 % better-designed, more well-commented function.
@@ -225,7 +205,30 @@ paramSet.upper_freq = 12;
 paramSet.estimate_best_freq = true;
 
 [grams S_summary C_summary] = ...
+	meanInFreqBand(grams, paramSet);
+[avg_grams] = ...
 	meanInFreqBand(avg_grams, paramSet);
+
+
+%% D. Plot and Save Spectrograms/Coherograms
+
+disp('Plotting and saving data...');
+
+% --------------
+% Select plot types ... comment out unwanted types
+% ---------------
+
+paramSet.coherograms = true;
+paramSet.plotAvgVelocity = true;
+paramSet.plotPositions = true;
+paramSet.plotStrongestBand = true;
+% ---------------
+    
+for trials = [true false]
+	paramSet.trials = trials;
+	if trials; dataToPlot = grams; else; dataToPlot = avg_grams; end
+	plotAndSave2(dataToPlot,paramSet,beh_data);
+end
 
 
 %% F. Plot Analyzed Components
