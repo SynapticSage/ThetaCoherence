@@ -66,12 +66,17 @@ clear sampleParams acquisition acquisition2 grams avg_grams paramSet
 % How large of radius should we sample
 sampleParams.circleParams.radius = 20;       % 20 pixel radius
 % % Where to sample
-sampleParams.circleParams.segment = {2, 'initial'}; % end of segment 1
+sampleParams.circleParams.segment = {3, 'initial'}; % end of segment 1
 
 
 % ----------------------------------------------------------
-% Parameters for controlling which segment transitions to sample
+% Parameters for controlling which segment transitions to sample 
 % ----------------------------------------------------------
+% In most cases, we trigger either on segment transitions (e.g. segment 1
+% to 4) or we trigger on radii around points. If you uncomment the line 
+% below, it triggers based on segment transition. Both circle and segment
+% triggers could be used together in theory, but it hasn't been debugged
+% yet.
 % 
 % sampleParams.segmentTransition = [1 4; 1 2];
 
@@ -91,7 +96,7 @@ sampleParams.trajbound_type = 1 ;            % 0 denotes outbound
 % entrance or exit. Its unit is frames.  For 30hz sample rate, [15 15]
 % grabs 15 frames in front and behind boundary crossing. entranceOrExit
 % subfield controls whether to sample entrance or exit.
- sampleParams.edgeMode.window = [120 120];
+ sampleParams.edgeMode.window = [60 60];
  
  sampleParams.edgeMode.entranceOrExit = 'entrance';
  
@@ -99,11 +104,10 @@ sampleParams.trajbound_type = 1 ;            % 0 denotes outbound
  % --------------------------------------------------------------------
  % Parmeters for controlling which data to acquire spec or coheregrams
  % ------------------------------------------------------------------------
-    
 
 animal_set = {'HPa'};       
 day_set = 1:8;			% set of days to analyze for all animals ...
-epoch_set = [2 4];
+epoch_set = [2 4];		% set of epochs, except exceptions described in EnforceException
 tetrode_set = [1];
 tetrode_set2 = [9];
 
@@ -218,10 +222,10 @@ disp('Plotting and saving data...');
 % Select plot types ... comment out unwanted types
 % ---------------
 
-paramSet.coherograms = true;
-paramSet.plotAvgVelocity = true;
-paramSet.plotPositions = true;
-paramSet.plotStrongestBand = true;
+paramSet.coherograms		= true;
+paramSet.plotAvgVelocity	= true;
+paramSet.plotPositions		= true;
+paramSet.plotStrongestBand	= false;
 % ---------------
     
 for trials = [true false]

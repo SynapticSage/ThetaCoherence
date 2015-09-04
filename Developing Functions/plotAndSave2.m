@@ -8,6 +8,8 @@ function plotAndSave( gram, sets, beh_data, beh_data2)
 
 XY_FONT_SIZE = 12;
 TITLE_FONT_SIZE = 14;
+POSITION = [];
+% POSITION = [55 660 560 420]
 
 %% Pre-processing
 
@@ -18,7 +20,7 @@ curr_plot = 0;
 
 %% Setting default options
 
-save = true;
+save = false;
 
 if isfield(sets,'coherograms') && sets.coherograms == true
 	coherograms = true;
@@ -212,7 +214,7 @@ catch ME; save('PlotAndSave2_ErrorState'); throw(ME); end;
                 temp.Stime=temp.Stime-min(temp.Stime)-adjust;
                 
                 %% Plot
-                set(gcf,'Position',[55 660 560 420]);
+                if ~isempty(POSITION);set(gcf,'Position',POSITION);end;
                 i=imagesc(temp.Stime,temp.Sfreq,temp.C'); %colorbar;
                 i.Parent.YDir='normal';
 				if ~trials
@@ -242,9 +244,9 @@ catch ME; save('PlotAndSave2_ErrorState'); throw(ME); end;
     function plotSpectrogram
         
         %% Plot
-                set(gcf,'Position',[55 660 560 420
+                if ~isempty(POSITION); set(gcf,'Position',POSITION); end;
                     
-                imagesc(temp.Stime,temp.Sfreq,temp.S'); colorbar;
+                imagesc(temp.Stime,temp.Sfreq,temp.S');
 				if ~trials
 					title([gram(a).animal '- Day:' num2str(d)...
 						' Epoch:' num2str(e)...
@@ -271,9 +273,9 @@ catch ME; save('PlotAndSave2_ErrorState'); throw(ME); end;
         temp.Stime=temp.Stime-min(temp.Stime)-adjust;
         
         if trials
-            [speed, sem, binSpec] = getAvgVelocity(gram, beh_data, d,e,t,t2,tr);
+            [speed, sem, ~] = getAvgVelocity(gram, beh_data, d,e,t,t2,tr);
         else
-            [speed, sem, binSpec] = getAvgVelocity(gram, beh_data, d,e,t,t2);
+            [speed, sem, ~] = getAvgVelocity(gram, beh_data, d,e,t,t2);
         end
         
         errorbar(temp.Stime,speed,sem,'-.','linewidth',2,'markersize',25);
