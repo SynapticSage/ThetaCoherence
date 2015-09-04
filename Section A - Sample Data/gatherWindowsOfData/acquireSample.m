@@ -157,7 +157,6 @@ if isfield(sampleParams, 'circleParams')
 	% Adjust the sample
 	sample = sample & circ_logical;
     sample_times(~sample) = 0;
-	
 end
 
 %% Subset out segment transition, if requested
