@@ -6,8 +6,8 @@ function plotAndSave( gram, sets, beh_data, beh_data2)
 
 %% Constants
 
-XY_FONT_SIZE = 12;
-TITLE_FONT_SIZE = 14;
+XY_FONT_SIZE = 9;
+TITLE_FONT_SIZE = 11;
 POSITION = [];
 % POSITION = [55 660 560 420]
 
@@ -20,7 +20,7 @@ curr_plot = 0;
 
 %% Setting default options
 
-save = false;
+save = true;
 
 if isfield(sets,'coherograms') && sets.coherograms == true
 	coherograms = true;
@@ -80,6 +80,10 @@ if isfield(sets,'trials') && sets.trials == true
 	trials = true;
 else
     trials = false;
+end
+
+if isfield(sets,'saveFolder')
+    saveFolder=sets.saveFolder;
 end
 
 %% Startup the subplot
@@ -145,7 +149,7 @@ for a = 1:numel(animals)
                  %% SAVE Section
                  if save
                      
-                     savefolder='./';
+                     if ~exist('saveFolder','var'); savefolder='./';end;
                      
                      if sets.trials
                          
@@ -172,7 +176,7 @@ for a = 1:numel(animals)
                      
                      curr_folder = pwd; cd(savefolder);
                      
-                     descriptor = '_Inbound_SideArm2_';
+                     descriptor = '_Inbound_Rad=20cm_';
                      
                      figfile = [animals{a} descriptor num2str(d) ...
                              '-' num2str(e) '- TetX=' num2str(t) ...
@@ -312,10 +316,14 @@ catch ME; save('PlotAndSave2_ErrorState'); throw(ME); end;
     function plotPos
         
         plotSingleSample(beh_data(a).pos{d,e}, beh_data(a).ssi{d,e}, tr);
+        legend({'Path in sample', 'Sample trigger', 'Start', 'Stop'}, ...
+            'Location', 'BestOutside');
         
 	end
 
 	function plotStrongestBand
+        
+        hold off;
 		
 		temp = gram.output{d,e,t,t2,tr};
 		if isfield(temp, 'CmaxPerTime')
@@ -326,8 +334,10 @@ catch ME; save('PlotAndSave2_ErrorState'); throw(ME); end;
 			plot(temp.Stime, smooth(temp.CmaxPerTime,3));
 			
 			xlabel('Time (s)');
-			ylabel(sprintf('Strongest Freq between %d - %d', ...
-				temp.freqCmean_lower, temp.freqCmean_upper));
+            ylabel('Freq (hz)');
+			title(sprintf('Strongest Freq between %d - %d', ...
+				temp.freqCmean_lower, temp.freqCmean_upper), ...
+                'FontSize',TITLE_FONT_SIZE,'FontWeight', 'normal');
 			
 			set(gca,'XLim',[min(temp.Stime) max(temp.Stime)]);
 			set(gca,'YLim',[temp.freqCmean_lower, temp.freqCmean_upper]);

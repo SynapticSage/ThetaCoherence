@@ -65,7 +65,7 @@ clear sampleParams acquisition acquisition2 grams avg_grams paramSet
 % Parameters for circumscribing sample around a point
 % --------------------------------------------------------
 % How large of radius should we sample
-sampleParams.circleParams.radius = 15;       % 20 pixel radius
+sampleParams.circleParams.radius = 20;       % 20 pixel radius
 % % Where to sample
 sampleParams.circleParams.segment = {1, 'final'}; % end of segment 1
 
@@ -97,7 +97,7 @@ sampleParams.trajbound_type = 1 ;            % 0 denotes outbound
 % entrance or exit. Its unit is frames.  For 30hz sample rate, [15 15]
 % grabs 15 frames in front and behind boundary crossing. entranceOrExit
 % subfield controls whether to sample entrance or exit.
- sampleParams.edgeMode.window = [150 150];
+ sampleParams.edgeMode.window = [120 120];
  
  sampleParams.edgeMode.entranceOrExit = 'entrance';
  
@@ -107,7 +107,7 @@ sampleParams.trajbound_type = 1 ;            % 0 denotes outbound
  % ------------------------------------------------------------------------
 
 animal_set = {'HPa'};       
-day_set = 5;			% set of days to analyze for all animals ...
+day_set = 1:8;			% set of days to analyze for all animals ...
 epoch_set = [2 4];		% set of epochs, except exceptions described in EnforceException
 tetrode_set = [1];
 tetrode_set2 = [9];
@@ -231,13 +231,6 @@ for trials = [true false]
 	plotAndSave2(dataToPlot,paramSet,beh_data);
 end
 
-
-%% F. Plot Analyzed Components
-% This script in this section are temporary and will be replaced by a
-% better-designed, more well-commented function.
-
-hold on;
-PlotSummaryBars;
 
 disp('FINISHED DAY');
 
