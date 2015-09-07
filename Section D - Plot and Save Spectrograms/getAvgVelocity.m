@@ -24,7 +24,7 @@ if d< 10; dstr= ['0' num2str(d)]; else dstr= num2str(d); end;
 posData = beh_data.pos{d,e}.data;
 posIndices= beh_data.ssi{d,e};
 
-if trialAvg % Single Trial
+if trialAvg % Trial Average
     
     for i= 1:length(posIndices)
     
@@ -32,7 +32,7 @@ if trialAvg % Single Trial
         velVector(i,:)= posData(tempidx(1):tempidx(2)-1,5);
     end
     
-else % Trial Average
+else % Single Trial
     tempidx = posIndices(tr,:);
     velVector = posData(tempidx(1):tempidx(2)-1,5)';
 end
@@ -66,7 +66,7 @@ if trialAvg
     sem     = std(newVelVector) ./ sqrt(size(newVelVector,1));
 else
     speed   = newVelVector;
-    sem     = std(velVectorBins,0,2,'omitnan') ./ sqrt(size(velVectorBins,2));
+    sem     = nanstd(velVectorBins) ./ sqrt(size(velVectorBins,2));
     sem     = squeeze(sem);
 end
 

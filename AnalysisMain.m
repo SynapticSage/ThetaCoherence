@@ -31,7 +31,8 @@
 d = filesep;
 
 if ispc; files_dot_brandeis_edu = '\\files.brandeis.edu\jadhav-lab';
-elseif ismac; files_dot_brandeis_edu = '/Volumes/jadhav-lab/';
+elseif ismac; files_dot_brandeis_edu = '/Volumes/jadhav-lab';
+elseif isunix; files_dot_brandeis_edu = '/Volumes/jadhav-lab';
 else files_dot_brandeis_edu = '/home/mcz/DataShare'; end;
 path_str = [d 'DATA' d 'sjadhav' d 'HPexpt' d];
 path_added = false;
@@ -64,7 +65,7 @@ clear sampleParams acquisition acquisition2 grams avg_grams paramSet
 % Parameters for circumscribing sample around a point
 % --------------------------------------------------------
 % How large of radius should we sample
-sampleParams.circleParams.radius = 20;       % 20 pixel radius
+sampleParams.circleParams.radius = 15;       % 20 pixel radius
 % % Where to sample
 sampleParams.circleParams.segment = {1, 'final'}; % end of segment 1
 

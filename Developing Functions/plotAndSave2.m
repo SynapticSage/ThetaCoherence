@@ -1,4 +1,4 @@
-function plotAndSave2( gram, sets, beh_data, beh_data2)
+function plotAndSave( gram, sets, beh_data, beh_data2)
 %PLOTANDSAVE Literally does what it says!
 %   pass in spectrograms or coherograms in gram 
 %	pass in sets struct containing information about what days, epochs and
@@ -20,7 +20,7 @@ curr_plot = 0;
 
 %% Setting default options
 
-savePlots = false;
+save = false;
 
 if isfield(sets,'coherograms') && sets.coherograms == true
 	coherograms = true;
@@ -56,7 +56,7 @@ if isfield(sets, 'plotStrongestBand') && sets.plotStrongestBand == true
 	num_of_plots = num_of_plots + 1;
 	strongestBand = true;
 else
-	strongestBand = false'
+	strongestBand = false;
 end
 
 if isfield(sets,'meanFreqPlot')
@@ -143,7 +143,7 @@ for a = 1:numel(animals)
                  curr_plot = 0;
                  
                  %% SAVE Section
-                 if savePlots
+                 if save
                      
                      savefolder='./';
                      
@@ -223,7 +223,7 @@ catch ME; save('PlotAndSave2_ErrorState'); throw(ME); end;
 						' Epoch:' num2str(e) sprintf('\n')...
 						' Tet_X:' num2str(t)...
 						'Tet_Y:' num2str(t2) ...
-						],'FontSize',TITLE_FONT_SIZE,'Fontweight','normal');
+						],'FontSize',TITLE_FONT_SIZE,'Fontweight','light');
 				else
 					title([ sprintf('Coherence, ') ...
 						gram(a).animal '- Day:' num2str(d)...
@@ -232,7 +232,7 @@ catch ME; save('PlotAndSave2_ErrorState'); throw(ME); end;
 						 sprintf('\n')...
 						' Tet_X =' num2str(t)...
 						' Tet_Y =' num2str(t2) ...
-						],'FontSize',TITLE_FONT_SIZE,'Fontweight','normal');
+						],'FontSize',TITLE_FONT_SIZE,'Fontweight','light');
 				end
                 ylabel('Freq','FontSize',XY_FONT_SIZE,'Fontweight','normal');
                 xlabel('Time(s)','FontSize',XY_FONT_SIZE,'Fontweight','normal');
@@ -272,6 +272,7 @@ catch ME; save('PlotAndSave2_ErrorState'); throw(ME); end;
         adjust=(max(temp.Stime)-min(temp.Stime))/2;
         temp.Stime=temp.Stime-min(temp.Stime)-adjust;
         
+        
         if trials
             [speed, sem, ~] = getAvgVelocity(gram, beh_data, d,e,t,t2,tr);
         else
@@ -282,12 +283,16 @@ catch ME; save('PlotAndSave2_ErrorState'); throw(ME); end;
         line([0 0],[min(sem)-min(speed) max(sem)+max(speed)],'color','k','linewidth',2,'linestyle','--')
         ylabel('avg. velocity (cm/s)','FontSize',XY_FONT_SIZE,'Fontweight','normal');
         xlabel('time (s)','FontSize',XY_FONT_SIZE,'Fontweight','normal');
-		%title('Velocity','FontSize',TITLE_FONT_SIZE);
         set(gca,'XLim',[min(temp.Stime) max(temp.Stime)]);
         set(gca,'YLim',[0 max(speed)]);
         
     end
-
+    
+    function plotStrongFreq
+        
+        %% TO DO
+        
+    end
 
     function plotMeanFreq
         
@@ -307,7 +312,6 @@ catch ME; save('PlotAndSave2_ErrorState'); throw(ME); end;
     function plotPos
         
         plotSingleSample(beh_data(a).pos{d,e}, beh_data(a).ssi{d,e}, tr);
-		%title('Sample Trajectory','FontSize',TITLE_FONT_SIZE);
         
 	end
 

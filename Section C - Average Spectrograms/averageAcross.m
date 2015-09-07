@@ -41,7 +41,7 @@ if ismember('trial',sets.average) && coherograms==false
                 % get the indices for all relevant inputs for this operation (avg across trials)
                 idxs= idx( (idx(:,1)==d & idx(:,2)==e & idx(:,3)==t),:);
                 
-                for r= 1:length(idxs);
+                for r= 1:size(idxs,1);
                     % store all gathered S'es and Serrors in temp matrices
                     tempC(r,:,:)       = grams(a).output{d,e,t,r}.S;
                     tempCerror(r,:,:,:)= grams(a).output{d,e,t,r}.Serror;
@@ -76,8 +76,7 @@ elseif ismember('trial',sets.average) && coherograms==true
 				fprintf('Averaging day %d, ep %d, tet %d, tet2 %d\n', ...
 					d,e,t,t2);
 				
-                for r= 1:length(idxs);
-					
+                for r= 1:size(idxs,1);
                     
                     input = grams(a).output{d,e,t,t2,r};
                     
@@ -105,6 +104,7 @@ end
     
 end
 catch ME
+    save('ErrorState_averageAcross'); % if there's an error, use this file to troubleshoot
 	disp(ME);
 end
 end
