@@ -35,6 +35,8 @@ if ismember('trial',sets.average) && coherograms==false
         for e= uVals{2}
             for t= uVals{3}
 				
+				fprintf('Averaging day %d, ep %d, tet %d\n', ...
+					d,e,t);
                 
                 % get the indices for all relevant inputs for this operation (avg across trials)
                 idxs= idx( (idx(:,1)==d & idx(:,2)==e & idx(:,3)==t),:);
@@ -71,7 +73,11 @@ elseif ismember('trial',sets.average) && coherograms==true
                 idxs= idx( (idx(:,1)==d & idx(:,2)==e & ...
                     idx(:,3)==t) & idx(:,4)==t2, :);
                 
+				fprintf('Averaging day %d, ep %d, tet %d, tet2 %d\n', ...
+					d,e,t,t2);
+				
                 for r= 1:length(idxs);
+					
                     
                     input = grams(a).output{d,e,t,t2,r};
                     

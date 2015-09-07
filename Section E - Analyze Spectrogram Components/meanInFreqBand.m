@@ -31,9 +31,9 @@ else
 end
 if ~exist('lower_freq')
 	lower_freq = paramSet.lower_freq;
-	disp('No frequency lower bound ...');
 else
 	lower_freq = -inf;
+	disp('No frequency lower bound ...');
 end
 if ~exist('estimate_best_freq') && ...
 		ismember('estimate_best_freq',fields(paramSet))
