@@ -89,7 +89,6 @@ sample = ones(size(all_times));				% Sample, a logical vector describing
 sample_times = all_times;
 
 
-
 %% Subset out radius around points of interest
 % This is the section where, if the user inputs points and radii to sample
 % around, we move through each point and find the times that fall inside
@@ -132,22 +131,26 @@ if isfield(sampleParams, 'circleParams')
         end
     end
     
-	
-	% feed animal (x,y) position list and selection parameters
+	% Feed animal (x,y) position list and selection parameters
     trajectoryData= data.pos.data(:,2:3);
+    % Setup point to create radius around
     xc = sampleParams.circleParams.center(1); yc = sampleParams.circleParams.center(2);
     x_pos = trajectoryData(:,1); y_pos = trajectoryData(:,2);
+    % Find set of distances from that point
     distance_from_center = sqrt(( x_pos - xc ).^2 + (y_pos - yc).^2);
     error_term = mean(diff(abs(sqrt(diff(trajectoryData(:,1).^2+...
         trajectoryData(:,2).^2)))),'omitnan');
-    % if user selected radius smaller than typical positional change in pos
-    % data then add an error term to their radius
-    if(sampleParams.circleParams.radius < error_term)
+    % If user selected rad=0, then implement special algorith, else if
+    % radius smaller than typical positional change in pos data then add an
+    % error term, else carry on with standard algorithm
+    if sampleParams.circleParams.radius < error_term
         sampleParams.circleParams.radius = ...
             sampleParams.circleParams.radius + error_term;
     end
     
-    circ_subset_indices = find(distance_from_center <= sampleParams.circleParams.radius);
+    % Get subset of indices that fall inside the radius of circle
+    circ_subset_indices = ...
+        find(distance_from_center <= sampleParams.circleParams.radius);
 	
 	% WE have indices that belong, but we need a logical vector
 	circ_logical = zeros(size(all_times));
@@ -197,6 +200,7 @@ if isfield(sampleParams,'segmentTransition')
 	
 	% Adjust the sample
 	sample = sample & logical_alltrans;
+    sample_times(~sample) = 0;
 end
 
 %% Subset out the trajectory

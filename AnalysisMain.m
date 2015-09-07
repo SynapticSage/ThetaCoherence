@@ -65,9 +65,9 @@ clear sampleParams acquisition acquisition2 grams avg_grams paramSet
 % Parameters for circumscribing sample around a point
 % --------------------------------------------------------
 % How large of radius should we sample
-sampleParams.circleParams.radius = 20;       % 20 pixel radius
-% % Where to sample
-sampleParams.circleParams.segment = {1, 'final'}; % end of segment 1
+% sampleParams.circleParams.radius = 20;       % 20 pixel radius
+% % % Where to sample
+% sampleParams.circleParams.segment = {1, 'final'}; % end of segment 1
 
 
 % ----------------------------------------------------------
@@ -79,7 +79,7 @@ sampleParams.circleParams.segment = {1, 'final'}; % end of segment 1
 % triggers could be used together in theory, but it hasn't been debugged
 % yet.
 % 
-% sampleParams.segmentTransition = [1 4; 1 2];
+sampleParams.segmentTransition = [1 4; 1 2];
 
 % ----------------------------------------------------------
 % Parameters for selecting trajectory type to sample

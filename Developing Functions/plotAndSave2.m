@@ -20,7 +20,7 @@ curr_plot = 0;
 
 %% Setting default options
 
-save = true;
+save = false;
 
 if isfield(sets,'coherograms') && sets.coherograms == true
 	coherograms = true;
@@ -183,11 +183,11 @@ for a = 1:numel(animals)
                              '- TetY=' num2str(t2) ...
                              typestr];
 
-					 print('-dpdf', figfile); 
-					 print('-dpng', figfile, '-r300'); 
-					 saveas(gcf,figfile,'fig'); 
-					 print('-depsc2', figfile); 
-					 print('-djpeg', figfile);
+					 print('-dpdf', ['./pdf/' figfile]); 
+					 print('-dpng', ['./png/' figfile], '-r300'); 
+					 saveas(gcf,['./fig/' figfile],'fig'); 
+					 print('-depsc2', ['./depsc/' figfile]); 
+					 print('-djpeg', ['./jpeg/' figfile]);
                      
                      cd(curr_folder);
 					 
@@ -316,7 +316,7 @@ catch ME; save('PlotAndSave2_ErrorState'); throw(ME); end;
     function plotPos
         
         plotSingleSample(beh_data(a).pos{d,e}, beh_data(a).ssi{d,e}, tr);
-        legend({'Path in sample', 'Sample trigger', 'Start', 'Stop'}, ...
+        legend({'', 'Path in sample', 'Sample trigger', 'Start', 'Stop'}, ...
             'Location', 'BestOutside');
         
 	end
